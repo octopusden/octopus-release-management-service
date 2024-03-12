@@ -4,7 +4,7 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="--info --stacktrace" />
+      <option name="scriptParameters" value="--stacktrace --info" />
       <option name="taskDescriptions">
         <list />
       </option>
@@ -19,7 +19,7 @@
     <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
     <EXTENSION ID="com.intellij.execution.ExternalSystemRunConfigurationJavaExtension">
       <extension name="net.ashald.envfile">
-        <option name="IS_ENABLED" value="false" />
+        <option name="IS_ENABLED" value="true" />
         <option name="IS_SUBST" value="true" />
         <option name="IS_PATH_MACRO_SUPPORTED" value="true" />
         <option name="IS_IGNORE_MISSING_FILES" value="true" />

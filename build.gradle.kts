@@ -11,7 +11,7 @@ plugins {
 }
 
 allprojects {
-    group = "org.octopusden.octopus.releasemanagement"
+    group = "org.octopusden.octopus.release-management-service"
 }
 
 nexusPublishing {

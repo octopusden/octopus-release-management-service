@@ -9,7 +9,7 @@
       </param>
     </additionalParameters>
     <module name="octopus-release-management-service.release-management-service.main" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="org.octopusden.octopus.releasemanagement.ReleaseManagementServiceApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="org.octopusden.octopus.releasemanagementservice.ReleaseManagementServiceApplication" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
       <option name="IS_SUBST" value="false" />
