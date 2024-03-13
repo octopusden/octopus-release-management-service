@@ -1,5 +1,5 @@
 releng:
-  host: # set via EnvFile
+  url: # set via EnvFile
 
 management:
   endpoints:

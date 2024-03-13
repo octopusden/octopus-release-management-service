@@ -1,5 +1,5 @@
 releng:
-  host: http://localhost:1080
+  url: http://localhost:1080
 
 management:
   endpoints:

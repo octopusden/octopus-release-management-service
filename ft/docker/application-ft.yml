@@ -1,5 +1,5 @@
 releng:
-  host: http://mockserver:1080
+  url: http://mockserver:1080
 
 management:
   endpoints:

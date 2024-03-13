@@ -25,5 +25,5 @@ class LegacyRelengConfig(private val relengProperties: LegacyRelengProperties, p
         .errorDecoder(LegacyRelengErrorDecoder(objectMapper))
         .logger(Slf4jLogger(LegacyRelengClient::class.java))
         .logLevel(Logger.Level.BASIC)
-        .target(LegacyRelengClient::class.java, relengProperties.host)
+        .target(LegacyRelengClient::class.java, relengProperties.url)
 }
