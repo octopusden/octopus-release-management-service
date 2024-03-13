@@ -20,6 +20,6 @@ class ActuatorTest : BaseActuatorTest(), BaseReleaseManagementServiceFuncTest {
             ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
                 override fun getApiUrl() = "http://localhost:8080"
                 override fun getTimeRetryInMillis() = 180000
-            }, mapper)
+            })
     }
 }
