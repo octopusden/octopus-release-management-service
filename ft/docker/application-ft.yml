@@ -1,3 +1,6 @@
+releng:
+  host: http://mockserver:1080
+
 management:
   endpoints:
     web:

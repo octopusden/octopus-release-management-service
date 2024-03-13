@@ -21,6 +21,9 @@ class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun handleNotFound(exception: ReleaseManagementServiceException) = getErrorResponse(exception)
+        .also {
+            log.error(exception.message)
+        }
 
     @ExceptionHandler(ArgumentsNotCompatibleException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

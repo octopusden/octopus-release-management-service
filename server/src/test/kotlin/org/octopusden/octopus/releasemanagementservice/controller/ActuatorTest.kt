@@ -1,20 +1,40 @@
 package org.octopusden.octopus.releasemanagementservice.controller
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.extension.ExtendWith
+import org.octopusden.octopus.releasemanagementservice.BaseActuatorTest
+import org.octopusden.octopus.releasemanagementservice.ReleaseManagementServiceApplication
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
-import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.web.servlet.MockMvc
 
-class ActuatorTest : BaseControllerTest() {
+@AutoConfigureMockMvc
+@ExtendWith(SpringExtension::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@SpringBootTest(
+    classes = [ReleaseManagementServiceApplication::class],
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+)
+@ActiveProfiles("test")
+class ActuatorTest : BaseControllerTest, BaseActuatorTest() {
 
-    override fun getServiceInfo(): ServiceInfoDTO =
-        mvc.perform(
-            MockMvcRequestBuilders.get("/actuator/info")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().`is`(200))
-            .andReturn()
-            .response.toObject(object : TypeReference<ServiceInfoDTO>() {})
+    @Autowired
+    protected lateinit var mvc: MockMvc
+
+    @Autowired
+    protected lateinit var mapper: ObjectMapper
+
+    override fun getServiceInfo(): ServiceInfoDTO {
+        return get(200, object : TypeReference<ServiceInfoDTO>() {}, "/actuator/info")
+    }
+
+    override fun getMockMvc(): MockMvc = mvc
+
+    override fun getObjectMapper(): ObjectMapper = mapper
 }

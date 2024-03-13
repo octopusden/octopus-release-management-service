@@ -13,7 +13,9 @@ import feign.slf4j.Slf4jLogger
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceErrorDecoder
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceRetry
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import java.util.concurrent.TimeUnit
 
 class ClassicReleaseManagementServiceClient(
@@ -28,6 +30,10 @@ class ClassicReleaseManagementServiceClient(
         getMapper()
     )
 
+    override fun getBuilds(component: String): Collection<ShortBuildDTO> = client.getBuilds(component)
+
+    override fun getBuild(component: String, version: String): BuildDTO = client.getBuild(component, version)
+
     fun setUrl(apiUrl: String, timeRetryInMillis: Int) {
         client = createClient(apiUrl, mapper, timeRetryInMillis)
     }
@@ -35,10 +41,8 @@ class ClassicReleaseManagementServiceClient(
     override fun getServiceInfo(): ServiceInfoDTO = client.getServiceInfo()
 
     companion object {
-        private fun getMapper(): ObjectMapper {
-            val objectMapper = jacksonObjectMapper()
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            return objectMapper
+        private fun getMapper(): ObjectMapper = with(jacksonObjectMapper()) {
+            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
 
         private fun createClient(

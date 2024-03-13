@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.octopusden.task.MigrateMockData
 
 plugins {
     java
@@ -63,6 +64,10 @@ subprojects {
         testLogging{
             info.events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
         }
+    }
+
+    val migrateMockData by tasks.creating(MigrateMockData::class) {
+        this.testDataDir = rootDir.toString() + File.separator + "test-data"
     }
 
     dependencyManagement {

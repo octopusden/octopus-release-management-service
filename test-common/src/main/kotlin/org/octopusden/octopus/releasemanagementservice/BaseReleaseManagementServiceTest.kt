@@ -1,18 +1,15 @@
 package org.octopusden.octopus.releasemanagementservice
 
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Test
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.TestInstance
-import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
+import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-abstract class BaseReleaseManagementServiceTest {
+interface BaseReleaseManagementServiceTest {
 
-    private val releaseManagementServiceVersion = System.getenv("release-management-service.version")
-    abstract fun getServiceInfo(): ServiceInfoDTO
-    @Test
-    fun serviceInfoTest() {
-        val expected = ServiceInfoDTO(ServiceInfoDTO.Build(releaseManagementServiceVersion))
-        Assertions.assertEquals(expected, getServiceInfo())
-    }
+    fun getObjectMapper(): ObjectMapper
+
+    fun <T> loadObject(file: String, typeReference: TypeReference<T>): T =
+        getObjectMapper().readValue(File(file), typeReference)
 }

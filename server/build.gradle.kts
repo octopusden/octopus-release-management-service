@@ -76,6 +76,10 @@ tasks.getByName("dockerBuildImage").doFirst {
 }
 
 tasks.withType<Test> {
+    dependsOn("migrateMockData")
+}
+
+tasks.named("migrateMockData") {
     dependsOn("composeUp")
 }
 

@@ -13,3 +13,8 @@ services:
       - SPRING_CONFIG_ADDITIONAL_LOCATION=/
       - SPRING_PROFILES_ACTIVE=ft
 
+  mockserver:
+    container_name: release-management-service-ft-mockserver
+    image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-5.15.0
+    ports:
+      - "1080:1080"
