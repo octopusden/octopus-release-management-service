@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  release-management-service:
+    container_name: release-management-service-ft-release-management-service
+    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/release-management-service:${APP_VERSION:-1.0-SNAPSHOT}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./application-ft.yml:/application-ft.yml
+      - ./bootstrap-ft.yml:/bootstrap-ft.yml
+    environment:
+      - SPRING_CONFIG_ADDITIONAL_LOCATION=/
+      - SPRING_PROFILES_ACTIVE=ft
+
