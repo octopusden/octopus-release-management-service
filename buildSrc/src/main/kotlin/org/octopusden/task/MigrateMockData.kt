@@ -9,6 +9,7 @@ import org.gradle.api.tasks.TaskAction
 import org.mockserver.client.MockServerClient
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
+import org.mockserver.model.HttpStatusCode
 import java.io.File
 import java.nio.charset.Charset
 
@@ -24,10 +25,10 @@ open class MigrateMockData : DefaultTask() {
     fun startMockServer() {
         mockServerClient.reset()
         endpointToResponseFileName.forEach {
-            generateMockserverData(it.key.first, it.key.second, testDataDir + File.separator + it.value, 200)
+            generateMockserverData(it.key.first, it.key.second, testDataDir + File.separator + it.value, HttpStatusCode.OK_200.code())
         }
         endpointNotFoundToResponseFileName.forEach {
-            generateMockserverData(it.key.first, it.key.second, testDataDir + File.separator + it.value, 404)
+            generateMockserverData(it.key.first, it.key.second, testDataDir + File.separator + it.value, HttpStatusCode.NOT_FOUND_404.code())
         }
     }
 
