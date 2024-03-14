@@ -53,6 +53,14 @@ tasks.named("composeUp") {
     dependsOn(":release-management-service:dockerBuildImage")
 }
 
+tasks.named("migrateMockData") {
+    dependsOn("composeUp")
+}
+
+tasks.named("ft") {
+    dependsOn("migrateMockData")
+}
+
 idea.module {
     scopes["PROVIDED"]?.get("plus")?.add(configurations["ftImplementation"])
 }

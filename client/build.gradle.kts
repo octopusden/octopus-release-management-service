@@ -59,9 +59,11 @@ dependencyManagement {
 
 dependencies {
     api(project(":common"))
+    /* These dependencies are added to :common due to there are usages at server side
     api("io.github.openfeign:feign-httpclient")
     api("io.github.openfeign:feign-jackson")
     api("io.github.openfeign:feign-slf4j")
+    */
     api("com.fasterxml.jackson.module:jackson-module-kotlin")
     api("com.fasterxml.jackson.core:jackson-databind")
 }
