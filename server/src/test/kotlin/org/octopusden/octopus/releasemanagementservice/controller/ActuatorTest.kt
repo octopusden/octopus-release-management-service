@@ -10,6 +10,7 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.Service
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -31,7 +32,7 @@ class ActuatorTest : BaseControllerTest, BaseActuatorTest() {
     protected lateinit var mapper: ObjectMapper
 
     override fun getServiceInfo(): ServiceInfoDTO {
-        return get(200, object : TypeReference<ServiceInfoDTO>() {}, "/actuator/info")
+        return get(HttpStatus.OK.value(), object : TypeReference<ServiceInfoDTO>() {}, "/actuator/info")
     }
 
     override fun getMockMvc(): MockMvc = mvc

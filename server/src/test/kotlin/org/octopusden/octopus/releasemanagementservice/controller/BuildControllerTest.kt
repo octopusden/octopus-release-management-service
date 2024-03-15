@@ -12,6 +12,7 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBu
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.servlet.MockMvc
@@ -36,7 +37,7 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
 
     override fun getBuilds(component: String): Collection<ShortBuildDTO> {
         return get(
-            200,
+            HttpStatus.OK.value(),
             object : TypeReference<Collection<ShortBuildDTO>>() {},
             "/builds/component/{component}",
             component
@@ -45,7 +46,7 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
 
     override fun getBuild(component: String, version: String): BuildDTO {
         return get(
-            200,
+            HttpStatus.OK.value(),
             object : TypeReference<BuildDTO>() {},
             "/builds/component/{component}/version/{version}",
             component,
@@ -55,7 +56,7 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
 
     override fun getNotExistedBuildErrorResponse(component: String, version: String): ErrorResponse {
         return get(
-            404,
+            HttpStatus.NOT_FOUND.value(),
             object : TypeReference<ErrorResponse>() {},
             "/builds/component/{component}/version/{version}",
             component,

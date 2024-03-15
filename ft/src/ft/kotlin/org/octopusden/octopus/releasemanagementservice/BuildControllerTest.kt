@@ -2,7 +2,10 @@ package org.octopusden.octopus.releasemanagementservice
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import org.octopusden.octopus.releasemanagementservice.client.common.dto.*
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.ReleaseManagementServiceErrorCode
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.NotFoundException
 import org.octopusden.octopus.releasemanagementservice.client.impl.ClassicReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManagementServiceClientParametersProvider
@@ -31,6 +34,7 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseReleaseManagementServ
     companion object {
         @JvmStatic
         private val mapper = jacksonObjectMapper()
+
         @JvmStatic
         private val client =
             ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {

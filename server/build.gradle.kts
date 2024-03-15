@@ -105,3 +105,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(project(":test-common"))
 }
+
+configurations.all {
+    exclude("commons-logging", "commons-logging")
+}

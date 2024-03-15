@@ -3,7 +3,7 @@ package org.octopusden.octopus.releasemanagementservice.client
 import feign.Param
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Date
 
 private const val ISO_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
 
