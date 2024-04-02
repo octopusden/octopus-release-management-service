@@ -39,7 +39,7 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
         return get(
             HttpStatus.OK.value(),
             object : TypeReference<Collection<ShortBuildDTO>>() {},
-            "/builds/component/{component}",
+            "/rest/api/1/builds/component/{component}",
             component
         )
     }
@@ -48,7 +48,7 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
         return get(
             HttpStatus.OK.value(),
             object : TypeReference<BuildDTO>() {},
-            "/builds/component/{component}/version/{version}",
+            "/rest/api/1/builds/component/{component}/version/{version}",
             component,
             version
         )
@@ -58,7 +58,7 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
         return get(
             HttpStatus.NOT_FOUND.value(),
             object : TypeReference<ErrorResponse>() {},
-            "/builds/component/{component}/version/{version}",
+            "/rest/api/1/builds/component/{component}/version/{version}",
             component,
             version
         )

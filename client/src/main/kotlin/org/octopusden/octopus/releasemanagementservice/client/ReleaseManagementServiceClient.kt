@@ -11,9 +11,9 @@ interface ReleaseManagementServiceClient {
     @RequestLine("GET /actuator/info")
     fun getServiceInfo(): ServiceInfoDTO
 
-    @RequestLine("GET /builds/component/{component}")
+    @RequestLine("GET /rest/api/1/builds/component/{component}")
     fun getBuilds(@Param("component") component: String): Collection<ShortBuildDTO>
 
-    @RequestLine("GET /builds/component/{component}/version/{version}")
+    @RequestLine("GET /rest/api/1/builds/component/{component}/version/{version}")
     fun getBuild(@Param("component") component: String, @Param("version") version: String): BuildDTO
 }
