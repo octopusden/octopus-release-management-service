@@ -1,6 +1,7 @@
 package org.octopusden.octopus.releasemanagementservice.legacy
 
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.NotFoundException
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.ReleaseManagementServiceException
@@ -14,8 +15,8 @@ class LegacyRelengBuildService(private val client: LegacyRelengClient) : BuildSe
     private val codeMapping = mapOf<Int, (e: LegacyRelengClientException) ->
     ReleaseManagementServiceException>(404 to { e: LegacyRelengClientException -> NotFoundException(e.message!!) })
 
-    override fun getBuilds(component: String): Collection<ShortBuildDTO> {
-        return execute { client.getBuilds(component) }
+    override fun getBuilds(component: String, filter: BuildFilterDTO): Collection<ShortBuildDTO> {
+        return execute { client.getBuilds(component, filter) }
     }
 
     override fun getBuild(component: String, version: String): BuildDTO {
