@@ -16,15 +16,16 @@ class LegacyRelengBuildService(private val client: LegacyRelengClient) : BuildSe
     ReleaseManagementServiceException>(404 to { e: LegacyRelengClientException -> NotFoundException(e.message!!) })
 
     override fun getBuilds(component: String, filter: BuildFilterDTO): Collection<ShortBuildDTO> {
-        return execute { client.getBuilds(component, filter) }
+        return execute("getBuilds($component, $filter)") { client.getBuilds(component, filter) }
     }
 
     override fun getBuild(component: String, version: String): BuildDTO {
-        return execute { client.getBuild(component, version) }
+        return execute("getBuild($component, $version)") { client.getBuild(component, version) }
     }
 
-    private fun <T : Any> execute(func: () -> T): T {
+    private fun <T : Any> execute(operationName: String, func: () -> T): T {
         return try {
+            log.trace("Execute: '{}'", operationName)
             func()
         } catch (e: LegacyRelengClientException) {
             log.error(e.message)

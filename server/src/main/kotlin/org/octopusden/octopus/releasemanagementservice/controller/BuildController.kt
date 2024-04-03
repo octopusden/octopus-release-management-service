@@ -18,13 +18,13 @@ class BuildController(private val buildService: BuildService) {
 
     @GetMapping("component/{component}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getComponentBuilds(@PathVariable("component") component: String, filter: BuildFilterDTO): Collection<ShortBuildDTO> {
-        log.info("Get all Builds of '{}'", component)
+        log.info("Get builds of '{}', filter: '{}'", component, filter)
         return buildService.getBuilds(component, filter)
     }
 
     @GetMapping("component/{component}/version/{version}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getBuild(@PathVariable("component") component: String, @PathVariable("version") version: String): BuildDTO {
-        log.info("Get Build '{}:{}'", component, version)
+        log.info("Get build '{}:{}'", component, version)
         return buildService.getBuild(component, version)
     }
 
