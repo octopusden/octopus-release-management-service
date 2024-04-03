@@ -11,6 +11,7 @@ import feign.slf4j.Slf4jLogger
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.concurrent.TimeUnit
+import org.slf4j.LoggerFactory
 
 
 @Configuration
@@ -26,4 +27,9 @@ class LegacyRelengConfig(private val relengProperties: LegacyRelengProperties, p
         .logger(Slf4jLogger(LegacyRelengClient::class.java))
         .logLevel(Logger.Level.BASIC)
         .target(LegacyRelengClient::class.java, relengProperties.url)
+        .also { log.info("LegacRelengClient initiated, url: '{}'", relengProperties.url) }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(LegacyRelengConfig::class.java)
+    }
 }
