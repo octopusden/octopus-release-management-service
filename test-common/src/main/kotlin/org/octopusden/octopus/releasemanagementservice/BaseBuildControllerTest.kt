@@ -13,21 +13,19 @@ import java.util.stream.Stream
 
 abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
 
-    abstract fun getBuilds(component: String): Collection<ShortBuildDTO>
+    abstract fun getBuilds(component: String, params: Map<String, Any>): Collection<ShortBuildDTO>
     abstract fun getBuild(component: String, version: String): BuildDTO
     abstract fun getNotExistedBuildErrorResponse(component: String, version: String): ErrorResponse
 
-    @Test
-    fun getBuildsTest() {
-        val builds = getBuilds("ReleaseManagementService")
-        Assertions.assertEquals(
-            loadObject("../test-data/releng/builds.json",
-                object : TypeReference<Collection<ShortBuildDTO>>() {}), builds
-        )
+    @ParameterizedTest
+    @MethodSource("builds")
+    fun getBuildsTest(params: Map<String, Any>, expectedBuilds: Collection<ShortBuildDTO>) {
+        val builds = getBuilds("ReleaseManagementService", params)
+        Assertions.assertEquals(expectedBuilds, builds)
     }
 
     @ParameterizedTest
-    @MethodSource("builds")
+    @MethodSource("build")
     fun getBuildTest(version: String, expected: BuildDTO) {
         Assertions.assertEquals(expected, getBuild("ReleaseManagementService", version))
     }
@@ -43,8 +41,36 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
 
     private fun builds(): Stream<Arguments> = Stream.of(
         Arguments.of(
-            "1.0.1", loadObject("../test-data/releng/build_1.0.1.json", object : TypeReference<BuildDTO>() {}),
-            "1.0.2", loadObject("../test-data/releng/build_1.0.2.json", object : TypeReference<BuildDTO>() {})
+            mapOf("descending" to false, "limit" to 10),
+            loadObject("../test-data/releng/builds.json", object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("limit" to 1),
+            loadObject("../test-data/releng/builds-limit.json", object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("descending" to true),
+            loadObject(
+                "../test-data/releng/builds-descending.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("minors" to listOf("2.0")),
+            loadObject("../test-data/releng/builds-2.0.json", object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("statuses" to listOf("RELEASE")),
+            loadObject(
+                "../test-data/releng/builds-release.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
         )
+    )
+
+    private fun build(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            "1.0.1",
+            loadObject("../test-data/releng/build_1.0.1.json", object : TypeReference<BuildDTO>() {})
+        ),
+        Arguments.of("2.0.1", loadObject("../test-data/releng/build_2.0.1.json", object : TypeReference<BuildDTO>() {}))
     )
 }

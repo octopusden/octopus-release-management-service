@@ -8,10 +8,10 @@ import feign.httpclient.ApacheHttpClient
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import java.util.concurrent.TimeUnit
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
 
 @Configuration

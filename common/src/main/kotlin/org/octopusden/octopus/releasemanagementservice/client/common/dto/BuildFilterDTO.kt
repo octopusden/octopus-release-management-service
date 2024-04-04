@@ -4,5 +4,5 @@ data class BuildFilterDTO(
     val statuses: Set<BuildStatus> = emptySet(),
     val minors: Set<String> = emptySet(),
     val descending: Boolean = false,
-    val limit: Int?
+    val limit: Int? = null
 )

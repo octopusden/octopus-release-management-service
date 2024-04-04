@@ -3,6 +3,7 @@ package org.octopusden.octopus.releasemanagementservice
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ReleaseManagementServiceErrorCode
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
@@ -14,8 +15,8 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseReleaseManagementServ
 
     override fun getObjectMapper(): ObjectMapper = mapper
 
-    override fun getBuilds(component: String): Collection<ShortBuildDTO> {
-        return client.getBuilds(component)
+    override fun getBuilds(component: String, params: Map<String, Any>): Collection<ShortBuildDTO> {
+        return client.getBuilds(component, mapper.convertValue(params, BuildFilterDTO::class.java))
     }
 
     override fun getBuild(component: String, version: String): BuildDTO {
