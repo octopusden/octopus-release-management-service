@@ -57,10 +57,15 @@ open class MigrateMockData : DefaultTask() {
     }
 
     companion object {
+        private val defaultParams = mapOf("descending" to "false")
         private val endpointToResponseFileName = mapOf(
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to emptyMap<String, String>() to "releng/builds.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to "10")to "releng/builds.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to "1") to "releng/builds-limit.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("descending" to "true") to "releng/builds-descending.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("minors" to "2.0") to "releng/builds-2.0.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("statuses" to "RELEASE") to "releng/builds-release.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.1/build" to emptyMap<String, String>() to "releng/build_1.0.1.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.2/build" to emptyMap<String, String>() to "releng/build_1.0.2.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/version/2.0.1/build" to emptyMap<String, String>() to "releng/build_2.0.1.json",
         )
         private val endpointNotFoundToResponseFileName = mapOf(
             "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.3/build" to emptyMap<String, String>() to "releng/build-not-exist-error.json"

@@ -10,13 +10,14 @@ import feign.httpclient.ApacheHttpClient
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
+import java.util.concurrent.TimeUnit
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceErrorDecoder
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceRetry
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
-import java.util.concurrent.TimeUnit
 
 class ClassicReleaseManagementServiceClient(
     apiParametersProvider: ReleaseManagementServiceClientParametersProvider,
@@ -30,7 +31,8 @@ class ClassicReleaseManagementServiceClient(
         getMapper()
     )
 
-    override fun getBuilds(component: String): Collection<ShortBuildDTO> = client.getBuilds(component)
+    override fun getBuilds(component: String, filter: BuildFilterDTO): Collection<ShortBuildDTO> =
+        client.getBuilds(component, filter)
 
     override fun getBuild(component: String, version: String): BuildDTO = client.getBuild(component, version)
 

@@ -9,4 +9,4 @@ management:
 
 logging:
   level:
-    org.octopusden.octopus.releasemanagementservice.controller: trace
+    org.octopusden.octopus.releasemanagementservice.*: trace

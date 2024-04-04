@@ -35,11 +35,12 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
     override fun getMockMvc(): MockMvc = mvc
     override fun getObjectMapper(): ObjectMapper = mapper
 
-    override fun getBuilds(component: String): Collection<ShortBuildDTO> {
+    override fun getBuilds(component: String, params: Map<String, Any>): Collection<ShortBuildDTO> {
         return get(
             HttpStatus.OK.value(),
             object : TypeReference<Collection<ShortBuildDTO>>() {},
             "/rest/api/1/builds/component/{component}",
+            params,
             component
         )
     }
@@ -49,6 +50,7 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
             HttpStatus.OK.value(),
             object : TypeReference<BuildDTO>() {},
             "/rest/api/1/builds/component/{component}/version/{version}",
+            emptyMap(),
             component,
             version
         )
@@ -59,6 +61,7 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
             HttpStatus.NOT_FOUND.value(),
             object : TypeReference<ErrorResponse>() {},
             "/rest/api/1/builds/component/{component}/version/{version}",
+            emptyMap(),
             component,
             version
         )

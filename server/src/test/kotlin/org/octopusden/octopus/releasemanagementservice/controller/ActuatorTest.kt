@@ -32,7 +32,7 @@ class ActuatorTest : BaseControllerTest, BaseActuatorTest() {
     protected lateinit var mapper: ObjectMapper
 
     override fun getServiceInfo(): ServiceInfoDTO {
-        return get(HttpStatus.OK.value(), object : TypeReference<ServiceInfoDTO>() {}, "/actuator/info")
+        return get(HttpStatus.OK.value(), object : TypeReference<ServiceInfoDTO>() {}, "/actuator/info", emptyMap())
     }
 
     override fun getMockMvc(): MockMvc = mvc
