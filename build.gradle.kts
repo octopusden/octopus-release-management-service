@@ -70,13 +70,6 @@ subprojects {
         this.testDataDir = rootDir.toString() + File.separator + "test-data"
     }
 
-    dependencyManagement {
-        imports {
-            mavenBom("org.springframework.boot:spring-boot-dependencies:${project.properties["spring-boot.version"]}")
-            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${project.properties["spring-cloud.version"]}")
-        }
-    }
-
     ext {
         System.getenv().let {
             set("signingRequired", it.containsKey("ORG_GRADLE_PROJECT_signingKey") && it.containsKey("ORG_GRADLE_PROJECT_signingPassword"))
