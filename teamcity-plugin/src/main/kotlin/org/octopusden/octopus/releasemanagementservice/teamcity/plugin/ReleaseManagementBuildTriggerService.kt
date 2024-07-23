@@ -1,5 +1,9 @@
 package org.octopusden.octopus.releasemanagementservice.teamcity.plugin
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.intellij.openapi.diagnostic.Logger
 import jetbrains.buildServer.buildTriggers.BuildTriggerDescriptor
 import jetbrains.buildServer.buildTriggers.BuildTriggerException
@@ -10,10 +14,9 @@ import jetbrains.buildServer.serverSide.BuildCustomizerFactory
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.serverSide.PropertiesProcessor
 import jetbrains.buildServer.web.openapi.PluginDescriptor
-import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
-import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildStatus
 import org.octopusden.octopus.releasemanagementservice.client.impl.ClassicReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManagementServiceClientParametersProvider
+import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.BuildSelectionDTO
 
 class ReleaseManagementBuildTriggerService(
     private val pluginDescriptor: PluginDescriptor,
@@ -32,7 +35,7 @@ class ReleaseManagementBuildTriggerService(
     override fun getEditParametersUrl() =
         pluginDescriptor.getPluginResourcesPath("editReleaseManagementBuildTriggerParameters.jsp")
 
-    override fun getDefaultTriggerProperties() = mutableMapOf(BRANCH to "", POLL_INTERVAL to "60")
+    override fun getDefaultTriggerProperties() = mutableMapOf(BRANCH to "", POLL_INTERVAL to "300")
 
     override fun getTriggerPropertiesProcessor() = PropertiesProcessor { properties ->
         val invalidProperties = mutableListOf<InvalidProperty>()
@@ -41,19 +44,22 @@ class ReleaseManagementBuildTriggerService(
             invalidProperties.add(InvalidProperty(SERVICE_URL, "Service URL must be defined"))
         } else {
             try {
-                ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
-                    override fun getApiUrl(): String = serviceUrl
-                    override fun getTimeRetryInMillis() = 1000
-                }).getBuilds( //service returns empty list for non-existing component
-                    "component",
-                    BuildFilterDTO(limit = 1)
-                )
+                createClient(serviceUrl).getServiceInfo()
             } catch (e: Exception) {
                 invalidProperties.add(InvalidProperty(SERVICE_URL, e.message))
             }
         }
-        if (properties[COMPONENT].isNullOrBlank()) {
-            invalidProperties.add(InvalidProperty(COMPONENT, "Component must be defined"))
+        val selections = properties[SELECTIONS]
+        if (selections.isNullOrBlank()) {
+            invalidProperties.add(InvalidProperty(SELECTIONS, "Selections must be defined"))
+        } else {
+            try {
+                if (mapper.readValue(selections, object : TypeReference<Set<BuildSelectionDTO>>() {}).isEmpty()) {
+                    throw NoSuchElementException("Selections is empty")
+                }
+            } catch (e: Exception) {
+                invalidProperties.add(InvalidProperty(SELECTIONS, e.message))
+            }
         }
         invalidProperties
     }
@@ -63,50 +69,41 @@ class ReleaseManagementBuildTriggerService(
             context.triggerDescriptor.properties[POLL_INTERVAL]?.toIntOrNull() ?: super.getPollInterval(context)
 
         override fun triggerBuild(context: PolledTriggerContext) {
-            val serviceUrl = context.triggerDescriptor.properties[SERVICE_URL]
-            val component = context.triggerDescriptor.properties[COMPONENT]
-            val latestVersion = try {
-                ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
-                    override fun getApiUrl() = serviceUrl!!
-                    override fun getTimeRetryInMillis() = 1000
-                }).getBuilds(
-                    component!!,
-                    BuildFilterDTO(
-                        statuses = setOf(BuildStatus.RELEASE),
-                        descending = true,
-                        limit = 1
+            val client = createClient(context.triggerDescriptor.properties[SERVICE_URL]!!)
+            val currentVersions = mapper.readValue(
+                context.triggerDescriptor.properties[SELECTIONS]!!,
+                object : TypeReference<Set<BuildSelectionDTO>>() {}
+            ).associateWith {
+                try {
+                    client.getBuilds(it.component, it.toBuildFilterDTO()).first().version
+                } catch (e: Exception) {
+                    throw BuildTriggerException(
+                        "Unable to retrieve latest version of '${it.component}' with status no less than ${it.status}" +
+                                if (it.minor == null) "" else " and minor equals ${it.minor}"
                     )
-                ).firstOrNull()?.version
-            } catch (e: Exception) {
-                throw BuildTriggerException(
-                    "Unable to retrieve latest RELEASE version of '$component' from '$serviceUrl'",
-                    e
-                )
+                }
             }
-            val previousVersion = context.customDataStorage.getValue(VERSION)
-            when (latestVersion) {
-                null ->
-                    log.info("No RELEASE version of '$component' found. Skip build triggering")
-
-                previousVersion ->
-                    log.info("Latest RELEASE version '$latestVersion' of '$component' has not been changed. Skip build triggering")
-
-                else -> {
-                    val triggeredBy =
-                        "$displayName on changing of RELEASE version from '$previousVersion' to '$latestVersion'"
-                    val branch = context.triggerDescriptor.properties[BRANCH]
-                    val queuedBuild = if (branch.isNullOrBlank()) {
-                        context.buildType.addToQueue(triggeredBy)
-                    } else {
-                        buildCustomizerFactory.createBuildCustomizer(context.buildType, null).apply {
-                            setDesiredBranchName(branch)
-                        }.createPromotion().addToQueue(triggeredBy)
-                    }
-                    if (queuedBuild == null) {
-                        log.warn("Unable to queue build on changing of RELEASE version of '$component' from '$previousVersion' to '$latestVersion'")
-                    } else {
-                        context.customDataStorage.putValue(VERSION, latestVersion)
-                    }
+            val previousVersions = context.customDataStorage.getValue(VERSIONS)?.let {
+                mapper.readValue(it, object : TypeReference<Map<BuildSelectionDTO, String>>() {})
+            } ?: emptyMap()
+            val diff = (currentVersions.entries - previousVersions.entries).map {
+                "- new version ${it.value} detected for '${it.key.component}' (status >= ${it.key.status}" +
+                        if (it.key.minor == null) ")" else ", minor == ${it.key.minor})"
+            }
+            if (diff.isNotEmpty()) {
+                log.debug(diff.joinToString("\n", "Triggering build on following changes:\n"))
+                val branch = context.triggerDescriptor.properties[BRANCH]
+                val queuedBuild = if (branch.isNullOrBlank()) {
+                    context.buildType.addToQueue(displayName)
+                } else {
+                    buildCustomizerFactory.createBuildCustomizer(context.buildType, null).apply {
+                        setDesiredBranchName(branch)
+                    }.createPromotion().addToQueue(displayName)
+                }
+                if (queuedBuild == null) {
+                    log.warn("Unable to queue build")
+                } else {
+                    context.customDataStorage.putValue(VERSIONS, mapper.writeValueAsString(currentVersions))
                 }
             }
         }
@@ -117,14 +114,22 @@ class ReleaseManagementBuildTriggerService(
 
         //Basic settings
         const val SERVICE_URL = "release.management.build.trigger.service.url"
-        const val COMPONENT = "release.management.build.trigger.component"
+        const val SELECTIONS = "release.management.build.trigger.selections"
 
         //Advanced settings
         const val BRANCH = "release.management.build.trigger.branch"
         const val POLL_INTERVAL = "release.management.build.trigger.poll.interval"
 
-        const val VERSION = "release.management.build.trigger.version"
+        const val VERSIONS = "release.management.build.trigger.version"
 
-        val log = Logger.getInstance(ReleaseManagementBuildTriggerService::class.java)
+        private val log = Logger.getInstance(ReleaseManagementBuildTriggerService::class.java)
+
+        private val mapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
+
+        private fun createClient(serviceUrl: String) =
+            ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
+                override fun getApiUrl() = serviceUrl
+                override fun getTimeRetryInMillis() = 1000
+            })
     }
 }

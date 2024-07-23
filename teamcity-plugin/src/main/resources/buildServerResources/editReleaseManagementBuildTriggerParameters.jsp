@@ -18,11 +18,11 @@
 </tr>
 
 <tr class="noBorder">
-    <td><label for="<%=ReleaseManagementBuildTriggerService.COMPONENT%>">Component: <l:star/></label></td>
+    <td><label for="<%=ReleaseManagementBuildTriggerService.SELECTIONS%>">Selections: <l:star/></label></td>
     <td>
-        <props:textProperty name="<%=ReleaseManagementBuildTriggerService.COMPONENT%>" className="longField"/>
-        <span class="smallNote">Component ID</span>
-        <span class="error" id="error_<%=ReleaseManagementBuildTriggerService.COMPONENT%>"></span>
+        <props:textProperty name="<%=ReleaseManagementBuildTriggerService.SELECTIONS%>" className="longField"/>
+        <span class="smallNote">Build selections</span>
+        <span class="error" id="error_<%=ReleaseManagementBuildTriggerService.SELECTIONS%>"></span>
     </td>
 </tr>
 
