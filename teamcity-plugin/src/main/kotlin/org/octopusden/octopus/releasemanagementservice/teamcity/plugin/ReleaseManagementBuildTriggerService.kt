@@ -32,24 +32,36 @@ class ReleaseManagementBuildTriggerService(
     override fun getEditParametersUrl() =
         pluginDescriptor.getPluginResourcesPath("editReleaseManagementBuildTriggerParameters.jsp")
 
-    override fun getDefaultTriggerProperties() = mutableMapOf(BRANCH to "")
+    override fun getDefaultTriggerProperties() = mutableMapOf(BRANCH to "", POLL_INTERVAL to "60")
 
     override fun getTriggerPropertiesProcessor() = PropertiesProcessor { properties ->
         val invalidProperties = mutableListOf<InvalidProperty>()
-        if (properties[SERVICE_URL].isNullOrBlank()) {
+        val serviceUrl = properties[SERVICE_URL]
+        if (serviceUrl.isNullOrBlank()) {
             invalidProperties.add(InvalidProperty(SERVICE_URL, "Service URL must be defined"))
+        } else {
+            try {
+                ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
+                    override fun getApiUrl(): String = serviceUrl
+                    override fun getTimeRetryInMillis() = 1000
+                }).getBuilds( //service returns empty list for non-existing component
+                    "component",
+                    BuildFilterDTO(limit = 1)
+                )
+            } catch (e: Exception) {
+                invalidProperties.add(InvalidProperty(SERVICE_URL, e.message))
+            }
         }
         if (properties[COMPONENT].isNullOrBlank()) {
             invalidProperties.add(InvalidProperty(COMPONENT, "Component must be defined"))
         }
-        /*TODO:
-         * check SERVICE_URL is valid URL of release management service
-         * check COMPONENT is existing component ID
-         */
         invalidProperties
     }
 
     override fun getBuildTriggeringPolicy() = object : PolledBuildTrigger() {
+        override fun getPollInterval(context: PolledTriggerContext) =
+            context.triggerDescriptor.properties[POLL_INTERVAL]?.toIntOrNull() ?: super.getPollInterval(context)
+
         override fun triggerBuild(context: PolledTriggerContext) {
             val serviceUrl = context.triggerDescriptor.properties[SERVICE_URL]
             val component = context.triggerDescriptor.properties[COMPONENT]
@@ -66,7 +78,10 @@ class ReleaseManagementBuildTriggerService(
                     )
                 ).firstOrNull()?.version
             } catch (e: Exception) {
-                throw BuildTriggerException("Unable to retrieve latest RELEASE version of '$component' from '$serviceUrl'", e)
+                throw BuildTriggerException(
+                    "Unable to retrieve latest RELEASE version of '$component' from '$serviceUrl'",
+                    e
+                )
             }
             val previousVersion = context.customDataStorage.getValue(VERSION)
             when (latestVersion) {
@@ -77,7 +92,8 @@ class ReleaseManagementBuildTriggerService(
                     log.info("Latest RELEASE version '$latestVersion' of '$component' has not been changed. Skip build triggering")
 
                 else -> {
-                    val triggeredBy = "$displayName on changing of RELEASE version from '$previousVersion' to '$latestVersion'"
+                    val triggeredBy =
+                        "$displayName on changing of RELEASE version from '$previousVersion' to '$latestVersion'"
                     val branch = context.triggerDescriptor.properties[BRANCH]
                     val queuedBuild = if (branch.isNullOrBlank()) {
                         context.buildType.addToQueue(triggeredBy)
@@ -105,6 +121,7 @@ class ReleaseManagementBuildTriggerService(
 
         //Advanced settings
         const val BRANCH = "release.management.build.trigger.branch"
+        const val POLL_INTERVAL = "release.management.build.trigger.poll.interval"
 
         const val VERSION = "release.management.build.trigger.version"
 
