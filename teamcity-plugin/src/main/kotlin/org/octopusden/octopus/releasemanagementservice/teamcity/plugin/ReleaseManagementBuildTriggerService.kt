@@ -93,24 +93,20 @@ class ReleaseManagementBuildTriggerService(
             if (diff.isNotEmpty()) {
                 log.debug(diff.joinToString("\n", "Triggering build on following changes:\n"))
                 val branch = context.triggerDescriptor.properties[BRANCH]
-                val queuedBuild = if (branch.isNullOrBlank()) {
+                if (branch.isNullOrBlank()) {
                     context.buildType.addToQueue(displayName)
                 } else {
                     buildCustomizerFactory.createBuildCustomizer(context.buildType, null).apply {
                         setDesiredBranchName(branch)
                     }.createPromotion().addToQueue(displayName)
                 }
-                if (queuedBuild == null) {
-                    log.warn("Unable to queue build")
-                } else {
-                    context.customDataStorage.putValue(VERSIONS, mapper.writeValueAsString(currentVersions))
-                }
+                context.customDataStorage.putValue(VERSIONS, mapper.writeValueAsString(currentVersions))
             }
         }
     }
 
     companion object {
-        const val DESCRIPTION = "Trigger build when detecting new RELEASE version of component in release management"
+        const val DESCRIPTION = "Trigger build when detecting new versions of components in release management"
 
         //Basic settings
         const val SERVICE_URL = "release.management.build.trigger.service.url"

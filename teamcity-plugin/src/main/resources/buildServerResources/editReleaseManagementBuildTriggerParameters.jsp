@@ -20,8 +20,15 @@
 <tr class="noBorder">
     <td><label for="<%=ReleaseManagementBuildTriggerService.SELECTIONS%>">Selections: <l:star/></label></td>
     <td>
-        <props:textProperty name="<%=ReleaseManagementBuildTriggerService.SELECTIONS%>" className="longField"/>
-        <span class="smallNote">Build selections</span>
+        <props:textProperty name="<%=ReleaseManagementBuildTriggerService.SELECTIONS%>" className="longField" expandable="true"/>
+        <span class="smallNote"><u title="- component: component_1
+&nbsp;&nbsp;status: RELEASE
+- component: component_2
+&nbsp;&nbsp;status: RC
+&nbsp;&nbsp;minor: 1.1
+- component: component_2
+&nbsp;&nbsp;status: BUILD
+&nbsp;&nbsp;minor: 1.2">Yaml array</u> of build selections defined by component id, build status and minor version (optionally)</span>
         <span class="error" id="error_<%=ReleaseManagementBuildTriggerService.SELECTIONS%>"></span>
     </td>
 </tr>
