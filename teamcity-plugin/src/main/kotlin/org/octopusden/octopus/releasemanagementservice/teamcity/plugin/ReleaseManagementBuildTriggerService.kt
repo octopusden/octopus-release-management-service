@@ -17,6 +17,7 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor
 import org.octopusden.octopus.releasemanagementservice.client.impl.ClassicReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManagementServiceClientParametersProvider
 import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.BuildSelectionDTO
+import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.VersionDTO
 
 class ReleaseManagementBuildTriggerService(
     private val pluginDescriptor: PluginDescriptor,
@@ -46,7 +47,8 @@ class ReleaseManagementBuildTriggerService(
             try {
                 createClient(serviceUrl).getServiceInfo()
             } catch (e: Exception) {
-                invalidProperties.add(InvalidProperty(SERVICE_URL, e.message))
+                log.warn("Invalid Service URL '$serviceUrl'", e)
+                invalidProperties.add(InvalidProperty(SERVICE_URL, "Invalid Service URL value"))
             }
         }
         val selections = properties[SELECTIONS]
@@ -58,7 +60,8 @@ class ReleaseManagementBuildTriggerService(
                     throw NoSuchElementException("Selections is empty")
                 }
             } catch (e: Exception) {
-                invalidProperties.add(InvalidProperty(SELECTIONS, e.message))
+                log.warn("Invalid Selections '$selections'", e)
+                invalidProperties.add(InvalidProperty(SELECTIONS, "Invalid Selections value"))
             }
         }
         invalidProperties
@@ -73,32 +76,32 @@ class ReleaseManagementBuildTriggerService(
             val currentVersions = mapper.readValue(
                 context.triggerDescriptor.properties[SELECTIONS]!!,
                 object : TypeReference<Set<BuildSelectionDTO>>() {}
-            ).associateWith {
+            ).map {
                 try {
-                    client.getBuilds(it.component, it.toBuildFilterDTO()).first().version
+                    VersionDTO(it, client.getBuilds(it.component, it.toBuildFilterDTO()).first().version)
                 } catch (e: Exception) {
                     throw BuildTriggerException(
                         "Unable to retrieve latest version of '${it.component}' with status no less than ${it.status}" +
-                                if (it.minor == null) "" else " and minor equals ${it.minor}"
+                                if (it.minor == null) "" else " and minor equals ${it.minor}", e
                     )
                 }
             }
             val previousVersions = context.customDataStorage.getValue(VERSIONS)?.let {
-                mapper.readValue(it, object : TypeReference<Map<BuildSelectionDTO, String>>() {})
-            } ?: emptyMap()
-            val diff = (currentVersions.entries - previousVersions.entries).map {
-                "- new version ${it.value} detected for '${it.key.component}' (status >= ${it.key.status}" +
-                        if (it.key.minor == null) ")" else ", minor == ${it.key.minor})"
+                mapper.readValue(it, object : TypeReference<Set<VersionDTO>>() {})
+            } ?: emptySet()
+            val diff = (currentVersions - previousVersions).map {
+                "${it.version} ['${it.selection.component}'|${it.selection.status}" +
+                        if (it.selection.minor == null) "]" else "|${it.selection.minor}]"
             }
             if (diff.isNotEmpty()) {
-                log.debug(diff.joinToString("\n", "Triggering build on following changes:\n"))
+                val triggeredBy = diff.joinToString(", ", "$displayName on following changes: ")
                 val branch = context.triggerDescriptor.properties[BRANCH]
                 if (branch.isNullOrBlank()) {
-                    context.buildType.addToQueue(displayName)
+                    context.buildType.addToQueue(triggeredBy)
                 } else {
                     buildCustomizerFactory.createBuildCustomizer(context.buildType, null).apply {
                         setDesiredBranchName(branch)
-                    }.createPromotion().addToQueue(displayName)
+                    }.createPromotion().addToQueue(triggeredBy)
                 }
                 context.customDataStorage.putValue(VERSIONS, mapper.writeValueAsString(currentVersions))
             }
@@ -116,7 +119,7 @@ class ReleaseManagementBuildTriggerService(
         const val BRANCH = "release.management.build.trigger.branch"
         const val POLL_INTERVAL = "release.management.build.trigger.poll.interval"
 
-        const val VERSIONS = "release.management.build.trigger.version"
+        const val VERSIONS = "release.management.build.trigger.versions"
 
         private val log = Logger.getInstance(ReleaseManagementBuildTriggerService::class.java)
 
