@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.intellij.openapi.diagnostic.Logger
+import java.net.URL
 import jetbrains.buildServer.buildTriggers.BuildTriggerDescriptor
 import jetbrains.buildServer.buildTriggers.BuildTriggerException
 import jetbrains.buildServer.buildTriggers.BuildTriggerService
 import jetbrains.buildServer.buildTriggers.PolledBuildTrigger
 import jetbrains.buildServer.buildTriggers.PolledTriggerContext
+import jetbrains.buildServer.parameters.ReferencesResolverUtil
 import jetbrains.buildServer.serverSide.BuildCustomizerFactory
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.serverSide.PropertiesProcessor
@@ -20,8 +22,7 @@ import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.Build
 import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.VersionDTO
 
 class ReleaseManagementBuildTriggerService(
-    private val pluginDescriptor: PluginDescriptor,
-    private val buildCustomizerFactory: BuildCustomizerFactory
+    private val pluginDescriptor: PluginDescriptor, private val buildCustomizerFactory: BuildCustomizerFactory
 ) : BuildTriggerService() {
     override fun getName() = "release-management-teamcity-build-trigger"
 
@@ -40,28 +41,24 @@ class ReleaseManagementBuildTriggerService(
 
     override fun getTriggerPropertiesProcessor() = PropertiesProcessor { properties ->
         val invalidProperties = mutableListOf<InvalidProperty>()
-        val serviceUrl = properties[SERVICE_URL]
-        if (serviceUrl.isNullOrBlank()) {
+        val serviceUrlProperty = properties[SERVICE_URL]
+        if (serviceUrlProperty.isNullOrBlank()) {
             invalidProperties.add(InvalidProperty(SERVICE_URL, "Service URL must be defined"))
-        } else {
+        } else if (!ReferencesResolverUtil.mayContainReference(serviceUrlProperty)) {
             try {
-                createClient(serviceUrl).getServiceInfo()
+                URL(serviceUrlProperty)
             } catch (e: Exception) {
-                log.warn("Invalid Service URL '$serviceUrl'", e)
-                invalidProperties.add(InvalidProperty(SERVICE_URL, "Invalid Service URL value"))
+                invalidProperties.add(InvalidProperty(SERVICE_URL, "Invalid Service URL format"))
             }
         }
-        val selections = properties[SELECTIONS]
-        if (selections.isNullOrBlank()) {
+        val selectionsProperty = properties[SELECTIONS]
+        if (selectionsProperty.isNullOrBlank()) {
             invalidProperties.add(InvalidProperty(SELECTIONS, "Selections must be defined"))
-        } else {
+        } else if (!ReferencesResolverUtil.mayContainReference(selectionsProperty)) {
             try {
-                if (mapper.readValue(selections, object : TypeReference<Set<BuildSelectionDTO>>() {}).isEmpty()) {
-                    throw NoSuchElementException("Selections is empty")
-                }
+                mapper.readValue(selectionsProperty, object : TypeReference<Set<BuildSelectionDTO>>() {})
             } catch (e: Exception) {
-                log.warn("Invalid Selections '$selections'", e)
-                invalidProperties.add(InvalidProperty(SELECTIONS, "Invalid Selections value"))
+                invalidProperties.add(InvalidProperty(SELECTIONS, "Invalid Selections format"))
             }
         }
         invalidProperties
@@ -72,26 +69,47 @@ class ReleaseManagementBuildTriggerService(
             context.triggerDescriptor.properties[POLL_INTERVAL]?.toIntOrNull() ?: super.getPollInterval(context)
 
         override fun triggerBuild(context: PolledTriggerContext) {
-            val client = createClient(context.triggerDescriptor.properties[SERVICE_URL]!!)
-            val currentVersions = mapper.readValue(
-                context.triggerDescriptor.properties[SELECTIONS]!!,
-                object : TypeReference<Set<BuildSelectionDTO>>() {}
-            ).map {
+            val serviceUrlProperty = context.triggerDescriptor.properties[SERVICE_URL]
+            val client = if (serviceUrlProperty.isNullOrBlank()) {
+                throw BuildTriggerException("Service URL is not defined")
+            } else {
+                createClient(serviceUrlProperty)
+            }
+            try {
+                client.getServiceInfo()
+            } catch (e: Exception) {
+                throw BuildTriggerException("Invalid Service URL", e)
+            }
+            val selectionsProperty = context.triggerDescriptor.properties[SELECTIONS]
+            val selections = if (selectionsProperty.isNullOrBlank()) {
+                throw BuildTriggerException("Selections are not defined")
+            } else {
+                try {
+                    mapper.readValue(selectionsProperty, object : TypeReference<Set<BuildSelectionDTO>>() {})
+                } catch (e: Exception) {
+                    throw BuildTriggerException("Unable to parse Selections", e)
+                }
+            }
+            val currentVersions = selections.map {
                 try {
                     VersionDTO(it, client.getBuilds(it.component, it.toBuildFilterDTO()).first().version)
                 } catch (e: Exception) {
                     throw BuildTriggerException(
-                        "Unable to retrieve latest version of '${it.component}' with status no less than ${it.status}" +
-                                if (it.minor == null) "" else " and minor equals ${it.minor}", e
+                        "Unable to retrieve latest version of '${it.component}' with status no less than ${it.status}" + if (it.minor == null) "" else " and minor equals ${it.minor}",
+                        e
                     )
                 }
             }
             val previousVersions = context.customDataStorage.getValue(VERSIONS)?.let {
-                mapper.readValue(it, object : TypeReference<Set<VersionDTO>>() {})
+                try {
+                    mapper.readValue(it, object : TypeReference<Set<VersionDTO>>() {})
+                } catch (e: Exception) {
+                    log.warn("Unable to parse stored versions", e)
+                    null
+                }
             } ?: emptySet()
             val diff = (currentVersions - previousVersions).map {
-                "${it.version} ['${it.selection.component}'|${it.selection.status}" +
-                        if (it.selection.minor == null) "]" else "|${it.selection.minor}]"
+                "${it.version} ['${it.selection.component}'|${it.selection.status}" + if (it.selection.minor == null) "]" else "|${it.selection.minor}]"
             }
             if (diff.isNotEmpty()) {
                 val triggeredBy = diff.joinToString(", ", "$displayName on following changes: ")
@@ -103,8 +121,9 @@ class ReleaseManagementBuildTriggerService(
                         setDesiredBranchName(branch)
                     }.createPromotion().addToQueue(triggeredBy)
                 }
-                context.customDataStorage.putValue(VERSIONS, mapper.writeValueAsString(currentVersions))
             }
+            context.customDataStorage.putValue(VERSIONS, mapper.writeValueAsString(currentVersions))
+            context.customDataStorage.flush()
         }
     }
 
