@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.intellij.openapi.diagnostic.Logger
-import java.net.URL
 import jetbrains.buildServer.buildTriggers.BuildTriggerDescriptor
 import jetbrains.buildServer.buildTriggers.BuildTriggerException
 import jetbrains.buildServer.buildTriggers.BuildTriggerService
@@ -41,24 +40,24 @@ class ReleaseManagementBuildTriggerService(
 
     override fun getTriggerPropertiesProcessor() = PropertiesProcessor { properties ->
         val invalidProperties = mutableListOf<InvalidProperty>()
-        val serviceUrlProperty = properties[SERVICE_URL]
-        if (serviceUrlProperty.isNullOrBlank()) {
+        val serviceUrlProperty = properties[SERVICE_URL]?.trim()
+        if (serviceUrlProperty.isNullOrEmpty()) {
             invalidProperties.add(InvalidProperty(SERVICE_URL, "Service URL must be defined"))
         } else if (!ReferencesResolverUtil.mayContainReference(serviceUrlProperty)) {
             try {
-                URL(serviceUrlProperty)
+                createClient(serviceUrlProperty).getServiceInfo()
             } catch (e: Exception) {
-                invalidProperties.add(InvalidProperty(SERVICE_URL, "Invalid Service URL format"))
+                invalidProperties.add(InvalidProperty(SERVICE_URL, "Invalid Service URL"))
             }
         }
-        val selectionsProperty = properties[SELECTIONS]
-        if (selectionsProperty.isNullOrBlank()) {
+        val selectionsProperty = properties[SELECTIONS]?.trim()
+        if (selectionsProperty.isNullOrEmpty()) {
             invalidProperties.add(InvalidProperty(SELECTIONS, "Selections must be defined"))
         } else if (!ReferencesResolverUtil.mayContainReference(selectionsProperty)) {
             try {
                 mapper.readValue(selectionsProperty, object : TypeReference<Set<BuildSelectionDTO>>() {})
             } catch (e: Exception) {
-                invalidProperties.add(InvalidProperty(SELECTIONS, "Invalid Selections format"))
+                invalidProperties.add(InvalidProperty(SELECTIONS, "Unable to parse Selections"))
             }
         }
         invalidProperties
@@ -66,11 +65,11 @@ class ReleaseManagementBuildTriggerService(
 
     override fun getBuildTriggeringPolicy() = object : PolledBuildTrigger() {
         override fun getPollInterval(context: PolledTriggerContext) =
-            context.triggerDescriptor.properties[POLL_INTERVAL]?.toIntOrNull() ?: super.getPollInterval(context)
+            context.triggerDescriptor.properties[POLL_INTERVAL]?.trim()?.toIntOrNull() ?: super.getPollInterval(context)
 
         override fun triggerBuild(context: PolledTriggerContext) {
-            val serviceUrlProperty = context.triggerDescriptor.properties[SERVICE_URL]
-            val client = if (serviceUrlProperty.isNullOrBlank()) {
+            val serviceUrlProperty = context.triggerDescriptor.properties[SERVICE_URL]?.trim()
+            val client = if (serviceUrlProperty.isNullOrEmpty()) {
                 throw BuildTriggerException("Service URL is not defined")
             } else {
                 createClient(serviceUrlProperty)
@@ -80,8 +79,8 @@ class ReleaseManagementBuildTriggerService(
             } catch (e: Exception) {
                 throw BuildTriggerException("Invalid Service URL", e)
             }
-            val selectionsProperty = context.triggerDescriptor.properties[SELECTIONS]
-            val selections = if (selectionsProperty.isNullOrBlank()) {
+            val selectionsProperty = context.triggerDescriptor.properties[SELECTIONS]?.trim()
+            val selections = if (selectionsProperty.isNullOrEmpty()) {
                 throw BuildTriggerException("Selections are not defined")
             } else {
                 try {
@@ -113,8 +112,8 @@ class ReleaseManagementBuildTriggerService(
             }
             if (diff.isNotEmpty()) {
                 val triggeredBy = diff.joinToString(", ", "$displayName on following changes: ")
-                val branch = context.triggerDescriptor.properties[BRANCH]
-                if (branch.isNullOrBlank()) {
+                val branch = context.triggerDescriptor.properties[BRANCH]?.trim()
+                if (branch.isNullOrEmpty()) {
                     context.buildType.addToQueue(triggeredBy)
                 } else {
                     buildCustomizerFactory.createBuildCustomizer(context.buildType, null).apply {
