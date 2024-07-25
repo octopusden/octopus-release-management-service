@@ -13,7 +13,7 @@ abstract class BaseActuatorTest : BaseReleaseManagementServiceTest {
 
     @Test
     fun serviceInfoTest() {
-        val expected = ServiceInfoDTO(ServiceInfoDTO.Build(releaseManagementServiceVersion))
+        val expected = ServiceInfoDTO(ServiceInfoDTO.Build(ServiceInfoDTO.ServiceName.RELEASE_MANAGEMENT_SERVICE, releaseManagementServiceVersion))
         Assertions.assertEquals(expected, getServiceInfo())
     }
 }
