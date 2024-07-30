@@ -2,8 +2,8 @@ version: '3'
 
 services:
   release-management-service:
-    container_name: release-management-service-ft-release-management-service
-    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/release-management-service:${APP_VERSION:-1.0-SNAPSHOT}
+    container_name: ft-release-management-service
+    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/release-management-service:${RELEASE_MANAGEMENT_SERVICE_VERSION}
     ports:
       - "8080:8080"
     volumes:
@@ -14,7 +14,28 @@ services:
       - SPRING_PROFILES_ACTIVE=ft
 
   mockserver:
-    container_name: release-management-service-ft-mockserver
-    image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-5.15.0
+    container_name: ft-mockserver
+    image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-${MOCKSERVER_VERSION}
     ports:
       - "1080:1080"
+
+  teamcity:
+    image: ${DOCKER_REGISTRY}/jetbrains/teamcity-server:${TEAMCITY_VERSION}
+    container_name: ft-teamcity
+    ports:
+      - "8111:8111"
+    volumes:
+      - ./../build/teamcity-server/datadir:/data/teamcity_server/datadir
+      - ./../build/teamcity-server/logs:/opt/teamcity/logs
+    healthcheck:
+      test: curl -u admin:admin -f teamcity:8111/app/rest/server >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  teamcity-agent:
+    image: ${DOCKER_REGISTRY}/jetbrains/teamcity-agent:${TEAMCITY_VERSION}-linux-sudo
+    container_name: ft-teamcity-agent
+    privileged: true
+    volumes:
+      - ./buildAgent.properties:/data/teamcity_agent/conf/buildAgent.properties

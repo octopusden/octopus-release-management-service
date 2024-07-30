@@ -72,12 +72,11 @@ class ReleaseManagementBuildTriggerService(
             val client = if (serviceUrlProperty.isNullOrEmpty()) {
                 throw BuildTriggerException("Service URL is not defined")
             } else {
-                createClient(serviceUrlProperty)
-            }
-            try {
-                client.getServiceInfo()
-            } catch (e: Exception) {
-                throw BuildTriggerException("Invalid Service URL", e)
+                try {
+                    createClient(serviceUrlProperty).also { it.getServiceInfo() }
+                } catch (e: Exception) {
+                    throw BuildTriggerException("Invalid Service URL", e)
+                }
             }
             val selectionsProperty = context.triggerDescriptor.properties[SELECTIONS]?.trim()
             val selections = if (selectionsProperty.isNullOrEmpty()) {

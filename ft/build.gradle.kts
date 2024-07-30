@@ -8,12 +8,14 @@ fun String.getExt() = project.ext[this] as? String
 
 
 configure<com.avast.gradle.dockercompose.ComposeExtension> {
-    useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
+    useComposeFiles.add(layout.projectDirectory.file("docker/docker-compose.yml").asFile.path )
     waitForTcpPorts.set(true)
-    captureContainersOutputToFiles.set(layout.buildDirectory.file("docker_logs").get().asFile)
+    captureContainersOutputToFiles.set(layout.buildDirectory.dir("docker-logs"))
     environment.putAll(
         mapOf(
-            "APP_VERSION" to project.version,
+            "RELEASE_MANAGEMENT_SERVICE_VERSION" to project.version,
+            "MOCKSERVER_VERSION" to project.properties["mockserver.version"],
+            "TEAMCITY_VERSION" to "2021.1.4",
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
             "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt()
         )
@@ -49,8 +51,15 @@ val ft by tasks.creating(Test::class) {
 
 dockerCompose.isRequiredBy(ft)
 
+tasks.register<Sync>("syncTeamcityServerData") {
+    from(zipTree(layout.projectDirectory.file("docker/data.zip")))
+    into(layout.buildDirectory.dir("teamcity-server"))
+}
+
 tasks.named("composeUp") {
     dependsOn(":release-management-service:dockerBuildImage")
+    dependsOn(":release-management-teamcity-plugin:serverPlugin")
+    dependsOn("syncTeamcityServerData")
 }
 
 tasks.named("migrateMockData") {

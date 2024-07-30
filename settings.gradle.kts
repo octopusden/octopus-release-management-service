@@ -8,7 +8,7 @@ pluginManagement {
         id("com.avast.gradle.docker-compose") version (extra["docker-compose-plugin.version"] as String)
         id("com.bmuschko.docker-spring-boot-application") version (extra["bmuschko-docker-plugin.version"] as String)
         id("io.github.gradle-nexus.publish-plugin") version "1.1.0" apply false
-        id("io.github.rodm.teamcity-server") version "1.5.4"
+        id("io.github.rodm.teamcity-server") version (extra["rodm-teamcity-plugin.version"] as String)
     }
     repositories {
         gradlePluginPortal()

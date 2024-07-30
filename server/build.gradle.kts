@@ -49,11 +49,12 @@ val extValidateFun = project.ext["validateFun"] as ((List<String>) -> Unit)
 fun String.getExt() = project.ext[this] as? String
 
 configure<com.avast.gradle.dockercompose.ComposeExtension> {
-    useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
+    useComposeFiles.add(layout.projectDirectory.file("docker/docker-compose.yml").asFile.path )
     waitForTcpPorts.set(true)
-    captureContainersOutputToFiles.set(layout.buildDirectory.file("docker_logs").get().asFile)
+    captureContainersOutputToFiles.set(layout.buildDirectory.dir("docker-logs"))
     environment.putAll(
         mapOf(
+            "MOCKSERVER_VERSION" to project.properties["mockserver.version"],
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
         )
     )
