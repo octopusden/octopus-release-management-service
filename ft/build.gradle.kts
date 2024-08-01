@@ -52,9 +52,6 @@ val ft by tasks.creating(Test::class) {
 dockerCompose.isRequiredBy(ft)
 
 val teamcityDir = layout.buildDirectory.dir("teamcity-server")
-val teamcityPlugin = "release-management-teamcity-plugin${
-    if (version == "unspecified") "" else "-$version"
-}.zip"
 
 tasks.register<Sync>("prepareTeamcityServerData") {
     from(zipTree(layout.projectDirectory.file("docker/data.zip")))
@@ -64,12 +61,7 @@ tasks.register<Sync>("prepareTeamcityServerData") {
 tasks.register<Copy>("deployTeamcityPlugin") {
     dependsOn("prepareTeamcityServerData")
     dependsOn(":release-management-teamcity-plugin:serverPlugin")
-    from(
-        rootProject.project("release-management-teamcity-plugin")
-            .layout.buildDirectory.file("distributions")
-    ) {
-        include(teamcityPlugin)
-    }
+    from(rootProject.project("release-management-teamcity-plugin").configurations["distributions"].artifacts.files)
     into(teamcityDir.get().dir("datadir/plugins"))
 }
 

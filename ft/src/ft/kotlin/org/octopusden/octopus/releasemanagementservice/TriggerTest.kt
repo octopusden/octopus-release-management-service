@@ -47,7 +47,7 @@ class TriggerTest {
             )
         )
         Thread.sleep(60000L) //3 * <default_teamcity_trigger_polling_interval>
-        with( //TODO: enhance TeamCityClient (support builds)
+        with( //TODO: enhance TeamcityClient (support builds)
             httpClient.send(
                 HttpRequest.newBuilder()
                     .uri(URI("http://localhost:8111/app/rest/2018.1/builds?locator=buildType:(id:${buildType.id})"))
@@ -82,7 +82,7 @@ class TriggerTest {
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
-            with( //TODO: enhance TeamCityClient (support agents)
+            with( //TODO: enhance TeamcityClient (support agents)
                 httpClient.send(
                     HttpRequest.newBuilder()
                         .uri(URI("http://localhost:8111/app/rest/2018.1/agents/name:test-agent/authorized"))
