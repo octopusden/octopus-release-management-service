@@ -2,7 +2,7 @@ version: '3'
 
 services:
   release-management-service:
-    container_name: ft-release-management-service
+    container_name: release-management-service-ft-release-management-service
     image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/release-management-service:${RELEASE_MANAGEMENT_SERVICE_VERSION}
     ports:
       - "8080:8080"
@@ -14,14 +14,14 @@ services:
       - SPRING_PROFILES_ACTIVE=ft
 
   mockserver:
-    container_name: ft-mockserver
+    container_name: release-management-service-ft-mockserver
     image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-${MOCKSERVER_VERSION}
     ports:
       - "1080:1080"
 
   teamcity:
     image: ${DOCKER_REGISTRY}/jetbrains/teamcity-server:${TEAMCITY_VERSION}
-    container_name: ft-teamcity
+    container_name: release-management-service-ft-teamcity
     ports:
       - "8111:8111"
     volumes:
@@ -35,7 +35,7 @@ services:
 
   teamcity-agent:
     image: ${DOCKER_REGISTRY}/jetbrains/teamcity-agent:${TEAMCITY_VERSION}-linux-sudo
-    container_name: ft-teamcity-agent
+    container_name: release-management-service-ft-teamcity-agent
     privileged: true
     volumes:
       - ./buildAgent.properties:/data/teamcity_agent/conf/buildAgent.properties
