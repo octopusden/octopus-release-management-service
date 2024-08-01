@@ -1,7 +1,7 @@
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:${project.properties["spring-boot.version"]}")
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${project.properties["spring-cloud.version"]}")
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${properties["spring-boot.version"]}")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${properties["spring-cloud.version"]}")
     }
 }
 

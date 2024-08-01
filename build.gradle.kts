@@ -58,12 +58,13 @@ subprojects {
     }
 
     tasks.withType<Test> {
-        environment["release-management-service.version"] = version
         useJUnitPlatform()
 
         testLogging{
             info.events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
         }
+
+        systemProperties["release-management-service.version"] = version
     }
 
     val migrateMockData by tasks.creating(MigrateMockData::class) {
@@ -73,8 +74,8 @@ subprojects {
     ext {
         System.getenv().let {
             set("signingRequired", it.containsKey("ORG_GRADLE_PROJECT_signingKey") && it.containsKey("ORG_GRADLE_PROJECT_signingPassword"))
-            set("dockerRegistry", it.getOrDefault("DOCKER_REGISTRY", project.properties["docker.registry"]))
-            set("octopusGithubDockerRegistry", it.getOrDefault("OCTOPUS_GITHUB_DOCKER_REGISTRY", project.properties["octopus.github.docker.registry"]))
+            set("dockerRegistry", it.getOrDefault("DOCKER_REGISTRY", properties["docker.registry"]))
+            set("octopusGithubDockerRegistry", it.getOrDefault("OCTOPUS_GITHUB_DOCKER_REGISTRY", properties["octopus.github.docker.registry"]))
         }
         set("validateFun", { properties: List<String> ->
             val emptyProperties = properties.filter { (project.ext[it] as? String).isNullOrBlank() }

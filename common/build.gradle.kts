@@ -53,9 +53,9 @@ tasks.withType<KotlinCompile>().configureEach {
 
 dependencyManagement {
     imports {
-        mavenBom("io.github.openfeign:feign-bom:${project.properties["openfeign.version"]}")
-        mavenBom("org.springframework.boot:spring-boot-dependencies:${project.properties["spring-boot.version"]}")
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${project.properties["spring-cloud.version"]}")
+        mavenBom("io.github.openfeign:feign-bom:${properties["openfeign.version"]}")
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${properties["spring-boot.version"]}")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${properties["spring-cloud.version"]}")
     }
 }
 

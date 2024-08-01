@@ -54,7 +54,7 @@ configure<com.avast.gradle.dockercompose.ComposeExtension> {
     captureContainersOutputToFiles.set(layout.buildDirectory.dir("docker-logs"))
     environment.putAll(
         mapOf(
-            "MOCKSERVER_VERSION" to project.properties["mockserver.version"],
+            "MOCKSERVER_VERSION" to properties["mockserver.version"],
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
         )
     )
@@ -68,7 +68,7 @@ docker {
     springBootApplication {
         baseImage.set("${"dockerRegistry".getExt()}/eclipse-temurin:17-jdk")
         ports.set(listOf(8080, 8080))
-        images.set(setOf("${"octopusGithubDockerRegistry".getExt()}/octopusden/${project.name}:${project.version}"))
+        images.set(setOf("${"octopusGithubDockerRegistry".getExt()}/octopusden/$name:$version"))
     }
 }
 
@@ -92,8 +92,8 @@ springBoot {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:${project.properties["spring-boot.version"]}")
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${project.properties["spring-cloud.version"]}")
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${properties["spring-boot.version"]}")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${properties["spring-cloud.version"]}")
     }
 }
 
@@ -108,7 +108,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework.boot:spring-boot-starter-aop")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${project.properties["springdoc-openapi.version"]}")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${properties["springdoc-openapi.version"]}")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(project(":test-common"))

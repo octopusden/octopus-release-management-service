@@ -30,7 +30,7 @@ teamcity {
 
 dependencyManagement {
     imports {
-        mavenBom("io.github.openfeign:feign-bom:${project.properties["openfeign.version"]}")
+        mavenBom("io.github.openfeign:feign-bom:${properties["openfeign.version"]}")
     }
 }
 

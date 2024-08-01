@@ -8,13 +8,13 @@ fun String.getExt() = project.ext[this] as? String
 
 
 configure<com.avast.gradle.dockercompose.ComposeExtension> {
-    useComposeFiles.add(layout.projectDirectory.file("docker/docker-compose.yml").asFile.path )
+    useComposeFiles.add(layout.projectDirectory.file("docker/docker-compose.yml").asFile.path)
     waitForTcpPorts.set(true)
     captureContainersOutputToFiles.set(layout.buildDirectory.dir("docker-logs"))
     environment.putAll(
         mapOf(
-            "RELEASE_MANAGEMENT_SERVICE_VERSION" to project.version,
-            "MOCKSERVER_VERSION" to project.properties["mockserver.version"],
+            "RELEASE_MANAGEMENT_SERVICE_VERSION" to version,
+            "MOCKSERVER_VERSION" to properties["mockserver.version"],
             "TEAMCITY_VERSION" to "2021.1.4",
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
             "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt()
@@ -51,15 +51,31 @@ val ft by tasks.creating(Test::class) {
 
 dockerCompose.isRequiredBy(ft)
 
-tasks.register<Sync>("syncTeamcityServerData") {
+val teamcityDir = layout.buildDirectory.dir("teamcity-server")
+val teamcityPlugin = "release-management-teamcity-plugin${
+    if (version == "unspecified") "" else "-$version"
+}.zip"
+
+tasks.register<Sync>("prepareTeamcityServerData") {
     from(zipTree(layout.projectDirectory.file("docker/data.zip")))
-    into(layout.buildDirectory.dir("teamcity-server"))
+    into(teamcityDir)
+}
+
+tasks.register<Copy>("deployTeamcityPlugin") {
+    dependsOn("prepareTeamcityServerData")
+    dependsOn(":release-management-teamcity-plugin:serverPlugin")
+    from(
+        rootProject.project("release-management-teamcity-plugin")
+            .layout.buildDirectory.file("distributions")
+    ) {
+        include(teamcityPlugin)
+    }
+    into(teamcityDir.get().dir("datadir/plugins"))
 }
 
 tasks.named("composeUp") {
     dependsOn(":release-management-service:dockerBuildImage")
-    dependsOn(":release-management-teamcity-plugin:serverPlugin")
-    dependsOn("syncTeamcityServerData")
+    dependsOn("deployTeamcityPlugin")
 }
 
 tasks.named("migrateMockData") {
@@ -76,8 +92,8 @@ idea.module {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:${project.properties["spring-boot.version"]}")
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${project.properties["spring-cloud.version"]}")
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${properties["spring-boot.version"]}")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${properties["spring-cloud.version"]}")
     }
 }
 
@@ -87,4 +103,5 @@ dependencies {
     ftImplementation(project(":test-common"))
     ftImplementation("org.junit.jupiter:junit-jupiter-engine")
     ftImplementation("org.junit.jupiter:junit-jupiter-params")
+    ftImplementation("org.octopusden.octopus.octopus-external-systems-clients:teamcity-client:2.0.44")
 }

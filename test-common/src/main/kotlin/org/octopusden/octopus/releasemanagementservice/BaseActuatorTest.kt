@@ -5,9 +5,8 @@ import org.junit.jupiter.api.Test
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
 
 abstract class BaseActuatorTest : BaseReleaseManagementServiceTest {
-
-    private val releaseManagementServiceVersion: String = System.getenv("release-management-service.version")
-        ?: throw IllegalStateException("Environment variable 'release-management-service.version' must be provided")
+    private val releaseManagementServiceVersion = System.getProperty("release-management-service.version")
+        ?: throw IllegalStateException("System property 'release-management-service.version' must be provided")
 
     abstract fun getServiceInfo(): ServiceInfoDTO
 
