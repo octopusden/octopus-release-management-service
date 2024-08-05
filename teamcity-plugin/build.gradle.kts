@@ -1,13 +1,27 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("io.github.rodm.teamcity-server")
     `maven-publish`
+}
+
+configurations {
+    create("distributions")
+}
+
+val teamcityPlugin = artifacts.add(
+    "distributions",
+    layout.buildDirectory.file("distributions/$name${if (version == "unspecified") "" else "-$version"}.zip").get().asFile
+) {
+    type = "zip"
+    builtBy("serverPlugin")
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
+            artifact(teamcityPlugin)
             pom {
                 name.set(project.name)
                 description.set("Octopus module: ${project.name}")
@@ -51,21 +65,27 @@ tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
+teamcity {
+    version = "2021.1"
+    server {
+        descriptor {
+            name = project.name
+            displayName = "Octopus Release Management TeamCity Plugin"
+            version = project.version as String
+            vendorName = "octopus"
+            description = "Octopus module: ${project.name}"
+            useSeparateClassloader = true
+        }
+    }
+}
+
 dependencyManagement {
     imports {
         mavenBom("io.github.openfeign:feign-bom:${properties["openfeign.version"]}")
-        mavenBom("org.springframework.boot:spring-boot-dependencies:${properties["spring-boot.version"]}")
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${properties["spring-cloud.version"]}")
     }
 }
 
 dependencies {
-    api(project(":common"))
-    /* These dependencies are added to :common due to there are usages at server side
-    api("io.github.openfeign:feign-httpclient")
-    api("io.github.openfeign:feign-jackson")
-    api("io.github.openfeign:feign-slf4j")
-    */
-    api("com.fasterxml.jackson.module:jackson-module-kotlin")
-    api("com.fasterxml.jackson.core:jackson-databind")
+    implementation(project(":client"))
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
 }

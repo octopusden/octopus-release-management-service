@@ -49,11 +49,12 @@ val extValidateFun = project.ext["validateFun"] as ((List<String>) -> Unit)
 fun String.getExt() = project.ext[this] as? String
 
 configure<com.avast.gradle.dockercompose.ComposeExtension> {
-    useComposeFiles.add("${projectDir}/docker/docker-compose.yml")
+    useComposeFiles.add(layout.projectDirectory.file("docker/docker-compose.yml").asFile.path )
     waitForTcpPorts.set(true)
-    captureContainersOutputToFiles.set(layout.buildDirectory.file("docker_logs").get().asFile)
+    captureContainersOutputToFiles.set(layout.buildDirectory.dir("docker-logs"))
     environment.putAll(
         mapOf(
+            "MOCKSERVER_VERSION" to properties["mockserver.version"],
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
         )
     )
@@ -67,7 +68,7 @@ docker {
     springBootApplication {
         baseImage.set("${"dockerRegistry".getExt()}/eclipse-temurin:17-jdk")
         ports.set(listOf(8080, 8080))
-        images.set(setOf("${"octopusGithubDockerRegistry".getExt()}/octopusden/${project.name}:${project.version}"))
+        images.set(setOf("${"octopusGithubDockerRegistry".getExt()}/octopusden/$name:$version"))
     }
 }
 
@@ -89,6 +90,13 @@ springBoot {
     buildInfo()
 }
 
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${properties["spring-boot.version"]}")
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${properties["spring-cloud.version"]}")
+    }
+}
+
 dependencies {
     implementation(project(":common"))
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -100,7 +108,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework.boot:spring-boot-starter-aop")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${project.properties["springdoc-openapi.version"]}")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${properties["springdoc-openapi.version"]}")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(project(":test-common"))

@@ -4,14 +4,14 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-Pversion=2.0-SNAPSHOT --stacktrace" />
+      <option name="scriptParameters" value="--info --stacktrace" />
       <option name="taskDescriptions">
         <list />
       </option>
       <option name="taskNames">
         <list>
           <option value="clean" />
-          <option value="dockerBuildImage" />
+          <option value="build" />
           <option value="ft" />
         </list>
       </option>
