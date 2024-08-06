@@ -1,0 +1,4 @@
+{
+  "errorCode": "NOT_FOUND",
+  "errorMessage": "Component NotExistedInDB is not found in Releng DB"
+}
