@@ -11,6 +11,7 @@ data class BuildSelectionDTO(
     fun toBuildFilterDTO() = BuildFilterDTO(
         status.noLessThan(),
         minor?.let { setOf(it) } ?: emptySet(),
+        emptySet(),
         true,
         1
     )
