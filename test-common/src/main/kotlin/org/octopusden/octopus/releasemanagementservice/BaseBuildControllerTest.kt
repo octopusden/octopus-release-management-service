@@ -63,6 +63,18 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
             loadObject(
                 "../test-data/releng/builds-release.json",
                 object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("versions" to listOf("1.0.1")),
+            loadObject(
+                "../test-data/releng/builds_1.0.1.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("versions" to listOf("2.0.1")),
+            loadObject(
+                "../test-data/releng/builds_2.0.1.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
         )
     )
 

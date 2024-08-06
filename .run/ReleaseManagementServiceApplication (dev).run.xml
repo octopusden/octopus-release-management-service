@@ -1,7 +1,12 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ReleaseManagementServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <configuration default="false" name="ReleaseManagementServiceApplication (dev)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="dev" />
     <additionalParameters>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="spring.cloud.config.enabled" />
+        <option name="value" value="false" />
+      </param>
       <param>
         <option name="enabled" value="true" />
         <option name="name" value="spring.config.additional-location" />
