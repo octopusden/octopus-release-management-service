@@ -8,5 +8,8 @@
       "repository": "ssh://git@github.com:octopusden/octopus-release-management-service.git",
       "sha": "0da242ad739a01e7c50aeb522fd17e1eece77bb3"
     }
-  ]
+  ],
+  "statusHistory": {
+    "BUILD": "2024-07-10T09:51:40.000+00:00"
+  }
 }
