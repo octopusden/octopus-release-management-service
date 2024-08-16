@@ -110,7 +110,9 @@ class ReleaseManagementBuildTriggerService(
                 "${it.version} ['${it.selection.component}'|${it.selection.status}" + if (it.selection.minor == null) "]" else "|${it.selection.minor}]"
             }
             if (diff.isNotEmpty()) {
-                val triggeredBy = diff.joinToString(", ", "$displayName on following changes: ")
+                val triggeredBy = diff.joinToString(", ", "$displayName on following changes: ").let {
+                    if (it.length < 257) it else "${it.take(253)}..."
+                }
                 val branch = context.triggerDescriptor.properties[BRANCH]?.trim()
                 if (branch.isNullOrEmpty()) {
                     context.buildType.addToQueue(triggeredBy)
