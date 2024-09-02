@@ -11,7 +11,6 @@ import jetbrains.buildServer.buildTriggers.BuildTriggerService
 import jetbrains.buildServer.buildTriggers.PolledBuildTrigger
 import jetbrains.buildServer.buildTriggers.PolledTriggerContext
 import jetbrains.buildServer.parameters.ReferencesResolverUtil
-import jetbrains.buildServer.serverSide.BuildCustomizerFactory
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.serverSide.PropertiesProcessor
 import jetbrains.buildServer.web.openapi.PluginDescriptor
@@ -21,7 +20,7 @@ import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.Build
 import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.VersionDTO
 
 class ReleaseManagementBuildTriggerService(
-    private val pluginDescriptor: PluginDescriptor, private val buildCustomizerFactory: BuildCustomizerFactory
+    private val pluginDescriptor: PluginDescriptor
 ) : BuildTriggerService() {
     override fun getName() = "release-management-teamcity-build-trigger"
 
@@ -114,13 +113,9 @@ class ReleaseManagementBuildTriggerService(
                     if (it.length < 257) it else "${it.take(253)}..."
                 }
                 val branch = context.triggerDescriptor.properties[BRANCH]?.trim()
-                if (branch.isNullOrEmpty()) {
-                    context.buildType.addToQueue(triggeredBy)
-                } else {
-                    buildCustomizerFactory.createBuildCustomizer(context.buildType, null).apply {
-                        setDesiredBranchName(branch)
-                    }.createPromotion().addToQueue(triggeredBy)
-                }
+                context.createBuildCustomizer(null).apply {
+                    if (!branch.isNullOrEmpty()) setDesiredBranchName(branch)
+                }.createPromotion().addToQueue(triggeredBy)
             }
             context.customDataStorage.putValue(VERSIONS, mapper.writeValueAsString(currentVersions))
             context.customDataStorage.flush()
