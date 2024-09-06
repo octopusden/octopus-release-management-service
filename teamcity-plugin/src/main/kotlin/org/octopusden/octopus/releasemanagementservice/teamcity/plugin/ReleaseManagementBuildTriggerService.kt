@@ -11,6 +11,7 @@ import jetbrains.buildServer.buildTriggers.BuildTriggerService
 import jetbrains.buildServer.buildTriggers.PolledBuildTrigger
 import jetbrains.buildServer.buildTriggers.PolledTriggerContext
 import jetbrains.buildServer.parameters.ReferencesResolverUtil
+import jetbrains.buildServer.serverSide.BuildQueue
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.serverSide.PropertiesProcessor
 import jetbrains.buildServer.web.openapi.PluginDescriptor
@@ -20,7 +21,7 @@ import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.Build
 import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.VersionDTO
 
 class ReleaseManagementBuildTriggerService(
-    private val pluginDescriptor: PluginDescriptor
+    private val pluginDescriptor: PluginDescriptor, private val buildQueue: BuildQueue
 ) : BuildTriggerService() {
     override fun getName() = "release-management-teamcity-build-trigger"
 
@@ -35,7 +36,7 @@ class ReleaseManagementBuildTriggerService(
     override fun getEditParametersUrl() =
         pluginDescriptor.getPluginResourcesPath("editReleaseManagementBuildTriggerParameters.jsp")
 
-    override fun getDefaultTriggerProperties() = mutableMapOf(BRANCH to "", POLL_INTERVAL to "300")
+    override fun getDefaultTriggerProperties() = mutableMapOf(POLL_INTERVAL to "300")
 
     override fun getTriggerPropertiesProcessor() = PropertiesProcessor { properties ->
         val invalidProperties = mutableListOf<InvalidProperty>()
@@ -113,12 +114,21 @@ class ReleaseManagementBuildTriggerService(
                     if (it.length < 257) it else "${it.take(253)}..."
                 }
                 val branch = context.triggerDescriptor.properties[BRANCH]?.trim()
-                context.createBuildCustomizer(null).apply {
+                val previousQueuedBuild = context.customDataStorage.getValue(QUEUED_BUILD)
+                if (context.triggerDescriptor.properties[QUEUE_OPTIMIZATION].toBoolean() && previousQueuedBuild != null) {
+                    buildQueue.findQueued(previousQueuedBuild)?.removeFromQueue(null, "Dismissed by $displayName")
+                }
+                val queuedBuild = context.createBuildCustomizer(null).apply {
                     if (!branch.isNullOrEmpty()) setDesiredBranchName(branch)
                 }.createPromotion().addToQueue(triggeredBy)
+                if (queuedBuild != null) {
+                    context.customDataStorage.putValue(VERSIONS, mapper.writeValueAsString(currentVersions))
+                    context.customDataStorage.putValue(QUEUED_BUILD, queuedBuild.itemId)
+                    context.customDataStorage.flush()
+                } else {
+                    log.warn("Unable to queue build triggered by $triggeredBy")
+                }
             }
-            context.customDataStorage.putValue(VERSIONS, mapper.writeValueAsString(currentVersions))
-            context.customDataStorage.flush()
         }
     }
 
@@ -132,8 +142,11 @@ class ReleaseManagementBuildTriggerService(
         //Advanced settings
         const val BRANCH = "release.management.build.trigger.branch"
         const val POLL_INTERVAL = "release.management.build.trigger.poll.interval"
+        const val QUEUE_OPTIMIZATION = "release.management.build.trigger.queue.optimization"
 
+        //Custom data
         const val VERSIONS = "release.management.build.trigger.versions"
+        const val QUEUED_BUILD = "release.management.build.trigger.queued.build"
 
         private val log = Logger.getInstance(ReleaseManagementBuildTriggerService::class.java)
 

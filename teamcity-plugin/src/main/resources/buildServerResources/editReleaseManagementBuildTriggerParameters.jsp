@@ -50,3 +50,12 @@
         <span class="error" id="error_<%=ReleaseManagementBuildTriggerService.POLL_INTERVAL%>"></span>
     </td>
 </tr>
+
+<tr class="advancedSetting">
+    <td><label for="<%=ReleaseManagementBuildTriggerService.QUEUE_OPTIMIZATION%>">Queue optimization: </label></td>
+    <td>
+        <props:checkboxProperty name="<%=ReleaseManagementBuildTriggerService.QUEUE_OPTIMIZATION%>"/>
+        <span class="smallNote">Enables eviction of previously queued build if it is still in queue</span>
+        <span class="error" id="error_<%=ReleaseManagementBuildTriggerService.QUEUE_OPTIMIZATION%>"></span>
+    </td>
+</tr>
