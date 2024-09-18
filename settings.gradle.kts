@@ -26,3 +26,4 @@ include(":test-common")
 include(":server")
 findProject(":server")?.name = "release-management-service"
 include(":ft")
+include(":legacy-releng-client")
