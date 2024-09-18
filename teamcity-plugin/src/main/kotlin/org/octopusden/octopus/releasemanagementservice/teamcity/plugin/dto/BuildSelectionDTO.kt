@@ -9,10 +9,9 @@ data class BuildSelectionDTO(
     val minor: String? = null
 ) {
     fun toBuildFilterDTO() = BuildFilterDTO(
-        status.noLessThan(),
-        minor?.let { setOf(it) } ?: emptySet(),
-        emptySet(),
-        true,
-        1
+        statuses = status.noLessThan(),
+        minors = minor?.let { setOf(it) } ?: emptySet(),
+        descending = true,
+        limit = 1
     )
 }
