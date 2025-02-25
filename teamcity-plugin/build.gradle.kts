@@ -66,7 +66,7 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 teamcity {
-    version = "2021.1"
+    version = "2022.04"
     server {
         descriptor {
             name = project.name
