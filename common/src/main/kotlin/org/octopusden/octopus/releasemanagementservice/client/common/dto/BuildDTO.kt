@@ -6,6 +6,7 @@ data class BuildDTO(
     val component: String,
     val version: String,
     val status: BuildStatus,
+    val parents: Collection<ShortBuildDTO>,
     val dependencies: Collection<ShortBuildDTO>,
     val commits: Collection<CommitDTO>,
     val statusHistory: Map<BuildStatus, Date>

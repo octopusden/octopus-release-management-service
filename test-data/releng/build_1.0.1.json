@@ -2,7 +2,25 @@
   "component": "ReleaseManagementService",
   "version": "1.0.1",
   "status": "BUILD",
-  "dependencies": [],
+  "parents": [
+    {
+      "component": "parent",
+      "version": "1.1",
+      "status": "BUILD"
+    }
+  ],
+  "dependencies": [
+    {
+      "component": "dependency1",
+      "version": "0.1",
+      "status": "RC"
+    },
+    {
+      "component": "dependency2",
+      "version": "0.2",
+      "status": "RELEASE"
+    }
+  ],
   "commits": [
     {
       "repository": "ssh://git@github.com:octopusden/octopus-release-management-service.git",
