@@ -10,7 +10,13 @@ import org.junit.jupiter.api.Test
 import org.octopusden.octopus.infrastructure.client.commons.ClientParametersProvider
 import org.octopusden.octopus.infrastructure.client.commons.StandardBasicCredCredentialProvider
 import org.octopusden.octopus.infrastructure.teamcity.client.TeamcityClassicClient
-import org.octopusden.octopus.infrastructure.teamcity.client.dto.*
+import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityBuildType
+import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityCreateBuildType
+import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityLinkProject
+import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityProperties
+import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityProperty
+import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityTrigger
+import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityTriggers
 
 class TriggerTest {
     @Test
