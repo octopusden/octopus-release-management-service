@@ -28,7 +28,9 @@
 &nbsp;&nbsp;minor: 1.1
 - component: component_2
 &nbsp;&nbsp;status: BUILD
-&nbsp;&nbsp;minor: 1.2">Yaml array</u> of build selections defined by component id, build status and minor version (optionally)</span>
+&nbsp;&nbsp;minor: 1.2
+- component: component_3
+&nbsp;&nbsp;inReleaseBranch: true">Yaml array</u> of build selections defined by component id, build status and minor version (optionally)</span>
         <span class="error" id="error_<%=ReleaseManagementBuildTriggerService.SELECTIONS%>"></span>
     </td>
 </tr>
