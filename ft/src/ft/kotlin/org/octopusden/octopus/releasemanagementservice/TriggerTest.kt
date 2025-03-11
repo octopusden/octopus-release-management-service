@@ -47,6 +47,7 @@ class TriggerTest {
             name = "Trigger In Release Branch Test",
             triggerSelector = """
                 - component: ReleaseManagementService
+                  status: RELEASE
                   inReleaseBranch: true
             """.trimIndent()
         )

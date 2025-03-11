@@ -5,12 +5,12 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildSt
 
 data class BuildSelectionDTO(
     val component: String,
-    val status: BuildStatus? = null,
+    val status: BuildStatus,
     val minor: String? = null,
     val inReleaseBranch: Boolean? = null
 ) {
     fun toBuildFilterDTO() = BuildFilterDTO(
-        statuses = status?.noLessThan() ?: emptySet(),
+        statuses = status.noLessThan(),
         minors = minor?.let { setOf(it) } ?: emptySet(),
         inReleaseBranch = inReleaseBranch,
         descending = true,
