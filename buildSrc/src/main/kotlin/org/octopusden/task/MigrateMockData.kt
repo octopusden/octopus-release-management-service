@@ -68,11 +68,9 @@ open class MigrateMockData : DefaultTask() {
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("statuses" to listOf("RELEASE")) to "releng/builds-release.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("versions" to listOf("1.0.1")) to "releng/builds_1.0.1.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("versions" to listOf("2.0.1")) to "releng/builds_2.0.1.json",
-
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("branchNames" to listOf("release-1.0", "release-1.1")) to "releng/builds-with-branch-filter-2.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("branchNames" to listOf("release-\\.\\+")) to "releng/builds-with-branch-filter-1.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("branchNames" to listOf("not-existed-branch")) to "releng/branch-not-found.json",
-
             "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.1/build" to emptyMap<String, List<String>>() to "releng/build_1.0.1.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/version/2.0.1/build" to emptyMap<String, List<String>>() to "releng/build_2.0.1.json",
             "/rest/release-engineering/3/component-management" to emptyMap<String, List<String>>() to "releng/components.json",
