@@ -32,13 +32,13 @@ open class MigrateMockData : DefaultTask() {
         }
     }
 
-    private fun generateMockserverData(endpoint: String, params: Map<String, String>, filename: String, status: Int) {
+    private fun generateMockserverData(endpoint: String, params: Map<String, List<String>>, filename: String, status: Int) {
         val body = Files.asCharSource(File(filename), Charset.defaultCharset()).read()
         val request = HttpRequest.request()
             .withMethod("GET")
             .withPath(endpoint)
-        params.forEach {
-            request.withQueryStringParameter(it.key, it.value)
+        params.forEach { (key, values) ->
+            request.withQueryStringParameter(key, *values.toTypedArray())
         }
         mockServerClient.`when`(request)
             .respond {
@@ -59,27 +59,29 @@ open class MigrateMockData : DefaultTask() {
     }
 
     companion object {
-        private val defaultParams = mapOf("descending" to "false")
+        private val defaultParams = mapOf("descending" to listOf("false"))
         private val endpointToResponseFileName = mapOf(
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to "10")to "releng/builds.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to "1") to "releng/builds-limit.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("descending" to "true") to "releng/builds-descending.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("minors" to "2.0") to "releng/builds-2.0.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("statuses" to "RELEASE") to "releng/builds-release.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("versions" to "1.0.1") to "releng/builds_1.0.1.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("versions" to "2.0.1") to "releng/builds_2.0.1.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("branchNames" to "release-1.0") + mapOf("branchNames" to "release-1.1") to "releng/builds-with-branch-filter-2.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("branchNames" to "release-.+") to "releng/builds-with-branch-filter-1.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("branchNames" to "not-existed-branch") to "releng/branch-not-found.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.1/build" to emptyMap<String, String>() to "releng/build_1.0.1.json",
-            "/rest/release-engineering/3/component/ReleaseManagementService/version/2.0.1/build" to emptyMap<String, String>() to "releng/build_2.0.1.json",
-            "/rest/release-engineering/3/component-management" to emptyMap<String, String>() to "releng/components.json",
-            "/rest/release-engineering/3/component-management/ReleaseManagementService" to emptyMap<String, String>() to "releng/component_rm_service.json",
-            "/rest/release-engineering/3/component-management/LegacyReleaseManagementService" to emptyMap<String, String>() to "releng/component_legacy_rm_service.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to listOf("10"))to "releng/builds.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to listOf("1")) to "releng/builds-limit.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("descending" to listOf("true")) to "releng/builds-descending.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("minors" to listOf("2.0")) to "releng/builds-2.0.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("statuses" to listOf("RELEASE")) to "releng/builds-release.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("versions" to listOf("1.0.1")) to "releng/builds_1.0.1.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("versions" to listOf("2.0.1")) to "releng/builds_2.0.1.json",
+
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("branchNames" to listOf("release-1.0", "release-1.1")) to "releng/builds-with-branch-filter-2.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("branchNames" to listOf("release-\\.\\+")) to "releng/builds-with-branch-filter-1.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("branchNames" to listOf("not-existed-branch")) to "releng/branch-not-found.json",
+
+            "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.1/build" to emptyMap<String, List<String>>() to "releng/build_1.0.1.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/version/2.0.1/build" to emptyMap<String, List<String>>() to "releng/build_2.0.1.json",
+            "/rest/release-engineering/3/component-management" to emptyMap<String, List<String>>() to "releng/components.json",
+            "/rest/release-engineering/3/component-management/ReleaseManagementService" to emptyMap<String, List<String>>() to "releng/component_rm_service.json",
+            "/rest/release-engineering/3/component-management/LegacyReleaseManagementService" to emptyMap<String, List<String>>() to "releng/component_legacy_rm_service.json",
         )
         private val endpointNotFoundToResponseFileName = mapOf(
-            "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.3/build" to emptyMap<String, String>() to "releng/build-not-exist-error.json",
-            "/rest/release-engineering/3/component-management/NotExistedInDB" to emptyMap<String, String>() to "releng/component-not-exist-error.json"
+            "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.3/build" to emptyMap<String, List<String>>() to "releng/build-not-exist-error.json",
+            "/rest/release-engineering/3/component-management/NotExistedInDB" to emptyMap<String, List<String>>() to "releng/component-not-exist-error.json"
         )
     }
 }
