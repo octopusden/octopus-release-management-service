@@ -75,6 +75,24 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
             loadObject(
                 "../test-data/releng/builds_2.0.1.json",
                 object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("branchNames" to listOf("release-.+")),
+            loadObject(
+                "../test-data/releng/builds-with-branch-filter-1.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("branchNames" to listOf("release-1.0, release-1.1")),
+            loadObject(
+                "../test-data/releng/builds-with-branch-filter-2.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("branchNames" to listOf("not-existed-branch")),
+            loadObject(
+                "../test-data/releng/branch-not-found.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
         )
     )
 
