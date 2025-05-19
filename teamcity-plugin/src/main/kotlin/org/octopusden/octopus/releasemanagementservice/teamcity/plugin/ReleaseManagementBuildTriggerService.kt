@@ -19,6 +19,7 @@ import org.octopusden.octopus.releasemanagementservice.client.impl.ClassicReleas
 import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManagementServiceClientParametersProvider
 import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.BuildSelectionDTO
 import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.VersionDTO
+import java.util.Date
 
 class ReleaseManagementBuildTriggerService(
     private val pluginDescriptor: PluginDescriptor, private val buildQueue: BuildQueue
@@ -36,7 +37,7 @@ class ReleaseManagementBuildTriggerService(
     override fun getEditParametersUrl() =
         pluginDescriptor.getPluginResourcesPath("editReleaseManagementBuildTriggerParameters.jsp")
 
-    override fun getDefaultTriggerProperties() = mutableMapOf(POLL_INTERVAL to "300")
+    override fun getDefaultTriggerProperties() = mutableMapOf(POLL_INTERVAL to "300", QUIET_PERIOD to "60")
 
     override fun getTriggerPropertiesProcessor() = PropertiesProcessor { properties ->
         val invalidProperties = mutableListOf<InvalidProperty>()
@@ -88,16 +89,6 @@ class ReleaseManagementBuildTriggerService(
                     throw BuildTriggerException("Unable to parse Selections", e)
                 }
             }
-            val currentVersions = selections.map {
-                try {
-                    VersionDTO(it, client.getBuilds(it.component, it.toBuildFilterDTO()).first().version)
-                } catch (e: Exception) {
-                    throw BuildTriggerException(
-                        "Unable to retrieve latest version of '${it.component}' with status no less than ${it.status}" + if (it.minor == null) "" else " and minor equals ${it.minor}",
-                        e
-                    )
-                }
-            }
             val previousVersions = context.customDataStorage.getValue(VERSIONS)?.let {
                 try {
                     mapper.readValue(it, object : TypeReference<Set<VersionDTO>>() {})
@@ -106,6 +97,24 @@ class ReleaseManagementBuildTriggerService(
                     null
                 }
             } ?: emptySet()
+            val quietPeriod = context.triggerDescriptor.properties[QUIET_PERIOD]?.trim()?.toLongOrNull() ?: 0L
+            val limitDate = Date(System.currentTimeMillis() - quietPeriod * 1_000L)
+            val currentVersions = selections.mapNotNull { selection ->
+                try {
+                    val version = client.getBuilds(selection.component, selection.toBuildFilterDTO()).first().version
+                    if (quietPeriod > 0) {
+                        val statusTime = client.getBuild(selection.component, version).statusHistory[selection.status]
+                        if (statusTime == null || statusTime <= limitDate) VersionDTO(selection, version) else null
+                    } else {
+                        VersionDTO(selection, version)
+                    }
+                } catch (e: Exception) {
+                    throw BuildTriggerException(
+                        "Unable to retrieve latest version of '${selection.component}' " + "with status no less than ${selection.status}" + (selection.minor?.let { " and minor equals $it" } ?: ""),
+                        e
+                    )
+                }
+            }
             val diff = (currentVersions - previousVersions).map {
                 "${it.version} ['${it.selection.component}'|${it.selection.status}" + if (it.selection.minor == null) "]" else "|${it.selection.minor}]"
             }
@@ -143,6 +152,7 @@ class ReleaseManagementBuildTriggerService(
         const val BRANCH = "release.management.build.trigger.branch"
         const val POLL_INTERVAL = "release.management.build.trigger.poll.interval"
         const val QUEUE_OPTIMIZATION = "release.management.build.trigger.queue.optimization"
+        const val QUIET_PERIOD = "release.management.build.trigger.quiet.period"
 
         //Custom data
         const val VERSIONS = "release.management.build.trigger.versions"
