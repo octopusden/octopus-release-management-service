@@ -64,7 +64,30 @@ class TriggerTest {
         }
     }
 
-    private fun createBuildType(name: String, triggerSelector: String): TeamcityBuildType {
+    @Test
+    fun testQuietPeriod() {
+        val buildType = createBuildType(
+            name = "Test quiet period",
+            triggerSelector = """
+            - component: ReleaseManagementService
+              status: RELEASE
+        """.trimIndent(),
+            quietPeriod = (10*365*24*3600).toString()
+        )
+        Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
+        with (readBuilds(buildType.id)) {
+            Assertions.assertTrue(
+                statusCode() / 100 == 2,
+                "Unable to get builds of build type '${buildType.id}':\n${body()}"
+            )
+            Assertions.assertTrue(
+                body().contains("\"count\":0,"),
+                "Expected 0 builds due to quiet period, but got:\n${body()}"
+            )
+        }
+    }
+
+    private fun createBuildType(name: String, triggerSelector: String, quietPeriod: String = "0"): TeamcityBuildType {
         return teamcityClient.createBuildType(
             TeamcityCreateBuildType(
                 name = name,
@@ -78,7 +101,8 @@ class TriggerTest {
                                         "release.management.build.trigger.service.url",
                                         RELEASE_MANAGEMENT_SERVICE_URL
                                     ),
-                                    TeamcityProperty("release.management.build.trigger.selections", triggerSelector)
+                                    TeamcityProperty("release.management.build.trigger.selections", triggerSelector),
+                                    TeamcityProperty("release.management.build.trigger.quiet.period", quietPeriod)
                                 )
                             )
                         )
