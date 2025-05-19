@@ -97,29 +97,32 @@ class ReleaseManagementBuildTriggerService(
                     null
                 }
             } ?: emptySet()
-            val quietPeriod = context.triggerDescriptor.properties[QUIET_PERIOD]?.trim()?.toLongOrNull() ?: 0L
-            val limitDate = Date(System.currentTimeMillis() - quietPeriod * 1_000L)
-            val currentVersions = selections.mapNotNull { selection ->
+            val currentVersions = selections.map {
                 try {
-                    val version = client.getBuilds(selection.component, selection.toBuildFilterDTO()).first().version
-                    if (quietPeriod > 0) {
-                        val statusTime = client.getBuild(selection.component, version).statusHistory[selection.status]
-                        if (statusTime == null || statusTime <= limitDate) VersionDTO(selection, version) else null
-                    } else {
-                        VersionDTO(selection, version)
-                    }
+                    VersionDTO(it, client.getBuilds(it.component, it.toBuildFilterDTO()).first().version)
                 } catch (e: Exception) {
                     throw BuildTriggerException(
-                        "Unable to retrieve latest version of '${selection.component}' " + "with status no less than ${selection.status}" + (selection.minor?.let { " and minor equals $it" } ?: ""),
+                        "Unable to retrieve latest version of '${it.component}' with status no less than ${it.status}" + if (it.minor == null) "" else " and minor equals ${it.minor}",
                         e
                     )
                 }
             }
-            val diff = (currentVersions - previousVersions).map {
-                "${it.version} ['${it.selection.component}'|${it.selection.status}" + if (it.selection.minor == null) "]" else "|${it.selection.minor}]"
+            val quietPeriod = context.triggerDescriptor.properties[QUIET_PERIOD]?.trim()?.toLongOrNull() ?: 0L
+            val limitDate = Date(System.currentTimeMillis() - quietPeriod * 1_000L)
+            val diff = currentVersions - previousVersions
+            val versionsToTrigger = if (quietPeriod > 0) {
+                diff.filter {
+                    val statusTime = client.getBuild(it.selection.component, it.version).statusHistory[it.selection.status]
+                    statusTime == null || statusTime <= limitDate
+                }
+            } else {
+                diff
             }
-            if (diff.isNotEmpty()) {
-                val triggeredBy = diff.joinToString(", ", "$displayName on following changes: ").let {
+            if (versionsToTrigger.isNotEmpty()) {
+                val descriptions = versionsToTrigger.map {
+                    "${it.version} ['${it.selection.component}'|${it.selection.status}" + if (it.selection.minor == null) "]" else "|${it.selection.minor}]"
+                }
+                val triggeredBy = descriptions.joinToString(", ", "$displayName on following changes: ").let {
                     if (it.length < 257) it else "${it.take(253)}..."
                 }
                 val branch = context.triggerDescriptor.properties[BRANCH]?.trim()
