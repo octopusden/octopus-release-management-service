@@ -58,7 +58,7 @@
     <td><label for="<%=ReleaseManagementBuildTriggerService.QUIET_PERIOD%>">Quiet period: </label></td>
     <td>
         <props:textProperty name="<%=ReleaseManagementBuildTriggerService.QUIET_PERIOD%>" className="longField"/>
-        <span class="smallNote">Quiet period in seconds. Empty value defines default TeamCity quiet period. It prevents the build from being queued, if the component is released later than (now - quiet_period)</span>
+        <span class="smallNote">Quiet period in seconds. It prevents the build from being queued, if the component is released later than (now - quiet_period). Empty value disables the quiet period.</span>
         <span class="error" id="error_<%=ReleaseManagementBuildTriggerService.QUIET_PERIOD%>"></span>
     </td>
 </tr>
