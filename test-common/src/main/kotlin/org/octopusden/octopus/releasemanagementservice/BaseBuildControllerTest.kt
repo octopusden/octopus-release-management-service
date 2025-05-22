@@ -93,7 +93,22 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
             loadObject(
                 "../test-data/releng/branch-not-found.json",
                 object : TypeReference<Collection<ShortBuildDTO>>() {})
-        )
+        ),
+        Arguments.of(mapOf("statuses" to listOf("BUILD"), "maxAgeBuilds" to 28),
+            loadObject(
+                "../test-data/releng/builds-with-max-age-filter-1.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(mapOf("statuses" to listOf("BUILD", "RC"), "maxAgeBuilds" to 28),
+            loadObject(
+                "../test-data/releng/builds-with-max-age-filter-2.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(mapOf("statuses" to listOf("BUILD"), "maxAgeBuilds" to 10),
+            loadObject(
+                "../test-data/releng/builds-with-max-age-filter-3.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
     )
 
     private fun build(): Stream<Arguments> = Stream.of(

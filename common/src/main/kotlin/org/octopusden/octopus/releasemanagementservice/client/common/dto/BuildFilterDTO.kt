@@ -8,5 +8,6 @@ data class BuildFilterDTO(
     val branchNames: Set<String> = emptySet(),
     val inReleaseBranch: Boolean? = null,
     val descending: Boolean = false,
-    val limit: Int? = null
+    val limit: Int? = null,
+    val maxAgeBuilds : Int? = null
 )
