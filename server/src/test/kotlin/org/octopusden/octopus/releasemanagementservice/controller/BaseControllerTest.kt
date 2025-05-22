@@ -24,13 +24,14 @@ interface BaseControllerTest : BaseReleaseManagementServiceTest {
         vararg uriVars: String
     ): T {
         val mockMvcParams = LinkedMultiValueMap<String, String>()
-        params.entries
-            .flatMap { (param, rawValue) ->
-                when (rawValue) {
-                    is Collection<*> -> rawValue.map { value -> param to value }
-                    else -> listOf(param to rawValue)
+        params.forEach { (param, rawValue) ->
+            when (rawValue) {
+                is Collection<*> -> rawValue.forEach { value ->
+                    mockMvcParams.add(param, value.toString())
                 }
-            }.forEach { (k, v) -> mockMvcParams[k] = v.toString() }
+                else -> mockMvcParams.add(param, rawValue.toString())
+            }
+        }
 
         return getMockMvc().perform(
             MockMvcRequestBuilders.get(path, *uriVars)

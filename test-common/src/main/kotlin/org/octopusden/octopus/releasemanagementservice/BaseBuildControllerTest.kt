@@ -83,7 +83,7 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
                 object : TypeReference<Collection<ShortBuildDTO>>() {})
         ),
         Arguments.of(
-            mapOf("branchNames" to listOf("release-1.0, release-1.1")),
+            mapOf("branchNames" to listOf("release-1.0", "release-1.1")),
             loadObject(
                 "../test-data/releng/builds-with-branch-filter-2.json",
                 object : TypeReference<Collection<ShortBuildDTO>>() {})
