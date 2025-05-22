@@ -19,6 +19,7 @@ import org.octopusden.octopus.releasemanagementservice.client.impl.ClassicReleas
 import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManagementServiceClientParametersProvider
 import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.BuildSelectionDTO
 import org.octopusden.octopus.releasemanagementservice.teamcity.plugin.dto.VersionDTO
+import java.util.Date
 
 class ReleaseManagementBuildTriggerService(
     private val pluginDescriptor: PluginDescriptor, private val buildQueue: BuildQueue
@@ -36,7 +37,7 @@ class ReleaseManagementBuildTriggerService(
     override fun getEditParametersUrl() =
         pluginDescriptor.getPluginResourcesPath("editReleaseManagementBuildTriggerParameters.jsp")
 
-    override fun getDefaultTriggerProperties() = mutableMapOf(POLL_INTERVAL to "300")
+    override fun getDefaultTriggerProperties() = mutableMapOf(POLL_INTERVAL to "300", QUIET_PERIOD to "60")
 
     override fun getTriggerPropertiesProcessor() = PropertiesProcessor { properties ->
         val invalidProperties = mutableListOf<InvalidProperty>()
@@ -88,6 +89,14 @@ class ReleaseManagementBuildTriggerService(
                     throw BuildTriggerException("Unable to parse Selections", e)
                 }
             }
+            val previousVersions = context.customDataStorage.getValue(VERSIONS)?.let {
+                try {
+                    mapper.readValue(it, object : TypeReference<Set<VersionDTO>>() {})
+                } catch (e: Exception) {
+                    log.warn("Unable to parse stored versions", e)
+                    null
+                }
+            } ?: emptySet()
             val currentVersions = selections.map {
                 try {
                     VersionDTO(it, client.getBuilds(it.component, it.toBuildFilterDTO()).first().version)
@@ -98,19 +107,22 @@ class ReleaseManagementBuildTriggerService(
                     )
                 }
             }
-            val previousVersions = context.customDataStorage.getValue(VERSIONS)?.let {
-                try {
-                    mapper.readValue(it, object : TypeReference<Set<VersionDTO>>() {})
-                } catch (e: Exception) {
-                    log.warn("Unable to parse stored versions", e)
-                    null
+            val quietPeriod = context.triggerDescriptor.properties[QUIET_PERIOD]?.trim()?.toLongOrNull() ?: 0L
+            val limitDate = Date(System.currentTimeMillis() - quietPeriod * 1_000L)
+            val diff = currentVersions - previousVersions
+            val versionsToTrigger = if (quietPeriod > 0) {
+                diff.filter {
+                    val statusTime = client.getBuild(it.selection.component, it.version).statusHistory[it.selection.status]
+                    statusTime == null || statusTime <= limitDate
                 }
-            } ?: emptySet()
-            val diff = (currentVersions - previousVersions).map {
-                "${it.version} ['${it.selection.component}'|${it.selection.status}" + if (it.selection.minor == null) "]" else "|${it.selection.minor}]"
+            } else {
+                diff
             }
-            if (diff.isNotEmpty()) {
-                val triggeredBy = diff.joinToString(", ", "$displayName on following changes: ").let {
+            if (versionsToTrigger.isNotEmpty()) {
+                val descriptions = versionsToTrigger.map {
+                    "${it.version} ['${it.selection.component}'|${it.selection.status}" + if (it.selection.minor == null) "]" else "|${it.selection.minor}]"
+                }
+                val triggeredBy = descriptions.joinToString(", ", "$displayName on following changes: ").let {
                     if (it.length < 257) it else "${it.take(253)}..."
                 }
                 val branch = context.triggerDescriptor.properties[BRANCH]?.trim()
@@ -143,6 +155,7 @@ class ReleaseManagementBuildTriggerService(
         const val BRANCH = "release.management.build.trigger.branch"
         const val POLL_INTERVAL = "release.management.build.trigger.poll.interval"
         const val QUEUE_OPTIMIZATION = "release.management.build.trigger.queue.optimization"
+        const val QUIET_PERIOD = "release.management.build.trigger.quiet.period"
 
         //Custom data
         const val VERSIONS = "release.management.build.trigger.versions"

@@ -17,6 +17,7 @@ import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityPropert
 import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityProperty
 import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityTrigger
 import org.octopusden.octopus.infrastructure.teamcity.client.dto.TeamcityTriggers
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildStatus
 
 class TriggerTest {
     @Test
@@ -64,7 +65,45 @@ class TriggerTest {
         }
     }
 
-    private fun createBuildType(name: String, triggerSelector: String): TeamcityBuildType {
+    @Test
+    fun testQuietPeriod() {
+        val releaseTime = TestUtil.client.getBuild("ReleaseManagementService", "2.0.1").statusHistory.getValue(BuildStatus.RELEASE)
+        val diffSec = (System.currentTimeMillis() - releaseTime.time) / 1000
+        val pollIntervalSec = DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL / 1000
+        val dynamicQuietPeriod = diffSec + pollIntervalSec
+        val buildType = createBuildType(
+            name = "Test quiet period",
+            triggerSelector = """
+            - component: ReleaseManagementService
+              status: RELEASE
+        """.trimIndent(),
+            quietPeriod = dynamicQuietPeriod.toString()
+        )
+        Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
+        with(readBuilds(buildType.id)) {
+            Assertions.assertTrue(
+                statusCode() / 100 == 2,
+                "Unable to get builds of build type '${buildType.id}':\n${body()}"
+            )
+            Assertions.assertTrue(
+                body().contains("\"count\":0,"),
+                "Expected 0 builds during quiet period, but got:\n${body()}"
+            )
+        }
+        Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
+        with(readBuilds(buildType.id)) {
+            Assertions.assertTrue(
+                statusCode() / 100 == 2,
+                "Unable to get builds of build type '${buildType.id}':\n${body()}"
+            )
+            Assertions.assertTrue(
+                body().contains("\"count\":1,"),
+                "Expected 1 build after quiet period elapsed, but got:\n${body()}"
+            )
+        }
+    }
+
+    private fun createBuildType(name: String, triggerSelector: String, quietPeriod: String = "0"): TeamcityBuildType {
         return teamcityClient.createBuildType(
             TeamcityCreateBuildType(
                 name = name,
@@ -78,7 +117,8 @@ class TriggerTest {
                                         "release.management.build.trigger.service.url",
                                         RELEASE_MANAGEMENT_SERVICE_URL
                                     ),
-                                    TeamcityProperty("release.management.build.trigger.selections", triggerSelector)
+                                    TeamcityProperty("release.management.build.trigger.selections", triggerSelector),
+                                    TeamcityProperty("release.management.build.trigger.quiet.period", quietPeriod)
                                 )
                             )
                         )
