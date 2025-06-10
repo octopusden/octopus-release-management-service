@@ -6,5 +6,5 @@ interface ComponentService {
     fun getComponents(): Collection<ComponentDTO>
     fun getComponent(component: String): ComponentDTO
     fun updateComponent(component: String, dto: ComponentDTO): ComponentDTO
-    fun getDependentComponents(component: String, version: String): Collection<ComponentDTO>
+    fun getMandatoryUpdateComponents(component: String, version: String): Collection<ComponentDTO>
 }
