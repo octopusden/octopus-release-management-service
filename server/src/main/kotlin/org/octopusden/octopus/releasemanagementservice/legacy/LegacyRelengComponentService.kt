@@ -11,4 +11,6 @@ class LegacyRelengComponentService(private val client: LegacyRelengClient) : Com
     override fun getComponent(component: String): ComponentDTO = client.getComponent(component)
 
     override fun updateComponent(component: String, dto: ComponentDTO): ComponentDTO = client.updateComponent(component, dto)
+
+    override fun getDependentComponents(component: String, version: String): Collection<ComponentDTO> = client.getDependentComponents(component, version)
 }
