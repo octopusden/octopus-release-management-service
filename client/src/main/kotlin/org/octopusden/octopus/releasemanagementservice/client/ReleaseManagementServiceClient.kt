@@ -28,4 +28,7 @@ interface ReleaseManagementServiceClient {
 
     @RequestLine("GET /rest/api/1/support/components/{component}")
     fun updateComponent(@Param("component") component: String, dto: ComponentDTO) : ComponentDTO
+
+    @RequestLine("GET /rest/api/1/support/components/{component}/version/{version}/dependent-on")
+    fun getMandatoryUpdateComponents(@Param("component") component: String, @Param("version") version: String) : Collection<ComponentDTO>
 }
