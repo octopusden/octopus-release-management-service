@@ -11,6 +11,8 @@ class SupportControllerTest : BaseSupportControllerTest() {
 
     override fun getComponent(component: String) = TestUtil.client.getComponent(component)
 
+    override fun getMandatoryUpdateComponents(component: String, version: String) = TestUtil.client.getMandatoryUpdateComponents(component, version)
+
     override fun getNotExistedComponentErrorResponse(component: String) = try {
         TestUtil.client.getComponent(component)
         ErrorResponse(ReleaseManagementServiceErrorCode.OTHER, "Failure expected")

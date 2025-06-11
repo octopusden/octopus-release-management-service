@@ -24,4 +24,7 @@ interface LegacyRelengClient {
 
     @RequestLine("PUT rest/release-engineering/3/component-management/{component}")
     fun updateComponent(@Param("component") component: String, dto: ComponentDTO): ComponentDTO
+
+    @RequestLine("GET rest/release-engineering/3/component-management/{component}/version/{version}/dependent-on")
+    fun getMandatoryUpdateComponents(@Param("component") component: String, @Param("version") version: String): Collection<ComponentDTO>
 }
