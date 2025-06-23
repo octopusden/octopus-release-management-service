@@ -24,8 +24,4 @@ class SupportController(private val componentService: ComponentService) {
     @PutMapping("components/{component}", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun updateComponent(@PathVariable("component") component: String, @RequestBody dto: ComponentDTO): ComponentDTO =
         componentService.updateComponent(component, dto)
-
-    @GetMapping("components/{component}/version/{version}/dependent-on", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getMandatoryUpdateComponents(@PathVariable("component") component: String, @PathVariable("version") version: String): Collection<ComponentDTO> =
-        componentService.getMandatoryUpdateComponents(component, version)
 }

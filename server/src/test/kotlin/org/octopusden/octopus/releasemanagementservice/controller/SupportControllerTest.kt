@@ -62,14 +62,4 @@ class SupportControllerTest : BaseSupportControllerTest(), BaseControllerTest {
             component
         )
     }
-
-    override fun getMandatoryUpdateComponents(component: String, version: String): Collection<ComponentDTO> {
-        return get(
-            HttpStatus.OK.value(),
-            object : TypeReference<Collection<ComponentDTO>>() {},
-            "/rest/api/1/support/components/{component}/version/{version}/dependent-on",
-            emptyMap(),
-            component, version
-        )
-    }
 }
