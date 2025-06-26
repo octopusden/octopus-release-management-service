@@ -26,6 +26,6 @@ interface ReleaseManagementServiceClient {
     @RequestLine("GET /rest/api/1/support/components/{component}")
     fun getComponent(@Param("component") component: String) : ComponentDTO
 
-    @RequestLine("GET /rest/api/1/support/components/{component}")
+    @RequestLine("PUT /rest/api/1/support/components/{component}")
     fun updateComponent(@Param("component") component: String, dto: ComponentDTO) : ComponentDTO
 }
