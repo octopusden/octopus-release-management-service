@@ -44,4 +44,7 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
 
     override fun updateComponent(component: String, dto: ComponentDTO): ComponentDTO =
         client.updateComponent(component, dto)
+
+    override fun getMandatoryUpdateBuilds(component: String, version: String, activeLinePeriod: Int)=
+        client.getMandatoryUpdateBuilds(component, version, activeLinePeriod)
 }
