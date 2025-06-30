@@ -100,6 +100,10 @@ dependencyManagement {
 dependencies {
     implementation(project(":common"))
     implementation(project(":legacy-releng-client"))
+    implementation("org.octopusden.octopus.jira:common:2.0.17")
+    implementation("org.octopusden.octopus.infrastructure:components-registry-service-client:${properties["octopus-components-registry.version"]}")
+    implementation("com.atlassian.jira:jira-rest-java-client-core:5.2.6")
+    implementation("com.atlassian.jira:jira-rest-java-client-api:5.2.6")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
