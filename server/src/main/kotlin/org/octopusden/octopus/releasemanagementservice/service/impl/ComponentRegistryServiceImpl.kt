@@ -3,6 +3,7 @@ package org.octopusden.octopus.releasemanagementservice.service.impl
 import org.octopusden.octopus.components.registry.client.impl.ClassicComponentsRegistryServiceClient
 import org.octopusden.octopus.components.registry.client.impl.ClassicComponentsRegistryServiceClientUrlProvider
 import org.octopusden.octopus.components.registry.core.dto.ComponentV1
+import org.octopusden.octopus.components.registry.core.dto.DetailedComponent
 import org.octopusden.octopus.releasemanagementservice.config.ComponentsRegistryServiceProperties
 import org.octopusden.octopus.releasemanagementservice.service.ComponentRegistryService
 import org.springframework.stereotype.Service
@@ -17,5 +18,9 @@ class ComponentRegistryServiceImpl(private val componentsRegistryServiceProperti
 
     override fun getById(id: String): ComponentV1 {
         return client.getById(id)
+    }
+
+    override fun getDetailedComponent(component: String, version: String): DetailedComponent {
+        return client.getDetailedComponent(component, version)
     }
 }

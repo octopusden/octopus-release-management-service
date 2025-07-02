@@ -6,6 +6,7 @@ import feign.RequestLine
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 
@@ -28,4 +29,12 @@ interface ReleaseManagementServiceClient {
 
     @RequestLine("PUT /rest/api/1/support/components/{component}")
     fun updateComponent(@Param("component") component: String, dto: ComponentDTO) : ComponentDTO
+
+    @RequestLine("POST /rest/api/1/support/components/{component}/version/{version}/mandatory-update?dryRun={dryRun}")
+    fun createMandatoryUpdate(
+        @Param("component") component: String,
+        @Param("version") version: String,
+        @Param("dryRun") dryRun: Boolean,
+        dto: MandatoryUpdateDTO
+    ): Collection<BuildDTO>
 }
