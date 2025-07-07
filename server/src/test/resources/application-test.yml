@@ -2,12 +2,12 @@ releng:
   url: http://localhost:1080
 
 jira1:
-  host: http://mockserver:1080/jira
+  host: http://localhost:1080
   username: admin
   password: admin
 
 components-registry-service:
-  url: http://localhost:10001
+  url: http://localhost:4567
 
 management:
   endpoints:

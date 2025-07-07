@@ -14,6 +14,7 @@ configure<com.avast.gradle.dockercompose.ComposeExtension> {
     environment.putAll(
         mapOf(
             "RELEASE_MANAGEMENT_SERVICE_VERSION" to version,
+            "OCTOPUS_COMPONENTS_REGISTRY_SERVICE_VERSION" to properties["octopus-components-registry.version"],
             "MOCKSERVER_VERSION" to properties["mockserver.version"],
             "TEAMCITY_VERSION" to "2022.04.7",
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
