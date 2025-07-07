@@ -30,12 +30,19 @@ open class MigrateMockData : DefaultTask() {
         endpointNotFoundToResponseFileName.forEach {
             generateMockserverData(it.key.first, it.key.second, testDataDir + File.separator + it.value, HttpStatusCode.NOT_FOUND_404.code())
         }
+        generateMockserverData(
+            "/rest/api/latest/issue",
+            emptyMap(),
+            testDataDir + File.separator + "jira/create-issue.json",
+            HttpStatusCode.CREATED_201.code(),
+            "POST"
+        )
     }
 
-    private fun generateMockserverData(endpoint: String, params: Map<String, List<String>>, filename: String, status: Int) {
+    private fun generateMockserverData(endpoint: String, params: Map<String, List<String>>, filename: String, status: Int, method: String = "GET") {
         val body = Files.asCharSource(File(filename), Charset.defaultCharset()).read()
         val request = HttpRequest.request()
-            .withMethod("GET")
+            .withMethod(method)
             .withPath(endpoint)
         params.forEach { (key, values) ->
             request.withQueryStringParameter(key, *values.toTypedArray())
@@ -78,7 +85,10 @@ open class MigrateMockData : DefaultTask() {
             "/rest/release-engineering/3/component/ReleaseManagementService/version/2.0.1/build" to emptyMap<String, List<String>>() to "releng/build_2.0.1.json",
             "/rest/release-engineering/3/component-management" to emptyMap<String, List<String>>() to "releng/components.json",
             "/rest/release-engineering/3/component-management/ReleaseManagementService" to emptyMap<String, List<String>>() to "releng/component_rm_service.json",
-            "/rest/release-engineering/3/component-management/LegacyReleaseManagementService" to emptyMap<String, List<String>>() to "releng/component_legacy_rm_service.json"
+            "/rest/release-engineering/3/component-management/LegacyReleaseManagementService" to emptyMap<String, List<String>>() to "releng/component_legacy_rm_service.json",
+            "/rest/release-engineering/3/component/dependency-component-first/version/1.0.2/mandatory-update" to mapOf("activeLinePeriod" to listOf("180")) to "releng/mandatory-update-builds.json",
+            "/rest/api/latest/issuetype" to emptyMap<String, List<String>>() to "jira/issue-types.json",
+            "/rest/api/latest/field" to emptyMap<String, List<String>>() to "jira/fields.json"
         )
         private val endpointNotFoundToResponseFileName = mapOf(
             "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.3/build" to emptyMap<String, List<String>>() to "releng/build-not-exist-error.json",

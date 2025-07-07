@@ -14,20 +14,9 @@ import java.util.Date
 class JiraServiceImpl(jiraClientConfig: JiraClientConfig): JiraService {
     private val client: JiraRestClient = jiraClientConfig.jiraRestClient()
 
-//    private val issueTypes: Map<String, IssueType> = client.metadataClient.issueTypes.claim().associateBy { it.name }
-//
-//    private val fields: Map<String, String> = client.metadataClient.fields.claim().associate { it.name to it.id }
+    private val issueTypes: Map<String, IssueType> by lazy { client.metadataClient.issueTypes.claim().associateBy { it.name } }
 
-private val issueTypes: Map<String, IssueType> by lazy {
-    client.metadataClient.issueTypes
-        .claim()
-        .associateBy { it.name }
-}
-    private val fields: Map<String, String> by lazy {
-        client.metadataClient.fields
-            .claim()
-            .associate { it.name to it.id }
-    }
+    private val fields: Map<String, String> by lazy { client.metadataClient.fields.claim().associate { it.name to it.id } }
 
     override fun createIssue(
         projectKey: String,

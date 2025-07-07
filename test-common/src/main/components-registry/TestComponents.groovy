@@ -1,5 +1,5 @@
 "main-component-first" {
-    system = "NONE"
+    system = "CLASSIC"
     componentDisplayName = "Main component first"
     componentOwner = "jdoe"
     releaseManager = "jdoe"

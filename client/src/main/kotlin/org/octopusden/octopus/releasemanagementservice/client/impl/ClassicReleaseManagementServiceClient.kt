@@ -18,6 +18,7 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDT
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 
@@ -50,7 +51,7 @@ class ClassicReleaseManagementServiceClient(
         version: String,
         dryRun: Boolean,
         dto: MandatoryUpdateDTO
-    ): Collection<BuildDTO> =
+    ): MandatoryUpdateResponseDTO =
         client.createMandatoryUpdate(component, version, dryRun, dto)
 
     fun setUrl(apiUrl: String, timeRetryInMillis: Int) {

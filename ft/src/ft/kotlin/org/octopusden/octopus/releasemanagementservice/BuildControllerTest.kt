@@ -2,6 +2,8 @@ package org.octopusden.octopus.releasemanagementservice
 
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ReleaseManagementServiceErrorCode
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.NotFoundException
 
@@ -20,4 +22,12 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseReleaseManagementServ
     } catch (e: NotFoundException) {
         ErrorResponse(ReleaseManagementServiceErrorCode.NOT_FOUND, e.message!!)
     }
+
+    override fun createMandatoryUpdate(
+        component: String,
+        version: String,
+        dryRun: Boolean,
+        dto: MandatoryUpdateDTO
+    ): MandatoryUpdateResponseDTO =
+        TestUtil.client.createMandatoryUpdate(component, version, dryRun, dto)
 }
