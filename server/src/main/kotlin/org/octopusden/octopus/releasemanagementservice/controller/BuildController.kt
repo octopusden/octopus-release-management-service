@@ -40,6 +40,7 @@ class BuildController(private val buildService: BuildService) {
         @RequestParam(defaultValue = "true") dryRun: Boolean,
         @RequestBody dto: MandatoryUpdateDTO
     ): MandatoryUpdateResponseDTO {
+        log.info("Create mandatory update: component='{}', version='{}', dryRun={}, dto={}", component, version, dryRun, dto)
         return buildService.createMandatoryUpdate(component, version, dryRun, dto)
     }
 

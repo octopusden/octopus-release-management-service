@@ -1,10 +1,12 @@
 package org.octopusden.octopus.releasemanagementservice.controller
 
+import jakarta.servlet.http.HttpServletResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ReleaseManagementServiceErrorCode
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.ArgumentsNotCompatibleException
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.NotFoundException
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.ReleaseManagementServiceException
+import org.octopusden.octopus.releasemanagementservice.legacy.LegacyRelengClientException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.Order
@@ -39,6 +41,14 @@ class ExceptionInfoHandler {
     @Order(100)
     fun handleException(exception: Exception): ErrorResponse {
         log.error(exception.message ?: "Internal error", exception)
+        return getErrorResponse(exception)
+    }
+
+    @ExceptionHandler(LegacyRelengClientException::class)
+    @ResponseBody
+    fun handleLegacyClientException(exception: LegacyRelengClientException, response: HttpServletResponse): ErrorResponse {
+        val status = HttpStatus.resolve(exception.code) ?: HttpStatus.INTERNAL_SERVER_ERROR
+        response.status = status.value()
         return getErrorResponse(exception)
     }
 

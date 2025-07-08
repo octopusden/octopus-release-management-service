@@ -15,7 +15,6 @@ import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceI
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_NAME_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_LINK_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_ISSUE
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -53,7 +52,7 @@ class BuildServiceImpl(
         }
         try {
             val epicKey = createEpic(component, version, dto)
-            createSubIssues(component, builds, dto, epicKey)
+            createSubIssues(component, version, builds, dto, epicKey)
             return MandatoryUpdateResponseDTO(epicKey, null)
         } catch (e: Exception) {
             throw Exception(e.message)
@@ -80,7 +79,7 @@ class BuildServiceImpl(
         )
     }
 
-    private fun createSubIssues(component: String, builds: List<BuildDTO>, dto: MandatoryUpdateDTO, epicKey: String) {
+    private fun createSubIssues(component: String, version: String, builds: List<BuildDTO>, dto: MandatoryUpdateDTO, epicKey: String) {
         val buildsByComponent = builds.groupBy { it.component }
         val extraFields = mapOf(CUSTOMER_FIELD to ComplexIssueInputFieldValue(mapOf("value" to dto.customer)), EPIC_LINK_FIELD to epicKey)
         for ((compId, compBuilds) in buildsByComponent) {
@@ -91,8 +90,8 @@ class BuildServiceImpl(
             jiraService.createIssue(
                 currentProjectKey,
                 MANDATORY_UPDATE_ISSUE,
-                ISSUE_SUMMARY_TEMPLATE.format(component),
-                ISSUE_DESCRIPTION_TEMPLATE.format(compId, versions),
+                ISSUE_SUMMARY_TEMPLATE.format(compId, component, version),
+                ISSUE_DESCRIPTION_TEMPLATE.format(compId, versions, component, version),
                 assignee,
                 dto.dueDate,
                 extraFields
@@ -100,16 +99,13 @@ class BuildServiceImpl(
         }
     }
 
-
     companion object {
-        private const val EPIC_SUMMARY_TEMPLATE = "Mandatory Update to the: %s %s"
+        private const val EPIC_SUMMARY_TEMPLATE = "Bump Dependencies on %s %s"
         private const val EPIC_DESCRIPTION_TEMPLATE =
-            "Mandatory update of %s dependent components in a version lower than %s. " +
-                    "All update candidates are listed in the epic issues."
-        private const val ISSUE_SUMMARY_TEMPLATE = "Mandatory update due to %s"
+            "Bump Dependencies on %s to %s or a later version. Components eligible for update are listed in the epic's issues."
+        private const val ISSUE_SUMMARY_TEMPLATE = "%s: Bump Dependencies on %s to %s or a later version."
         private const val ISSUE_DESCRIPTION_TEMPLATE =
-            "Component %s has the following outdated versions requiring mandatory update:\n" +
-                    "%s\n\n Please update these versions."
-        private val log = LoggerFactory.getLogger(BuildServiceImpl::class.java)
+            "Component %s has the following versions eligible for mandatory update:\n%s\n\n" +
+                    "Those versions are to be updated: please bump dependencies on %s to %s or a later version."
     }
 }
