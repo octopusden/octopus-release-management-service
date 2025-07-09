@@ -22,27 +22,18 @@ class ExceptionInfoHandler {
     @ExceptionHandler(NotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    fun handleNotFound(exception: ReleaseManagementServiceException) = getErrorResponse(exception)
-        .also {
-            log.error(exception.message)
-        }
+    fun handleNotFound(exception: ReleaseManagementServiceException): ErrorResponse = getErrorResponse(exception)
 
     @ExceptionHandler(ArgumentsNotCompatibleException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    fun handleArgumentsNotCompatible(exception: ReleaseManagementServiceException): ErrorResponse {
-        log.error(exception.message)
-        return getErrorResponse(exception)
-    }
+    fun handleArgumentsNotCompatible(exception: ReleaseManagementServiceException): ErrorResponse = getErrorResponse(exception)
 
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     @Order(100)
-    fun handleException(exception: Exception): ErrorResponse {
-        log.error(exception.message ?: "Internal error", exception)
-        return getErrorResponse(exception)
-    }
+    fun handleException(exception: Exception): ErrorResponse = getErrorResponse(exception)
 
     @ExceptionHandler(LegacyRelengClientException::class)
     @ResponseBody
@@ -56,6 +47,7 @@ class ExceptionInfoHandler {
         private val log: Logger = LoggerFactory.getLogger(ExceptionInfoHandler::class.java)
 
         private fun getErrorResponse(exception: Exception): ErrorResponse {
+            log.error(exception.message ?: "Unexpected error", exception)
             val errorCode = ReleaseManagementServiceErrorCode.getErrorCode(exception)
             return ErrorResponse(
                 errorCode, exception.message

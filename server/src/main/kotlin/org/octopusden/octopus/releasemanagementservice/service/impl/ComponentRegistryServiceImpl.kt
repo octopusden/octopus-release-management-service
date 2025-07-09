@@ -4,15 +4,18 @@ import org.octopusden.octopus.components.registry.client.impl.ClassicComponentsR
 import org.octopusden.octopus.components.registry.client.impl.ClassicComponentsRegistryServiceClientUrlProvider
 import org.octopusden.octopus.components.registry.core.dto.ComponentV1
 import org.octopusden.octopus.components.registry.core.dto.DetailedComponent
-import org.octopusden.octopus.releasemanagementservice.config.ComponentsRegistryServiceProperties
 import org.octopusden.octopus.releasemanagementservice.service.ComponentRegistryService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
-class ComponentRegistryServiceImpl(private val componentsRegistryServiceProperties: ComponentsRegistryServiceProperties): ComponentRegistryService {
+class ComponentRegistryServiceImpl(
+    @Value("\${components-registry-service.url}")
+    private val componentsRegistryServiceUrl: String
+): ComponentRegistryService {
     private val client = ClassicComponentsRegistryServiceClient(
         object : ClassicComponentsRegistryServiceClientUrlProvider {
-            override fun getApiUrl() = componentsRegistryServiceProperties.url
+            override fun getApiUrl() = componentsRegistryServiceUrl
         }
     )
 

@@ -41,19 +41,16 @@ class BuildServiceImpl(
         val builds = client.getMandatoryUpdateBuilds(component, version, dto.filter.activeLinePeriod)
             .filter {
                 if (excludes.contains(it.component)) return@filter false
-                val comp = componentRegistryService.getById(it.component)
-                comp.system.intersect(systems).isEmpty() && comp.distribution?.external == true
+                val foundComponent = componentRegistryService.getById(it.component)
+                foundComponent.system.intersect(systems).isEmpty() && foundComponent.distribution?.external == true
             }
-        if (builds.isEmpty()) {
-            return MandatoryUpdateResponseDTO(null, null)
-        }
-        if (dryRun) {
+        if (builds.isEmpty() || dryRun) {
             return MandatoryUpdateResponseDTO(null, builds)
         }
         try {
             val epicKey = createEpic(component, version, dto)
             createSubIssues(component, version, builds, dto, epicKey)
-            return MandatoryUpdateResponseDTO(epicKey, null)
+            return MandatoryUpdateResponseDTO(epicKey, builds)
         } catch (e: Exception) {
             throw Exception(e.message)
         }
