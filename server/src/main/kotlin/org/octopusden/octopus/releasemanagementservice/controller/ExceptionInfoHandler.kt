@@ -1,5 +1,6 @@
 package org.octopusden.octopus.releasemanagementservice.controller
 
+import com.atlassian.jira.rest.client.api.RestClientException
 import jakarta.servlet.http.HttpServletResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ReleaseManagementServiceErrorCode
@@ -34,6 +35,11 @@ class ExceptionInfoHandler {
     @ResponseBody
     @Order(100)
     fun handleException(exception: Exception): ErrorResponse = getErrorResponse(exception)
+
+    @ExceptionHandler(RestClientException::class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    @ResponseBody
+    fun handleRestClientException(exception: RestClientException): ErrorResponse = getErrorResponse(exception)
 
     @ExceptionHandler(LegacyRelengClientException::class)
     @ResponseBody

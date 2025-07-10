@@ -47,13 +47,9 @@ class BuildServiceImpl(
         if (builds.isEmpty() || dryRun) {
             return MandatoryUpdateResponseDTO(null, builds)
         }
-        try {
-            val epicKey = createEpic(component, version, dto)
-            createSubIssues(component, version, builds, dto, epicKey)
-            return MandatoryUpdateResponseDTO(epicKey, builds)
-        } catch (e: Exception) {
-            throw Exception(e.message)
-        }
+        val epicKey = createEpic(component, version, dto)
+        createSubIssues(component, version, builds, dto, epicKey)
+        return MandatoryUpdateResponseDTO(epicKey, builds)
     }
 
     private fun createEpic(component: String, version: String, dto: MandatoryUpdateDTO): String {
