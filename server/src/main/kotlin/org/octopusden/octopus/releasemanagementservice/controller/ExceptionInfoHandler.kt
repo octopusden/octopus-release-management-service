@@ -36,15 +36,18 @@ class ExceptionInfoHandler {
     @Order(100)
     fun handleException(exception: Exception): ErrorResponse = getErrorResponse(exception)
 
-    @ExceptionHandler(RestClientException::class)
-    @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    @ResponseBody
-    fun handleRestClientException(exception: RestClientException): ErrorResponse = getErrorResponse(exception)
-
     @ExceptionHandler(LegacyRelengClientException::class)
     @ResponseBody
     fun handleLegacyClientException(exception: LegacyRelengClientException, response: HttpServletResponse): ErrorResponse {
         val status = HttpStatus.resolve(exception.code) ?: HttpStatus.INTERNAL_SERVER_ERROR
+        response.status = status.value()
+        return getErrorResponse(exception)
+    }
+
+    @ExceptionHandler(RestClientException::class)
+    @ResponseBody
+    fun handleRestClientException(exception: RestClientException, response: HttpServletResponse): ErrorResponse {
+        val status = exception.statusCode.orNull()?.let { HttpStatus.resolve(it) } ?: HttpStatus.INTERNAL_SERVER_ERROR
         response.status = status.value()
         return getErrorResponse(exception)
     }

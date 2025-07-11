@@ -42,7 +42,7 @@ class BuildServiceImpl(
             .filter {
                 if (excludes.contains(it.component)) return@filter false
                 val foundComponent = componentRegistryService.getById(it.component)
-                foundComponent.system.intersect(systems).isEmpty() && foundComponent.distribution?.external == true
+                foundComponent.distribution?.external == true && foundComponent.system.intersect(systems).isEmpty()
             }
         if (builds.isEmpty() || dryRun) {
             return MandatoryUpdateResponseDTO(null, builds)
