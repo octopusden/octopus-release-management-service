@@ -35,6 +35,7 @@ subprojects {
 
     repositories {
         mavenCentral()
+        maven { setUrl("https://maven.artifacts.atlassian.com/") }
     }
 
     idea.module {
