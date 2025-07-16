@@ -9,6 +9,7 @@ pluginManagement {
         id("com.bmuschko.docker-spring-boot-application") version (extra["bmuschko-docker-plugin.version"] as String)
         id("io.github.gradle-nexus.publish-plugin") version "1.1.0" apply false
         id("io.github.rodm.teamcity-server") version (extra["rodm-teamcity-plugin.version"] as String)
+        id("com.github.johnrengelman.shadow") version ("8.1.1")
     }
     repositories {
         gradlePluginPortal()
@@ -18,6 +19,7 @@ pluginManagement {
 
 rootProject.name = "octopus-release-management-service"
 
+include(":automation")
 include(":common")
 include(":client")
 include(":teamcity-plugin")

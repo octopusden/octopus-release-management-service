@@ -91,6 +91,7 @@ dependencyManagement {
 
 dependencies {
     ftImplementation(project(":client"))
+    ftImplementation(project(":automation"))
     ftImplementation(project(":common"))
     ftImplementation(project(":test-common"))
     ftImplementation("org.junit.jupiter:junit-jupiter-engine")
