@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<meta-runner name="Dependencies Status">
+<meta-runner name="Generate Dependencies Status Report">
     <description>
         Depends on following TeamCity parameters:
         * RELEASE_MANAGEMENT_SERVICE_URL
-        Dependencies Status
     </description>
     <settings>
         <parameters>
@@ -12,10 +11,9 @@
             <param name="DEPENDENCIES_STATUS_FILE" value="" spec="text validationMode='not_empty'"/>
         </parameters>
         <build-runners>
-            <runner name="dependencies status" type="OctopusReleaseManagementAutomation">
+            <runner name="Generate Dependencies Status Report" type="OctopusReleaseManagementAutomation">
                 <parameters>
-                    <param name="ARGS"
-                           value="--url=%RELEASE_MANAGEMENT_SERVICE_URL%  dependencies-status --component=%COMPONENT_NAME% --version=%BUILD_VERSION% --dependencies-status-file=%DEPENDENCIES_STATUS_FILE%"/>
+                    <param name="ARGS" value="--url=%RELEASE_MANAGEMENT_SERVICE_URL%  dependencies-status --component=%COMPONENT_NAME% --version=%BUILD_VERSION% --dependencies-status-file=%DEPENDENCIES_STATUS_FILE%"/>
                 </parameters>
             </runner>
         </build-runners>
