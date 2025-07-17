@@ -5,7 +5,6 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.Mandato
 import org.octopusden.octopus.releasemanagementservice.service.UtilityService
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,18 +12,16 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("rest/api/1/utility")
+@RequestMapping("rest/api/1/utils")
 class UtilityController(private val utilityService: UtilityService) {
 
-    @PostMapping("component/{component}/version/{version}/mandatory-update", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping("generate-mandatory-updates", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createMandatoryUpdate(
-        @PathVariable("component") component: String,
-        @PathVariable("version") version: String,
         @RequestParam(defaultValue = "true") dryRun: Boolean,
         @RequestBody dto: MandatoryUpdateDTO
     ): MandatoryUpdateResponseDTO {
-        log.info("Create mandatory update: component='{}', version='{}', dryRun={}, dto={}", component, version, dryRun, dto)
-        return utilityService.createMandatoryUpdate(component, version, dryRun, dto)
+        log.info("Create mandatory update: dryRun={}, dto={}", dryRun, dto)
+        return utilityService.createMandatoryUpdate(dryRun, dto)
     }
 
     companion object {

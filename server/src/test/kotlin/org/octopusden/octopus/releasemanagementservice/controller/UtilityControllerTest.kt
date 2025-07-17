@@ -50,20 +50,13 @@ class UtilityControllerTest: BaseUtilityControllerTest(), BaseControllerTest {
         stubCreateMandatoryUpdate()
     }
 
-    override fun createMandatoryUpdate(
-        component: String,
-        version: String,
-        dryRun: Boolean,
-        dto: MandatoryUpdateDTO
-    ): MandatoryUpdateResponseDTO {
+    override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO {
         return post(
             200,
             object: TypeReference<MandatoryUpdateResponseDTO>() {},
-            "/rest/api/1/utility/component/{component}/version/{version}/mandatory-update",
+            "/rest/api/1/utils/generate-mandatory-updates",
             mapOf("dryRun" to dryRun),
-            dto,
-            component,
-            version
+            dto
         )
     }
 
@@ -105,10 +98,12 @@ class UtilityControllerTest: BaseUtilityControllerTest(), BaseControllerTest {
             )
             doReturn(expected).whenever(utilityService)
                 .createMandatoryUpdate(
-                    eq("dependency-component-first"),
-                    eq("1.0.2"),
                     eq(dryRun),
-                    argThat { dto -> dto.filter == filterDto }
+                    argThat { dto ->
+                        dto.component == "dependency-component-first" &&
+                                dto.version == "1.0.2" &&
+                                dto.filter == filterDto
+                    }
                 )
         }
     }

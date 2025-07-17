@@ -23,14 +23,9 @@ interface ReleaseManagementServiceClient {
     @RequestLine("GET /rest/api/1/builds/component/{component}/version/{version}")
     fun getBuild(@Param("component") component: String, @Param("version") version: String): BuildDTO
 
-    @RequestLine("POST /rest/api/1/utility/component/{component}/version/{version}/mandatory-update?dryRun={dryRun}")
+    @RequestLine("POST /rest/api/1/utils/generate-mandatory-updates?dryRun={dryRun}")
     @Headers("Content-Type: application/json")
-    fun createMandatoryUpdate(
-        @Param("component") component: String,
-        @Param("version") version: String,
-        @Param("dryRun") dryRun: Boolean,
-        dto: MandatoryUpdateDTO
-    ): MandatoryUpdateResponseDTO
+    fun createMandatoryUpdate(@Param("dryRun") dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO
 
     @RequestLine("GET /rest/api/1/support/components")
     fun getComponents() : Collection<ComponentDTO>

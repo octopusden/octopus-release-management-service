@@ -4,5 +4,5 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.Mandato
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
 
 interface UtilityService {
-    fun createMandatoryUpdate(component: String, version: String, dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO
+    fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO
 }

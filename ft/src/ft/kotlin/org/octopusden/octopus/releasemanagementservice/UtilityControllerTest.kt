@@ -7,11 +7,6 @@ class UtilityControllerTest: BaseUtilityControllerTest(), BaseReleaseManagementS
 
     override fun getObjectMapper() = TestUtil.mapper
 
-    override fun createMandatoryUpdate(
-        component: String,
-        version: String,
-        dryRun: Boolean,
-        dto: MandatoryUpdateDTO
-    ): MandatoryUpdateResponseDTO =
-        TestUtil.client.createMandatoryUpdate(component, version, dryRun, dto)
+    override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO =
+        TestUtil.client.createMandatoryUpdate(dryRun, dto)
 }

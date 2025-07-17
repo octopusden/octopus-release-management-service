@@ -14,16 +14,16 @@ import java.util.stream.Stream
 
 abstract class BaseUtilityControllerTest: BaseReleaseManagementServiceTest {
 
-    abstract fun createMandatoryUpdate(component: String,version: String, dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO
+    abstract fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO
 
     @ParameterizedTest
     @MethodSource("mandatoryUpdateCases")
     fun createMandatoryUpdateTest(dryRun: Boolean, excludeComponents: Set<String>, systems: Set<String>, expected: MandatoryUpdateResponseDTO) {
         val result = createMandatoryUpdate(
-            "dependency-component-first",
-            "1.0.2",
             dryRun,
             MandatoryUpdateDTO(
+                component = "dependency-component-first",
+                version = "1.0.2",
                 projectKey = "PROJ",
                 epicName = "Mandatory update to dependency-component-first",
                 dueDate = Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(10)),

@@ -24,15 +24,10 @@ class UtilityServiceImpl(
     private val jiraService: JiraService,
     private val componentRegistryService: ComponentRegistryService
 ): UtilityService {
-    override fun createMandatoryUpdate(
-        component: String,
-        version: String,
-        dryRun: Boolean,
-        dto: MandatoryUpdateDTO
-    ): MandatoryUpdateResponseDTO {
+    override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO {
         val excludes = dto.filter.excludeComponents
         val systems = dto.filter.systems
-        val builds = legacyRelengClient.getMandatoryUpdateBuilds(component, version, dto.filter.activeLinePeriod)
+        val builds = legacyRelengClient.getMandatoryUpdateBuilds(dto.component, dto.version, dto.filter.activeLinePeriod)
             .filter {
                 if (excludes.contains(it.component)) return@filter false
                 val foundComponent = componentRegistryService.getById(it.component)
@@ -41,8 +36,8 @@ class UtilityServiceImpl(
         if (builds.isEmpty() || dryRun) {
             return MandatoryUpdateResponseDTO(null, builds)
         }
-        val epicKey = createEpic(component, version, dto)
-        createSubIssues(component, version, builds, dto, epicKey)
+        val epicKey = createEpic(dto.component, dto.version, dto)
+        createSubIssues(dto.component, dto.version, builds, dto, epicKey)
         return MandatoryUpdateResponseDTO(epicKey, builds)
     }
 

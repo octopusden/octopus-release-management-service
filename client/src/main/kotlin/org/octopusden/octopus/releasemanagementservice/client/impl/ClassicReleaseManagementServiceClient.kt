@@ -46,13 +46,8 @@ class ClassicReleaseManagementServiceClient(
     override fun updateComponent(component: String, dto: ComponentDTO): ComponentDTO =
         client.updateComponent(component, dto)
 
-    override fun createMandatoryUpdate(
-        component: String,
-        version: String,
-        dryRun: Boolean,
-        dto: MandatoryUpdateDTO
-    ): MandatoryUpdateResponseDTO =
-        client.createMandatoryUpdate(component, version, dryRun, dto)
+    override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO =
+        client.createMandatoryUpdate(dryRun, dto)
 
     fun setUrl(apiUrl: String, timeRetryInMillis: Int) {
         client = createClient(apiUrl, mapper, timeRetryInMillis)
