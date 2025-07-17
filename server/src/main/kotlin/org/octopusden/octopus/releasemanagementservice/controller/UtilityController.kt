@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("rest/api/1/utils")
 class UtilityController(private val utilityService: UtilityService) {
 
-    @PostMapping("generate-mandatory-updates", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @PostMapping("mandatory-update", produces = [MediaType.APPLICATION_JSON_VALUE], consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun createMandatoryUpdate(
         @RequestParam(defaultValue = "true") dryRun: Boolean,
         @RequestBody dto: MandatoryUpdateDTO

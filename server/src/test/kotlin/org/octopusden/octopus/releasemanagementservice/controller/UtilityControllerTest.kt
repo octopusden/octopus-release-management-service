@@ -54,7 +54,7 @@ class UtilityControllerTest: BaseUtilityControllerTest(), BaseControllerTest {
         return post(
             200,
             object: TypeReference<MandatoryUpdateResponseDTO>() {},
-            "/rest/api/1/utils/generate-mandatory-updates",
+            "/rest/api/1/utils/mandatory-update",
             mapOf("dryRun" to dryRun),
             dto
         )
