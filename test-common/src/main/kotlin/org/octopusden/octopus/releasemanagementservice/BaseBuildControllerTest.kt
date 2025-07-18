@@ -1,7 +1,6 @@
 package org.octopusden.octopus.releasemanagementservice
 
 import com.fasterxml.jackson.core.type.TypeReference
-import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -10,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
+import java.util.stream.Stream
 
 abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
 
@@ -108,7 +108,7 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
             loadObject(
                 "../test-data/releng/builds-with-max-age-filter-3.json",
                 object : TypeReference<Collection<ShortBuildDTO>>() {})
-        ),
+        )
     )
 
     private fun build(): Stream<Arguments> = Stream.of(

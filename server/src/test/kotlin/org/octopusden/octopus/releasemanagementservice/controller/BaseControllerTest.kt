@@ -44,6 +44,37 @@ interface BaseControllerTest : BaseReleaseManagementServiceTest {
             .response.toObject(typeReference)
     }
 
+    fun <T : Any> post(
+        code: Int,
+        typeReference: TypeReference<T>,
+        path: String,
+        params: Map<String, Any>,
+        body: Any?,
+        vararg uriVars: String
+    ): T {
+        val mockMvcParams = LinkedMultiValueMap<String, String>()
+        params.forEach { (param, rawValue) ->
+            when (rawValue) {
+                is Collection<*> -> rawValue.forEach { value ->
+                    mockMvcParams.add(param, value.toString())
+                }
+                else -> mockMvcParams.add(param, rawValue.toString())
+            }
+        }
+        val builder = MockMvcRequestBuilders.post(path, *uriVars)
+            .params(mockMvcParams)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+        body?.let {
+            val json = getObjectMapper().writeValueAsString(it)
+            builder.content(json)
+        }
+        return getMockMvc().perform(builder)
+            .andExpect(MockMvcResultMatchers.status().`is`(code))
+            .andReturn()
+            .response.toObject(typeReference)
+    }
+
     fun <T> MockHttpServletResponse.toObject(typeReference: TypeReference<T>): T =
         getObjectMapper().readValue(this.contentAsByteArray, typeReference)
 

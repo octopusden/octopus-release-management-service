@@ -100,6 +100,11 @@ dependencyManagement {
 dependencies {
     implementation(project(":common"))
     implementation(project(":legacy-releng-client"))
+    implementation("org.octopusden.octopus.infrastructure:components-registry-service-client:${properties["octopus-components-registry.version"]}")
+    implementation("com.atlassian.jira:jira-rest-java-client-core:${properties["jira-rest-client.version"]}")
+    implementation("com.atlassian.jira:jira-rest-java-client-api:${properties["jira-rest-client.version"]}")
+    implementation("io.atlassian.fugue:fugue:${properties["fugue.version"]}")
+    implementation("org.glassfish.jersey.core:jersey-common:${properties["glassfish-jersey.version"]}")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -112,6 +117,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${properties["springdoc-openapi.version"]}")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:${properties["mockito-kotlin.version"]}")
     testImplementation(project(":test-common"))
 }
 

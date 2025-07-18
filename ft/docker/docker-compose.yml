@@ -19,6 +19,19 @@ services:
     ports:
       - "1080:1080"
 
+  components-registry-service:
+    container_name: release-management-service-ft-components-registry-service
+    image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/components-registry-service:${OCTOPUS_COMPONENTS_REGISTRY_SERVICE_VERSION}
+    ports:
+      - "4567:4567"
+    environment:
+      - SPRING_CONFIG_ADDITIONAL_LOCATION=/
+      - SPRING_PROFILES_ACTIVE=ft
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+    volumes:
+      - ./components-registry-service.yaml:/application-ft.yaml
+      - ./../../test-common/src/main/components-registry:/components-registry
+
   teamcity:
     image: ${DOCKER_REGISTRY}/jetbrains/teamcity-server:${TEAMCITY_VERSION}
     container_name: release-management-service-ft-teamcity

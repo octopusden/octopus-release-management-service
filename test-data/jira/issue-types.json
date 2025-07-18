@@ -1,0 +1,18 @@
+[
+  {
+    "self" : "http://mockserver:1080/rest/api/latest/issuetype/10400",
+    "id" : 10400,
+    "name" : "Epic",
+    "description" : "Created by Jira Software - do not edit or delete. Issue type for a big user story that needs to be broken down.",
+    "iconUri" : "http://mockserver:1080/images/icons/issuetypes/epic.svg",
+    "subtask" : false
+  },
+  {
+    "self" : "http://mockserver:1080/rest/api/latest/issuetype/10800",
+    "id" : 10800,
+    "name" : "Mandatory Update",
+    "description" : "Request generated due to external.",
+    "iconUri" : "http://mockserver:1080/secure/viewavatar?size=xsmall&avatarId=10500&avatarType=issuetype",
+    "subtask" : false
+  }
+]

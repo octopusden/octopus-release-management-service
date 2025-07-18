@@ -17,6 +17,8 @@ import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementS
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 
@@ -44,8 +46,8 @@ class ClassicReleaseManagementServiceClient(
     override fun updateComponent(component: String, dto: ComponentDTO): ComponentDTO =
         client.updateComponent(component, dto)
 
-    override fun getMandatoryUpdateComponents(component: String, version: String): Collection<ComponentDTO> =
-        client.getMandatoryUpdateComponents(component, version)
+    override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO =
+        client.createMandatoryUpdate(dryRun, dto)
 
     fun setUrl(apiUrl: String, timeRetryInMillis: Int) {
         client = createClient(apiUrl, mapper, timeRetryInMillis)

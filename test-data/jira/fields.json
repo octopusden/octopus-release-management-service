@@ -1,0 +1,53 @@
+[
+  {
+    "self" : "http://mockserver:1080/rest/api/latest/field/customfield_11205",
+    "id" : "customfield_11205",
+    "name" : "Epic Name",
+    "fieldType" : "CUSTOM",
+    "custom": true,
+    "orderable" : true,
+    "navigable" : true,
+    "searchable" : true,
+    "schema" : {
+      "type" : "string",
+      "items" : null,
+      "system" : null,
+      "custom" : "com.pyxis.greenhopper.jira:gh-epic-label",
+      "customId" : 11205
+    }
+  },
+  {
+    "self" : "http://mockserver:1080/rest/api/latest/field/customfield_11206",
+    "id" : "customfield_11206",
+    "name" : "Epic Link",
+    "fieldType" : "CUSTOM",
+    "custom": true,
+    "orderable" : true,
+    "navigable" : true,
+    "searchable" : true,
+    "schema" : {
+      "type" : "any",
+      "items" : null,
+      "system" : null,
+      "custom" : "com.pyxis.greenhopper.jira:gh-epic-link",
+      "customId" : 11206
+    }
+  },
+  {
+    "self" : "http://mockserver:1080/rest/api/latest/field/customfield_13400",
+    "id": "customfield_13400",
+    "name": "Customer",
+    "fieldType": "CUSTOM",
+    "custom": true,
+    "orderable": true,
+    "navigable": true,
+    "searchable": true,
+    "schema": {
+      "type": "option",
+      "items": null,
+      "system": null,
+      "custom": "com.atlassian.jira.plugin.system.customfieldtypes:select",
+      "customId": 13400
+    }
+  }
+]
