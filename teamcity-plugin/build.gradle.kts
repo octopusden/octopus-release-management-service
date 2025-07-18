@@ -87,5 +87,5 @@ dependencyManagement {
 
 dependencies {
     implementation(project(":client"))
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${properties["jackson-dataformat-yaml.version"]}")
 }
