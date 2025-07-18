@@ -1,0 +1,5 @@
+$build.component:$build.version $build.status [
+#foreach($dependency in $build.dependencies)
+    $dependency.component:$dependency.version $dependency.status
+#end
+]

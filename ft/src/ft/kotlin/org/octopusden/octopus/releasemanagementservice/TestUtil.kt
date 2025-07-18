@@ -15,5 +15,11 @@ class TestUtil private constructor() {
                 override fun getApiUrl() = "http://localhost:8080"
                 override fun getTimeRetryInMillis() = 180000
             })
+
+        @JvmStatic
+        fun executeAutomation(command: String, vararg options: String) =
+            org.octopusden.octopus.automation.releasemanagement.main(
+                arrayOf("--url=http://localhost:8080", command, *options)
+            )
     }
 }
