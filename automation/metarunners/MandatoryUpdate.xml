@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<meta-runner name="Create Mandatory Update">
+    <description>
+        Depends on following TeamCity parameters:
+        * RELEASE_MANAGEMENT_SERVICE_URL
+    </description>
+    <settings>
+        <parameters>
+            <param name="COMPONENT_NAME" value="" spec="text description='Component name' validationMode='not_empty' display='normal'" />
+            <param name="COMPONENT_VERSION" value="" spec="text description='Component version' validationMode='not_empty' display='normal'" />
+            <param name="PROJECT_KEY" value="" spec="text description='Project key in which the epic will be created' validationMode='not_empty' display='normal'" />
+            <param name="EPIC_NAME" value="" spec="text description='Epic name' validationMode='not_empty' display='normal'" />
+            <param name="DUE_DATE" value="" spec="text description='Due date (yyyy‑MM‑dd)' validationMode='not_empty' display='normal'" />
+            <param name="CUSTOMER" value="" spec="text description='Customer' validationMode='not_empty' display='normal'" />
+            <param name="NOTICE" value="" spec="text description='Additional notice' validationMode='not_empty' display='normal'" />
+            <param name="ACTIVE_LINE_PERIOD" value="0" spec="text description='Active line period (days)' validationMode='not_empty' display='normal'" />
+            <param name="EXCLUDE_COMPONENTS" value="" spec="text description='Exclude components (comma‑separated)' validationMode='not_empty' display='normal'" />
+            <param name="SYSTEMS" value="" spec="text description='Systems with which components will be excluded (comma-separated)' validationMode='not_empty' display='normal'" />
+            <param name="OUTPUT_FILE" value="" spec="text description='File to save result' validationMode='not_empty' display='normal'" />
+            <param name="DRY_RUN" value="true" spec="text description='Dry run only, do not apply. Possible values are |'true|' or |'false|'' validationMode='not_empty' display='normal'" />
+        </parameters>
+        <build-runners>
+            <runner name="Create Mandatory Update" type="OctopusReleaseManagementAutomation">
+                <parameters>
+                    <param name="ARGS"
+                           value="--url=%RELEASE_MANAGEMENT_SERVICE_URL% mandatory-update --component=%COMPONENT_NAME% --version=%COMPONENT_VERSION% --project-key=%PROJECT_KEY% --epic-name=%EPIC_NAME% --due-date=%DUE_DATE% --customer=%CUSTOMER% --notice=%NOTICE% --active-line-period=%ACTIVE_LINE_PERIOD% --exclude-components=%EXCLUDE_COMPONENTS% --systems=%SYSTEMS% --output-file=%OUTPUT_FILE% --dry-run=%DRY_RUN%" />
+                </parameters>
+            </runner>
+        </build-runners>
+        <requirements/>
+    </settings>
+</meta-runner>
