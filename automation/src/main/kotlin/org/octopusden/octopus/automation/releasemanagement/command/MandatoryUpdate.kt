@@ -53,7 +53,7 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .convert { it.trim() }.required()
         .check("$CUSTOMER must not be empty") { it.isNotEmpty() }
 
-    private val notice by option("--notice", help = "Additional notice")
+    private val notice by option(NOTICE, help = "Additional notice")
         .convert { it.trim() }
         .default("")
 
@@ -120,6 +120,7 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         const val EPIC_NAME = "--epic-name"
         const val DUE_DATE = "--due-date"
         const val CUSTOMER = "--customer"
+        const val NOTICE = "--notice"
         const val ACTIVE_LINE_PERIOD = "--active-line-period"
         const val EXCLUDE_COMPONENTS = "--exclude-components"
         const val SYSTEMS = "--systems"

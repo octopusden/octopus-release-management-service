@@ -22,8 +22,7 @@
         <build-runners>
             <runner name="Create Mandatory Update" type="OctopusReleaseManagementAutomation">
                 <parameters>
-                    <param name="ARGS"
-                           value="--url=%RELEASE_MANAGEMENT_SERVICE_URL% mandatory-update --component=%COMPONENT_NAME% --version=%COMPONENT_VERSION% --project-key=%PROJECT_KEY% --epic-name=%EPIC_NAME% --due-date=%DUE_DATE% --customer=%CUSTOMER% --notice=%NOTICE% --active-line-period=%ACTIVE_LINE_PERIOD% --exclude-components=%EXCLUDE_COMPONENTS% --systems=%SYSTEMS% --output-file=%OUTPUT_FILE% --dry-run=%DRY_RUN%" />
+                    <param name="ARGS" value="--url=%RELEASE_MANAGEMENT_SERVICE_URL% mandatory-update --component=%COMPONENT_NAME% --version=%COMPONENT_VERSION% --project-key=%PROJECT_KEY% --epic-name=%EPIC_NAME% --due-date=%DUE_DATE% --customer=%CUSTOMER% --notice=%NOTICE% --active-line-period=%ACTIVE_LINE_PERIOD% --exclude-components=%EXCLUDE_COMPONENTS% --systems=%SYSTEMS% --output-file=%OUTPUT_FILE% --dry-run=%DRY_RUN%" />
                 </parameters>
             </runner>
         </build-runners>
