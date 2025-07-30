@@ -12,11 +12,11 @@
             <param name="EPIC_NAME" value="" spec="text description='Epic name' validationMode='not_empty' display='normal'" />
             <param name="DUE_DATE" value="" spec="text description='Due date (yyyy‑MM‑dd)' validationMode='not_empty' display='normal'" />
             <param name="CUSTOMER" value="" spec="text description='Customer' validationMode='not_empty' display='normal'" />
-            <param name="NOTICE" value="" spec="text description='Additional notice' validationMode='not_empty' display='normal'" />
+            <param name="NOTICE" value="" spec="text description='Additional notice' validationMode='any' display='normal'" />
             <param name="ACTIVE_LINE_PERIOD" value="0" spec="text description='Active line period (days)' validationMode='not_empty' display='normal'" />
-            <param name="EXCLUDE_COMPONENTS" value="" spec="text description='Exclude components (comma‑separated)' validationMode='not_empty' display='normal'" />
-            <param name="SYSTEMS" value="" spec="text description='Systems with which components will be excluded (comma-separated)' validationMode='not_empty' display='normal'" />
-            <param name="OUTPUT_FILE" value="" spec="text description='File to save result' validationMode='not_empty' display='normal'" />
+            <param name="EXCLUDE_COMPONENTS" value="" spec="text description='Exclude components (comma‑separated)' validationMode='any' display='normal'" />
+            <param name="SYSTEMS" value="" spec="text description='Systems with which components will be excluded (comma-separated)' validationMode='any' display='normal'" />
+            <param name="OUTPUT_FILE" value="" spec="text description='File to save result' validationMode='any' display='normal'" />
             <param name="DRY_RUN" value="true" spec="text description='Dry run only, do not apply. Possible values are |'true|' or |'false|'' validationMode='not_empty' display='normal'" />
         </parameters>
         <build-runners>

@@ -58,8 +58,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .default("")
 
     private val activeLinePeriod by option(ACTIVE_LINE_PERIOD, help = "Active line period (days)")
-        .convert { it.toInt() }
-        .default(0)
+        .convert { it.toInt() }.required()
+        .check("$ACTIVE_LINE_PERIOD must be non-negative") { it >= 0 }
 
     private val excludeComponents by option(EXCLUDE_COMPONENTS, help = "Exclude components (comma-separated)")
         .convert {
@@ -84,8 +84,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .default("")
 
     private val dryRun by option(DRY_RUN, help = "Dry run only, do not apply")
-        .convert { it.toBoolean() }
-        .default(true)
+        .convert { it.toBooleanStrictOrNull() ?: throw IllegalArgumentException("$DRY_RUN must be 'true' or 'false'") }
+        .required()
 
     override fun run() {
         val filter = MandatoryUpdateFilterDTO(
@@ -108,8 +108,11 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
             .registerKotlinModule()
             .enable(SerializationFeature.INDENT_OUTPUT)
             .writeValueAsString(client.createMandatoryUpdate(dryRun, dto))
-        File(outputFile).writeText(result)
-        log.info("Result is written to file $outputFile")
+        if (outputFile.isNotEmpty()) {
+            File(outputFile).writeText(result)
+            log.info("Result is written to file: {}", outputFile)
+        }
+        log.info("Result: {}", result)
     }
 
     companion object {
