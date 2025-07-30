@@ -1,4 +1,4 @@
-package org.octopusden.octopus.automation.releasemanagement
+package org.octopusden.octopus.automation.releasemanagement.command
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.findOrSetObject
