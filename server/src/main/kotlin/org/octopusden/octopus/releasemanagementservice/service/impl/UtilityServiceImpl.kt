@@ -49,7 +49,7 @@ class UtilityServiceImpl(
             }
         }
         val assignee = componentRegistryService.getById(component).let { it.releaseManager ?: it.componentOwner }
-        val extraFields = mapOf(CUSTOMER_FIELD to ComplexIssueInputFieldValue(mapOf("value" to dto.customer)), EPIC_NAME_FIELD to dto.epicName)
+        val extraFields = mapOf(CUSTOMER_FIELD to multiSelectOf(dto.customer), EPIC_NAME_FIELD to dto.epicName)
         return jiraService.createIssue(
             dto.projectKey,
             EPIC_ISSUE,
@@ -63,7 +63,7 @@ class UtilityServiceImpl(
 
     private fun createSubIssues(component: String, version: String, builds: List<BuildDTO>, dto: MandatoryUpdateDTO, epicKey: String) {
         val buildsByComponent = builds.groupBy { it.component }
-        val extraFields = mapOf(CUSTOMER_FIELD to ComplexIssueInputFieldValue(mapOf("value" to dto.customer)), EPIC_LINK_FIELD to epicKey)
+        val extraFields = mapOf(CUSTOMER_FIELD to multiSelectOf(dto.customer), EPIC_LINK_FIELD to epicKey)
         for ((compId, compBuilds) in buildsByComponent) {
             val detailedComponent = componentRegistryService.getDetailedComponent(compId, compBuilds.first().version)
             val assignee = detailedComponent.componentOwner
@@ -80,6 +80,9 @@ class UtilityServiceImpl(
             )
         }
     }
+
+    private fun multiSelectOf(vararg values: String): List<ComplexIssueInputFieldValue> =
+        values.map { ComplexIssueInputFieldValue(mapOf("value" to it)) }
 
     companion object {
         private const val EPIC_SUMMARY_TEMPLATE = "Bump Dependencies on %s %s"
