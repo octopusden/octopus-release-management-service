@@ -70,7 +70,7 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         }
         .default(emptySet())
 
-    private val systems by option(SYSTEMS, help = "Systems with which components will be excluded (comma-separated)")
+    private val excludeSystems by option(EXCLUDE_SYSTEMS, help = "Systems with which components will be excluded (comma-separated)")
         .convert {
             it.split(Regex(SPLIT_SYMBOLS))
                 .map(String::trim)
@@ -91,7 +91,7 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         val filter = MandatoryUpdateFilterDTO(
             activeLinePeriod = activeLinePeriod,
             excludeComponents = excludeComponents,
-            systems = systems
+            excludeSystems = excludeSystems
         )
         val dto = MandatoryUpdateDTO(
             component = component,
@@ -126,7 +126,7 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         const val NOTICE = "--notice"
         const val ACTIVE_LINE_PERIOD = "--active-line-period"
         const val EXCLUDE_COMPONENTS = "--exclude-components"
-        const val SYSTEMS = "--systems"
+        const val EXCLUDE_SYSTEMS = "--exclude-systems"
         const val OUTPUT_FILE = "--output-file"
         const val DRY_RUN = "--dry-run"
     }

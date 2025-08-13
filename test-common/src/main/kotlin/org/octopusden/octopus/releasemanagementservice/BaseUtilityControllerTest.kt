@@ -32,7 +32,7 @@ abstract class BaseUtilityControllerTest: BaseReleaseManagementServiceTest {
                 filter = MandatoryUpdateFilterDTO(
                     activeLinePeriod = 180,
                     excludeComponents = excludeComponents,
-                    systems = systems
+                    excludeSystems = systems
                 )
             )
         )
