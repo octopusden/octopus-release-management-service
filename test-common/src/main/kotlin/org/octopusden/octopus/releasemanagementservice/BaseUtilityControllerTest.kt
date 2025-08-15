@@ -18,7 +18,7 @@ abstract class BaseUtilityControllerTest: BaseReleaseManagementServiceTest {
 
     @ParameterizedTest
     @MethodSource("mandatoryUpdateCases")
-    fun createMandatoryUpdateTest(dryRun: Boolean, excludeComponents: Set<String>, systems: Set<String>, expected: MandatoryUpdateResponseDTO) {
+    fun createMandatoryUpdateTest(dryRun: Boolean, excludeComponents: Set<String>, excludeSystems: Set<String>, expected: MandatoryUpdateResponseDTO) {
         val result = createMandatoryUpdate(
             dryRun,
             MandatoryUpdateDTO(
@@ -32,7 +32,7 @@ abstract class BaseUtilityControllerTest: BaseReleaseManagementServiceTest {
                 filter = MandatoryUpdateFilterDTO(
                     activeLinePeriod = 180,
                     excludeComponents = excludeComponents,
-                    systems = systems
+                    excludeSystems = excludeSystems
                 )
             )
         )

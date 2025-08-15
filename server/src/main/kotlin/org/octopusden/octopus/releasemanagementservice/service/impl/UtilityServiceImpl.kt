@@ -4,6 +4,7 @@ import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldVal
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import org.octopusden.octopus.releasemanagementservice.legacy.LegacyRelengClient
 import org.octopusden.octopus.releasemanagementservice.service.ComponentRegistryService
 import org.octopusden.octopus.releasemanagementservice.service.JiraService
@@ -25,14 +26,13 @@ class UtilityServiceImpl(
     private val componentRegistryService: ComponentRegistryService
 ): UtilityService {
     override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO {
-        val excludes = dto.filter.excludeComponents
-        val systems = dto.filter.systems
         val builds = legacyRelengClient.getMandatoryUpdateBuilds(dto.component, dto.version, dto.filter.activeLinePeriod)
             .filter {
-                if (excludes.contains(it.component)) return@filter false
+                if (dto.filter.excludeComponents.contains(it.component)) return@filter false
                 val foundComponent = componentRegistryService.getById(it.component)
-                foundComponent.distribution?.external == true && foundComponent.system.intersect(systems).isEmpty()
+                foundComponent.distribution?.external == true && foundComponent.system.intersect(dto.filter.excludeSystems).isEmpty()
             }
+            .map { it.toShortBuildDTO() }
         if (builds.isEmpty() || dryRun) {
             return MandatoryUpdateResponseDTO(null, builds)
         }
@@ -45,7 +45,7 @@ class UtilityServiceImpl(
         val description = buildString {
             append(EPIC_DESCRIPTION_TEMPLATE.format(component, version))
             if (dto.notice.isNotBlank()) {
-                append(" Notice: ").append(dto.notice)
+                append("\nNotice: ").append(dto.notice)
             }
         }
         val assignee = componentRegistryService.getById(component).let { it.releaseManager ?: it.componentOwner }
@@ -61,7 +61,7 @@ class UtilityServiceImpl(
         )
     }
 
-    private fun createSubIssues(component: String, version: String, builds: List<BuildDTO>, dto: MandatoryUpdateDTO, epicKey: String) {
+    private fun createSubIssues(component: String, version: String, builds: List<ShortBuildDTO>, dto: MandatoryUpdateDTO, epicKey: String) {
         val buildsByComponent = builds.groupBy { it.component }
         val extraFields = mapOf(CUSTOMER_FIELD to multiSelectOf(dto.customer), EPIC_LINK_FIELD to epicKey)
         for ((compId, compBuilds) in buildsByComponent) {
@@ -83,6 +83,9 @@ class UtilityServiceImpl(
 
     private fun multiSelectOf(vararg values: String): List<ComplexIssueInputFieldValue> =
         values.map { ComplexIssueInputFieldValue(mapOf("value" to it)) }
+
+    private fun BuildDTO.toShortBuildDTO(): ShortBuildDTO =
+        ShortBuildDTO(component = component, version = version, status = status)
 
     companion object {
         private const val EPIC_SUMMARY_TEMPLATE = "Bump Dependencies on %s %s"

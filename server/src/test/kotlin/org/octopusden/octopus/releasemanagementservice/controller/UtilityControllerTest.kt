@@ -67,7 +67,7 @@ class UtilityControllerTest: BaseUtilityControllerTest(), BaseControllerTest {
                 MandatoryUpdateFilterDTO(
                     activeLinePeriod = 180,
                     excludeComponents = emptySet(),
-                    systems = emptySet()
+                    excludeSystems = emptySet()
                 ),
                 "../test-data/releng/create-mandatory-update-1.json"
             ),
@@ -76,7 +76,7 @@ class UtilityControllerTest: BaseUtilityControllerTest(), BaseControllerTest {
                 MandatoryUpdateFilterDTO(
                     activeLinePeriod = 180,
                     excludeComponents = setOf("main-component-second"),
-                    systems = setOf("CLASSIC")
+                    excludeSystems = setOf("CLASSIC")
                 ),
                 "../test-data/releng/create-mandatory-update-2.json"
             ),
@@ -85,7 +85,7 @@ class UtilityControllerTest: BaseUtilityControllerTest(), BaseControllerTest {
                 MandatoryUpdateFilterDTO(
                     180,
                     emptySet(),
-                    systems = emptySet()
+                    excludeSystems = emptySet()
                 ),
                 "../test-data/releng/create-mandatory-update-3.json"
             )
