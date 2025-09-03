@@ -87,16 +87,12 @@ class UtilityServiceImpl(
     }
 
     private fun epicExists(summary: String): Boolean {
-        val escapedSummary = jqlQuote(summary)
         val jql = """
             issueType = "$EPIC_ISSUE"
-            AND summary ~ "\"$escapedSummary\""
+            AND summary ~ "\"${jqlQuote(summary)}\""
         """.trimIndent()
         return jiraService.findIssues(jql).any { it.summary == summary }
     }
-
-    private fun jqlQuote(value: String): String =
-        value.replace("\\", "\\\\").replace("\"", "\\\"")
 
     private fun multiSelectOf(vararg values: String): List<ComplexIssueInputFieldValue> =
         values.map { ComplexIssueInputFieldValue(mapOf("value" to it)) }
@@ -112,5 +108,8 @@ class UtilityServiceImpl(
         private const val ISSUE_DESCRIPTION_TEMPLATE =
             "Component %s has the following versions eligible for mandatory update:\n%s\n\n" +
                     "Those versions are to be updated: please bump dependencies on %s to %s or a later version."
+
+        private fun jqlQuote(value: String): String =
+            value.replace("\\", "\\\\").replace("\"", "\\\"")
     }
 }
