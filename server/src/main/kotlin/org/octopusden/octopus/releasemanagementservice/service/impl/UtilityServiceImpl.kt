@@ -87,12 +87,16 @@ class UtilityServiceImpl(
     }
 
     private fun epicExists(summary: String): Boolean {
+        val escapedSummary = jqlQuote(summary)
         val jql = """
             issueType = "$EPIC_ISSUE"
-            AND summary ~ "$summary"
+            AND summary ~ "\"$escapedSummary\""
         """.trimIndent()
         return jiraService.findIssues(jql).any { it.summary == summary }
     }
+
+    private fun jqlQuote(value: String): String =
+        value.replace("\\", "\\\\").replace("\"", "\\\"")
 
     private fun multiSelectOf(vararg values: String): List<ComplexIssueInputFieldValue> =
         values.map { ComplexIssueInputFieldValue(mapOf("value" to it)) }
