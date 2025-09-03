@@ -88,7 +88,8 @@ open class MigrateMockData : DefaultTask() {
             "/rest/release-engineering/3/component-management/LegacyReleaseManagementService" to emptyMap<String, List<String>>() to "releng/component_legacy_rm_service.json",
             "/rest/release-engineering/3/component/dependency-component-first/version/1.0.2/mandatory-update" to mapOf("activeLinePeriod" to listOf("180")) to "releng/mandatory-update-builds.json",
             "/rest/api/latest/issuetype" to emptyMap<String, List<String>>() to "jira/issue-types.json",
-            "/rest/api/latest/field" to emptyMap<String, List<String>>() to "jira/fields.json"
+            "/rest/api/latest/field" to emptyMap<String, List<String>>() to "jira/fields.json",
+            "/rest/api/latest/search" to emptyMap<String, List<String>>() to "jira/find-issues.json"
         )
         private val endpointNotFoundToResponseFileName = mapOf(
             "/rest/release-engineering/3/component/ReleaseManagementService/version/1.0.3/build" to emptyMap<String, List<String>>() to "releng/build-not-exist-error.json",

@@ -7,6 +7,7 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.Release
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.ArgumentsNotCompatibleException
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.NotFoundException
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.ReleaseManagementServiceException
+import org.octopusden.octopus.releasemanagementservice.client.common.exception.AlreadyExistsException
 import org.octopusden.octopus.releasemanagementservice.legacy.LegacyRelengClientException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -24,6 +25,11 @@ class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun handleNotFound(exception: ReleaseManagementServiceException): ErrorResponse = getErrorResponse(exception)
+
+    @ExceptionHandler(AlreadyExistsException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    fun handleAlreadyExists(exception: ReleaseManagementServiceException): ErrorResponse = getErrorResponse(exception)
 
     @ExceptionHandler(ArgumentsNotCompatibleException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

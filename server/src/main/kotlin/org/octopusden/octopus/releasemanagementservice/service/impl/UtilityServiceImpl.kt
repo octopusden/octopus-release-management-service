@@ -5,6 +5,7 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDT
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.exception.AlreadyExistsException
 import org.octopusden.octopus.releasemanagementservice.legacy.LegacyRelengClient
 import org.octopusden.octopus.releasemanagementservice.service.ComponentRegistryService
 import org.octopusden.octopus.releasemanagementservice.service.JiraService
@@ -14,6 +15,7 @@ import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceI
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_LINK_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_NAME_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.MANDATORY_UPDATE_ISSUE
+import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.jqlQuote
 import org.springframework.stereotype.Service
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -42,6 +44,10 @@ class UtilityServiceImpl(
     }
 
     private fun createEpic(component: String, version: String, dto: MandatoryUpdateDTO): String {
+        val summary = EPIC_SUMMARY_TEMPLATE.format(component, version)
+        if (epicExists(summary)) {
+            throw AlreadyExistsException("Epic for bump dependencies $component:$version already exists!")
+        }
         val description = buildString {
             append(EPIC_DESCRIPTION_TEMPLATE.format(component, version))
             if (dto.notice.isNotBlank()) {
@@ -53,7 +59,7 @@ class UtilityServiceImpl(
         return jiraService.createIssue(
             dto.projectKey,
             EPIC_ISSUE,
-            EPIC_SUMMARY_TEMPLATE.format(component, version),
+            summary,
             description,
             assignee,
             dto.dueDate,
@@ -79,6 +85,14 @@ class UtilityServiceImpl(
                 extraFields
             )
         }
+    }
+
+    private fun epicExists(summary: String): Boolean {
+        val jql = """
+            issueType = "$EPIC_ISSUE"
+            AND summary ~ "\"${jqlQuote(summary)}\""
+        """.trimIndent()
+        return jiraService.findIssues(jql).any { it.summary == summary }
     }
 
     private fun multiSelectOf(vararg values: String): List<ComplexIssueInputFieldValue> =
