@@ -15,6 +15,7 @@ import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceI
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_LINK_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_NAME_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.MANDATORY_UPDATE_ISSUE
+import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.jqlQuote
 import org.springframework.stereotype.Service
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -108,8 +109,5 @@ class UtilityServiceImpl(
         private const val ISSUE_DESCRIPTION_TEMPLATE =
             "Component %s has the following versions eligible for mandatory update:\n%s\n\n" +
                     "Those versions are to be updated: please bump dependencies on %s to %s or a later version."
-
-        private fun jqlQuote(value: String): String =
-            value.replace("\\", "\\\\").replace("\"", "\\\"")
     }
 }

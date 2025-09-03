@@ -60,5 +60,8 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
         const val CUSTOMER_FIELD = "Customer"
         const val EPIC_NAME_FIELD = "Epic Name"
         const val EPIC_LINK_FIELD = "Epic Link"
+
+        fun jqlQuote(value: String): String =
+            value.replace("\\", "\\\\").replace("\"", "\\\"")
     }
 }
