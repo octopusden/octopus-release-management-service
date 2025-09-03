@@ -2,6 +2,7 @@ package org.octopusden.octopus.releasemanagementservice.service.impl
 
 import com.atlassian.jira.rest.client.api.domain.IssueType
 import com.atlassian.jira.rest.client.api.domain.Field
+import com.atlassian.jira.rest.client.api.domain.Issue
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory
 import org.joda.time.DateTime
@@ -39,6 +40,10 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
         }
         val input = builder.build()
         return client.issueClient.createIssue(input).claim().key
+    }
+
+    override fun findIssues(jql: String): List<Issue> {
+        return client.searchClient.searchJql(jql).claim().issues.toList()
     }
 
     private fun getIssueType(name: String): IssueType {

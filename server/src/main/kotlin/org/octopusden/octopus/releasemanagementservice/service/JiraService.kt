@@ -1,5 +1,6 @@
 package org.octopusden.octopus.releasemanagementservice.service
 
+import com.atlassian.jira.rest.client.api.domain.Issue
 import java.util.Date
 
 interface JiraService {
@@ -12,4 +13,6 @@ interface JiraService {
         dueDate: Date,
         extraFields: Map<String, Any>
     ): String
+
+    fun findIssues(jql: String): List<Issue>
 }
