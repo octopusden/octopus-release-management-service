@@ -47,6 +47,7 @@ class AutomationTest : BaseReleaseManagementServiceFuncTest {
             "${MandatoryUpdate.DUE_DATE}=2025-08-15",
             "${MandatoryUpdate.CUSTOMER}=Octopus",
             "${MandatoryUpdate.DRY_RUN}=false",
+            "${MandatoryUpdate.IS_FULL_MATCH_SYSTEMS}=true",
             "${MandatoryUpdate.ACTIVE_LINE_PERIOD}=180",
             "${MandatoryUpdate.OUTPUT_FILE}=${outFile.absolutePath}"
         )
