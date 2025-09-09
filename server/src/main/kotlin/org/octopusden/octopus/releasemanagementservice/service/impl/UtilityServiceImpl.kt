@@ -32,7 +32,12 @@ class UtilityServiceImpl(
             .filter {
                 if (dto.filter.excludeComponents.contains(it.component)) return@filter false
                 val foundComponent = componentRegistryService.getById(it.component)
-                foundComponent.distribution?.external == true && foundComponent.system.intersect(dto.filter.excludeSystems).isEmpty()
+                val excludeBySystems = if (dto.filter.isFullMatchSystems) {
+                    dto.filter.excludeSystems == foundComponent.system
+                } else {
+                    foundComponent.system.intersect(dto.filter.excludeSystems).isNotEmpty()
+                }
+                foundComponent.distribution?.external == true && !excludeBySystems
             }
             .map { it.toShortBuildDTO() }
         if (builds.isEmpty() || dryRun) {
