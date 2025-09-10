@@ -79,6 +79,11 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         }
         .default(emptySet())
 
+    private val isFullMatchSystems by option(IS_FULL_MATCH_SYSTEMS, help = "Exclude components by systems match strategy: " +
+            "true - exclude only if component systems fully match exclude-systems; false - exclude if component has any system from exclude-systems")
+        .convert { it.toBooleanStrictOrNull() ?: throw IllegalArgumentException("$IS_FULL_MATCH_SYSTEMS must be 'true' or 'false'") }
+        .required()
+
     private val outputFile by option(OUTPUT_FILE, help = "File to save result")
         .convert { it.trim() }
         .default("")
@@ -91,7 +96,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         val filter = MandatoryUpdateFilterDTO(
             activeLinePeriod = activeLinePeriod,
             excludeComponents = excludeComponents,
-            excludeSystems = excludeSystems
+            excludeSystems = excludeSystems,
+            isFullMatchSystems = isFullMatchSystems
         )
         val dto = MandatoryUpdateDTO(
             component = component,
@@ -127,6 +133,7 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         const val ACTIVE_LINE_PERIOD = "--active-line-period"
         const val EXCLUDE_COMPONENTS = "--exclude-components"
         const val EXCLUDE_SYSTEMS = "--exclude-systems"
+        const val IS_FULL_MATCH_SYSTEMS = "--is-full-match-systems"
         const val OUTPUT_FILE = "--output-file"
         const val DRY_RUN = "--dry-run"
     }
