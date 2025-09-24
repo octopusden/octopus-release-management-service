@@ -10,6 +10,7 @@ pluginManagement {
         id("io.github.gradle-nexus.publish-plugin") version "1.1.0" apply false
         id("io.github.rodm.teamcity-server") version (extra["rodm-teamcity-plugin.version"] as String)
         id("com.github.johnrengelman.shadow") version ("8.1.1")
+        id("org.octopusden.octopus.oc-template") version (extra["octopus-oc-template.version"] as String)
     }
     repositories {
         gradlePluginPortal()

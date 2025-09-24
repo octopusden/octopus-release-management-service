@@ -1,8 +1,12 @@
+import org.octopusden.task.MigrateMockData
+import com.avast.gradle.dockercompose.ComposeExtension
+
 plugins {
     id("org.springframework.boot")
     id("org.jetbrains.kotlin.plugin.spring")
     id("com.avast.gradle.docker-compose")
     id("com.bmuschko.docker-spring-boot-application")
+    id("org.octopusden.octopus.oc-template")
     `maven-publish`
 }
 
@@ -44,24 +48,71 @@ signing {
     sign(publishing.publications["bootJar"])
 }
 
-@Suppress("UNCHECKED_CAST")
-val extValidateFun = project.ext["validateFun"] as ((List<String>) -> Unit)
-fun String.getExt() = project.ext[this] as? String
+fun String.getExt() = project.ext[this] as String
 
-configure<com.avast.gradle.dockercompose.ComposeExtension> {
+configure<ComposeExtension> {
     useComposeFiles.add(layout.projectDirectory.file("docker/docker-compose.yml").asFile.path )
     waitForTcpPorts.set(true)
     captureContainersOutputToFiles.set(layout.buildDirectory.dir("docker-logs"))
     environment.putAll(
         mapOf(
             "MOCKSERVER_VERSION" to properties["mockserver.version"],
-            "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
+            "DOCKER_REGISTRY" to "dockerRegistry".getExt()
         )
     )
 }
 
-tasks.getByName("composeUp").doFirst {
-    extValidateFun.invoke(listOf("dockerRegistry"))
+ocTemplate {
+    workDir.set(layout.buildDirectory.dir("okd"))
+    clusterDomain.set("okdClusterDomain".getExt())
+    namespace.set("okdProject".getExt())
+    prefix.set("rm-service-ut")
+
+    "okdWebConsoleUrl".getExt().takeIf { it.isNotBlank() }?.let{
+        webConsoleUrl.set(it)
+    }
+
+    service("mockserver") {
+        templateFile.set(rootProject.layout.projectDirectory.file("okd/mockserver.yaml"))
+        parameters.set(mapOf(
+            "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
+            "ACTIVE_DEADLINE_SECONDS" to "okdActiveDeadlineSeconds".getExt(),
+            "MOCK_SERVER_VERSION" to properties["mockserver.version"] as String
+        ))
+    }
+}
+
+tasks {
+    val migrateMockData by registering(MigrateMockData::class)
+}
+
+when ("testPlatform".getExt()) {
+    "okd" -> {
+        tasks.named<MigrateMockData>("migrateMockData") {
+            testDataDir.set(rootDir.toString() + File.separator + "test-data")
+            host.set(ocTemplate.getOkdHost("mockserver"))
+            port.set(80)
+            dependsOn("ocCreate")
+        }
+        tasks.withType<Test> {
+            systemProperties["test.mockserver-host"] = ocTemplate.getOkdHost("mockserver")
+            dependsOn("migrateMockData")
+            finalizedBy("ocLogs", "ocDelete")
+        }
+    }
+    "docker" -> {
+        tasks.named<MigrateMockData>("migrateMockData") {
+            testDataDir.set(rootDir.toString() + File.separator + "test-data")
+            host.set("localhost")
+            port.set(1080)
+            dependsOn("composeUp")
+        }
+        tasks.withType<Test> {
+            systemProperties["test.mockserver-host"] = "localhost:1080"
+            dependsOn("migrateMockData")
+            finalizedBy("composeLogs", "composeDown")
+        }
+    }
 }
 
 docker {
@@ -71,20 +122,6 @@ docker {
         images.set(setOf("${"octopusGithubDockerRegistry".getExt()}/octopusden/$name:$version"))
     }
 }
-
-tasks.getByName("dockerBuildImage").doFirst {
-    extValidateFun.invoke(listOf("dockerRegistry", "octopusGithubDockerRegistry"))
-}
-
-tasks.withType<Test> {
-    dependsOn("migrateMockData")
-}
-
-tasks.named("migrateMockData") {
-    dependsOn("composeUp")
-}
-
-dockerCompose.isRequiredBy(tasks["test"])
 
 springBoot {
     buildInfo()
