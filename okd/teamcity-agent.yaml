@@ -1,0 +1,82 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: teamcity-agent-template
+objects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-teamcity-agent-config-data
+    data:
+      buildAgent.properties: |-
+        ${BUILD_AGENT_PROPERTIES_CONTENT}
+  - apiVersion: v1
+    kind: Pod
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-tc${TEAMCITY_ID}-agent
+      labels:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-tc${TEAMCITY_ID}-agent
+    spec:
+      restartPolicy: Never
+      activeDeadlineSeconds: ${{ACTIVE_DEADLINE_SECONDS}}
+      serviceAccountName: ${SERVICE_ACCOUNT_ANYUID}
+      securityContext:
+        runAsUser: 0
+      initContainers:
+        - name: update-buildagent-properties
+          image: public.ecr.aws/docker/library/busybox:1.37
+          env:
+            - name: TEAMCITY_SERVER_HOST
+              value: ${TEAMCITY_SERVER_HOST}
+          command: [ "/bin/sh","-c" ]
+          args:
+            - |
+              set -eu
+              sed -E "s#^serverUrl=.*#serverUrl=http\://${TEAMCITY_SERVER_HOST}#" \
+                /in/buildAgent.properties > /conf/buildAgent.properties
+          volumeMounts:
+            - name: build-agent-properties
+              mountPath: /in
+              readOnly: true
+            - name: build-agent-properties-updated
+              mountPath: /conf
+      containers:
+        - name: tc${TEAMCITY_ID}-agent
+          image: ${DOCKER_REGISTRY}/jetbrains/teamcity-agent:${TEAMCITY_IMAGE_TAG}-linux-sudo
+          volumeMounts:
+            - name: build-agent-properties-updated
+              mountPath: /data/teamcity_agent/conf
+      volumes:
+        - name: build-agent-properties
+          configMap:
+            name: ${DEPLOYMENT_PREFIX}-teamcity-agent-config-data
+            items:
+              - key: buildAgent.properties
+                path: buildAgent.properties
+        - name: build-agent-properties-updated
+          emptyDir: {}
+parameters:
+  - description: Unique deployment prefix
+    name: DEPLOYMENT_PREFIX
+    required: true
+  - description: Active deadline seconds
+    name: ACTIVE_DEADLINE_SECONDS
+    required: true
+  - description: Docker registry
+    name: DOCKER_REGISTRY
+    required: true
+  - description: Tag of TeamCity image
+    name: TEAMCITY_IMAGE_TAG
+    required: true
+  - description: Service account name with SCC - anyuid
+    name: SERVICE_ACCOUNT_ANYUID
+    required: true
+  - description: TeamCity instance identifier
+    name: TEAMCITY_ID
+    required: true
+  - description: TeamCity server URL
+    name: TEAMCITY_SERVER_HOST
+    required: true
+  - description: buildAgent.properties content
+    name: BUILD_AGENT_PROPERTIES_CONTENT
+    required: true

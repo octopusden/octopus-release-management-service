@@ -1,0 +1,115 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: release-management-template
+objects:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-release-management-config-data
+    data:
+      application-ft.yml: |-
+        ${APPLICATION_FT_CONTENT}
+      bootstrap-ft.yml: |-
+        ${BOOTSTRAP_FT_CONTENT}
+  - apiVersion: v1
+    kind: Pod
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-rm
+      labels:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-rm
+    spec:
+      restartPolicy: Never
+      activeDeadlineSeconds: ${{ACTIVE_DEADLINE_SECONDS}}
+      containers:
+        - name: rm
+          image: ${OCTOPUS_GITHUB_DOCKER_REGISTRY}/octopusden/release-management-service:${RELEASE_MANAGEMENT_SERVICE_VERSION}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          env:
+            - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+              value: "/"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "ft"
+            - name: TEST_MOCKSERVER_HOST
+              value: ${TEST_MOCKSERVER_HOST}
+            - name: TEST_COMPONENTS_REGISTRY_HOST
+              value: ${TEST_COMPONENTS_REGISTRY_HOST}
+          volumeMounts:
+            - name: application-ft
+              mountPath: /application-ft.yml
+              subPath: application-ft.yml
+              readOnly: true
+            - name: bootstrap-ft
+              mountPath: /bootstrap-ft.yml
+              subPath: bootstrap-ft.yml
+              readOnly: true
+      volumes:
+        - name: application-ft
+          configMap:
+            name: ${DEPLOYMENT_PREFIX}-release-management-config-data
+            items:
+              - key: application-ft.yml
+                path: application-ft.yml
+        - name: bootstrap-ft
+          configMap:
+            name: ${DEPLOYMENT_PREFIX}-release-management-config-data
+            items:
+              - key: bootstrap-ft.yml
+                path: bootstrap-ft.yml
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-rm-service
+    spec:
+      ports:
+        - port: 8080
+          protocol: TCP
+          targetPort: 8080
+      selector:
+        app.kubernetes.io/name: ${DEPLOYMENT_PREFIX}-rm
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: ${DEPLOYMENT_PREFIX}-rm-route
+    spec:
+      port:
+        targetPort: 8080
+      to:
+        kind: Service
+        name: ${DEPLOYMENT_PREFIX}-rm-service
+parameters:
+  - description: Unique deployment prefix
+    name: DEPLOYMENT_PREFIX
+    required: true
+  - description: Active deadline seconds
+    name: ACTIVE_DEADLINE_SECONDS
+    required: true
+  - description: Docker registry
+    name: DOCKER_REGISTRY
+    required: true
+  - description: Release management service version
+    name: RELEASE_MANAGEMENT_SERVICE_VERSION
+    required: true
+  - description: Octopus github docker registry
+    name: OCTOPUS_GITHUB_DOCKER_REGISTRY
+    required: true
+  - description: Test mockserver host
+    name: TEST_MOCKSERVER_HOST
+    required: true
+  - description: Test components registry host
+    name: TEST_COMPONENTS_REGISTRY_HOST
+    required: true
+  - description: application-ft.yml content
+    name: APPLICATION_FT_CONTENT
+    required: true
+  - description: bootstrap-ft.yml content
+    name: BOOTSTRAP_FT_CONTENT
+    required: true

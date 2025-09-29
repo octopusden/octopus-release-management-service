@@ -13,12 +13,14 @@ class ActuatorTest : BaseActuatorTest(), BaseReleaseManagementServiceFuncTest {
     override fun getServiceInfo(): ServiceInfoDTO = client.getServiceInfo()
 
     companion object {
+        private val hostReleaseManagement = System.getProperty("test.release-management-host")
+            ?: throw Exception("System property 'test.release-management-host' must be defined")
         @JvmStatic
         private val mapper = jacksonObjectMapper()
         @JvmStatic
         private val client =
             ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
-                override fun getApiUrl() = "http://localhost:8080"
+                override fun getApiUrl() = "http://$hostReleaseManagement"
                 override fun getTimeRetryInMillis() = 180000
             })
     }

@@ -1,13 +1,13 @@
 releng:
-  url: http://mockserver:1080
+  url: http://${TEST_MOCKSERVER_HOST}
 
 jira1:
-  host: http://mockserver:1080
+  host: http://${TEST_MOCKSERVER_HOST}
   username: admin
   password: admin
 
 components-registry-service:
-  url: http://components-registry-service:4567
+  url: http://${TEST_COMPONENTS_REGISTRY_HOST}
 
 management:
   endpoints:
