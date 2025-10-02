@@ -115,7 +115,7 @@ class TriggerTest {
                                 properties = listOf(
                                     TeamcityProperty(
                                         "release.management.build.trigger.service.url",
-                                        RELEASE_MANAGEMENT_SERVICE_URL
+                                        releaseManagementServiceUrl
                                     ),
                                     TeamcityProperty("release.management.build.trigger.selections", triggerSelector),
                                     TeamcityProperty("release.management.build.trigger.quiet.period", quietPeriod)
@@ -131,8 +131,8 @@ class TriggerTest {
     private fun readBuilds(buildTypeId: String): HttpResponse<String> {
         return httpClient.send(
             HttpRequest.newBuilder()
-                .uri(URI("${TEAMCITY_API_URL}/builds?locator=buildType:(id:${buildTypeId})"))
-                .header("Origin", TEAMCITY_URL)
+                .uri(URI("${teamcityApiUrl}/builds?locator=buildType:(id:${buildTypeId})"))
+                .header("Origin", teamcityUrl)
                 .header("Authorization", TEAMCITY_AUTHORIZATION)
                 .header("Accept", "application/json")
                 .method("GET", HttpRequest.BodyPublishers.noBody())
@@ -142,14 +142,18 @@ class TriggerTest {
     }
 
     companion object {
+        private val hostTeamcity2022 = System.getProperty("test.teamcity-2022-host")
+            ?: throw Exception("System property 'test.teamcity-2022-host' must be defined")
+        private val hostReleaseManagement = System.getProperty("test.release-management-host-for-teamcity")
+            ?: throw Exception("System property 'test.release-management-host-for-teamcity' must be defined")
+        val releaseManagementServiceUrl = "http://$hostReleaseManagement"
+        val teamcityUrl = "http://$hostTeamcity2022"
+        val teamcityApiUrl = "$teamcityUrl/app/rest/2018.1"
         const val DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL = 60000L
-        const val RELEASE_MANAGEMENT_SERVICE_URL = "http://release-management-service:8080"
-        const val TEAMCITY_URL = "http://localhost:8111"
-        const val TEAMCITY_API_URL = "${TEAMCITY_URL}/app/rest/2018.1"
         const val TEAMCITY_AUTHORIZATION = "Basic YWRtaW46YWRtaW4="
 
         private val teamcityClient = TeamcityClassicClient(object : ClientParametersProvider {
-            override fun getApiUrl() = TEAMCITY_URL
+            override fun getApiUrl() = teamcityUrl
             override fun getAuth() = StandardBasicCredCredentialProvider("admin", "admin")
         })
 
@@ -161,8 +165,8 @@ class TriggerTest {
             with( //TODO: enhance TeamcityClient (support agents)
                 httpClient.send(
                     HttpRequest.newBuilder()
-                        .uri(URI("${TEAMCITY_API_URL}/agents/name:test-agent/authorized"))
-                        .header("Origin", TEAMCITY_URL)
+                        .uri(URI("${teamcityApiUrl}/agents/name:test-agent/authorized"))
+                        .header("Origin", teamcityUrl)
                         .header("Authorization", TEAMCITY_AUTHORIZATION)
                         .header("Content-Type", "text/plain")
                         .method("PUT", HttpRequest.BodyPublishers.ofString("true"))

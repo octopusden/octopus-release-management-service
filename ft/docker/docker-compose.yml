@@ -12,6 +12,8 @@ services:
     environment:
       - SPRING_CONFIG_ADDITIONAL_LOCATION=/
       - SPRING_PROFILES_ACTIVE=ft
+      - TEST_MOCKSERVER_HOST=${TEST_MOCKSERVER_HOST}
+      - TEST_COMPONENTS_REGISTRY_HOST=${TEST_COMPONENTS_REGISTRY_HOST}
 
   mockserver:
     container_name: release-management-service-ft-mockserver
@@ -33,13 +35,13 @@ services:
       - ./../../test-common/src/main/components-registry:/components-registry
 
   teamcity:
-    image: ${DOCKER_REGISTRY}/jetbrains/teamcity-server:${TEAMCITY_VERSION}
+    image: ${DOCKER_REGISTRY}/jetbrains/teamcity-server:${TEAMCITY_2022_IMAGE_TAG}
     container_name: release-management-service-ft-teamcity
     ports:
       - "8111:8111"
     volumes:
-      - ./../build/teamcity-server/datadir:/data/teamcity_server/datadir
-      - ./../build/teamcity-server/logs:/opt/teamcity/logs
+      - ./../build/teamcity-server-2022/datadir:/data/teamcity_server/datadir
+      - ./../build/teamcity-server-2022/logs:/opt/teamcity/logs
     healthcheck:
       test: curl -u admin:admin -f teamcity:8111/app/rest/server >/dev/null || exit 1
       interval: 30s
@@ -47,7 +49,7 @@ services:
       retries: 5
 
   teamcity-agent:
-    image: ${DOCKER_REGISTRY}/jetbrains/teamcity-agent:${TEAMCITY_VERSION}-linux-sudo
+    image: ${DOCKER_REGISTRY}/jetbrains/teamcity-agent:${TEAMCITY_2022_IMAGE_TAG}-linux-sudo
     container_name: release-management-service-ft-teamcity-agent
     privileged: true
     volumes:
