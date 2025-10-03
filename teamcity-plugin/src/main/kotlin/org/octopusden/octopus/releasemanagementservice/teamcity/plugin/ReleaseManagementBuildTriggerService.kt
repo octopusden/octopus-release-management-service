@@ -169,6 +169,8 @@ class ReleaseManagementBuildTriggerService(
             ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
                 override fun getApiUrl() = serviceUrl
                 override fun getTimeRetryInMillis() = 1000
+                override fun getConnectTimoutInMillis() = 30000
+                override fun getReadTimoutInMillis() = 30000
             })
     }
 }

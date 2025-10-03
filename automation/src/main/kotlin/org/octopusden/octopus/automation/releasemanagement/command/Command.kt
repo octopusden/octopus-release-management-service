@@ -21,6 +21,8 @@ class Command : CliktCommand(name = "") {
         val client = ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
             override fun getApiUrl() = url
             override fun getTimeRetryInMillis() = 180000
+            override fun getConnectTimoutInMillis() = 30000
+            override fun getReadTimoutInMillis() = 90000
         })
 
         context[LOG] = log
