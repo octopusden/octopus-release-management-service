@@ -31,8 +31,8 @@ class ClassicReleaseManagementServiceClient(
             apiParametersProvider.getApiUrl(),
             mapper,
             apiParametersProvider.getTimeRetryInMillis(),
-            apiParametersProvider.getConnectTimoutInMillis(),
-            apiParametersProvider.getReadTimoutInMillis()
+            apiParametersProvider.getConnectTimeoutInMillis(),
+            apiParametersProvider.getReadTimeoutInMillis()
         )
 
     constructor(apiParametersProvider: ReleaseManagementServiceClientParametersProvider) : this(
