@@ -22,6 +22,8 @@ class ActuatorTest : BaseActuatorTest(), BaseReleaseManagementServiceFuncTest {
             ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
                 override fun getApiUrl() = "http://$hostReleaseManagement"
                 override fun getTimeRetryInMillis() = 180000
+                override fun getConnectTimeoutInMillis() = 30000
+                override fun getReadTimeoutInMillis() = 30000
             })
     }
 }
