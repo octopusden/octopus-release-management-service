@@ -27,7 +27,13 @@ class ClassicReleaseManagementServiceClient(
     private val mapper: ObjectMapper
 ) : ReleaseManagementServiceClient {
     private var client =
-        createClient(apiParametersProvider.getApiUrl(), mapper, apiParametersProvider.getTimeRetryInMillis())
+        createClient(
+            apiParametersProvider.getApiUrl(),
+            mapper,
+            apiParametersProvider.getTimeRetryInMillis(),
+            apiParametersProvider.getConnectTimeoutInMillis(),
+            apiParametersProvider.getReadTimeoutInMillis()
+        )
 
     constructor(apiParametersProvider: ReleaseManagementServiceClientParametersProvider) : this(
         apiParametersProvider,
@@ -49,8 +55,14 @@ class ClassicReleaseManagementServiceClient(
     override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO =
         client.createMandatoryUpdate(dryRun, dto)
 
-    fun setUrl(apiUrl: String, timeRetryInMillis: Int) {
-        client = createClient(apiUrl, mapper, timeRetryInMillis)
+    fun setUrl(apiUrl: String, timeRetryInMillis: Int, connectTimeoutInMillis: Int, readTimeoutInMillis: Int) {
+        client = createClient(
+            apiUrl,
+            mapper,
+            timeRetryInMillis,
+            connectTimeoutInMillis,
+            readTimeoutInMillis
+        )
     }
 
     override fun getServiceInfo(): ServiceInfoDTO = client.getServiceInfo()
@@ -63,11 +75,13 @@ class ClassicReleaseManagementServiceClient(
         private fun createClient(
             apiUrl: String,
             objectMapper: ObjectMapper,
-            timeRetryInMillis: Int
+            timeRetryInMillis: Int,
+            connectTimeoutInMillis: Int,
+            readTimeoutInMillis: Int
         ): ReleaseManagementServiceClient {
             return Feign.builder()
                 .client(ApacheHttpClient())
-                .options(Request.Options(30, TimeUnit.SECONDS, 30, TimeUnit.SECONDS, true))
+                .options(Request.Options(connectTimeoutInMillis.toLong(), TimeUnit.MILLISECONDS, readTimeoutInMillis.toLong(), TimeUnit.MILLISECONDS, true))
                 .encoder(JacksonEncoder(objectMapper))
                 .decoder(JacksonDecoder(objectMapper))
                 .errorDecoder(ReleaseManagementServiceErrorDecoder(objectMapper))
