@@ -53,7 +53,7 @@
         lineVersionFormat = '$major.$minor'
         majorVersionFormat = '$major.$minor'
         releaseVersionFormat = '$major.$minor.$service'
-        displayName = 'Main component second'
+        displayName = 'Main component third'
     }
     distribution {
         external = true
