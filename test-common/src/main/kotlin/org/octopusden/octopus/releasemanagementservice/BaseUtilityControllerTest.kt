@@ -18,19 +18,30 @@ abstract class BaseUtilityControllerTest: BaseReleaseManagementServiceTest {
 
     @ParameterizedTest
     @MethodSource("mandatoryUpdateCases")
-    fun createMandatoryUpdateTest(dryRun: Boolean, excludeComponents: Set<String>, excludeSystems: Set<String>, expected: MandatoryUpdateResponseDTO) {
+    fun createMandatoryUpdateTest(
+        dryRun: Boolean,
+        component: String,
+        version: String,
+        startVersion: String,
+        excludeVersions: Set<String>,
+        excludeComponents: Set<String>,
+        excludeSystems: Set<String>,
+        expected: MandatoryUpdateResponseDTO
+    ) {
         val result = createMandatoryUpdate(
             dryRun,
             MandatoryUpdateDTO(
-                component = "dependency-component-first",
-                version = "1.0.2",
+                component = component,
+                version = version,
                 projectKey = "PROJ",
-                epicName = "Mandatory update to dependency-component-first",
+                epicName = "Mandatory update to $component:$version",
                 dueDate = Date(System.currentTimeMillis() + TimeUnit.DAYS.toMillis(10)),
                 notice = "Something",
                 customer = "Octopus",
                 filter = MandatoryUpdateFilterDTO(
                     activeLinePeriod = 180,
+                    startVersion = startVersion,
+                    excludeVersions = excludeVersions,
                     excludeComponents = excludeComponents,
                     excludeSystems = excludeSystems
                 )
@@ -39,18 +50,22 @@ abstract class BaseUtilityControllerTest: BaseReleaseManagementServiceTest {
         Assertions.assertEquals(expected, result)
     }
 
-    private fun mandatoryUpdateCases(): Stream<Arguments> = Stream.of(
+    fun mandatoryUpdateCases(): Stream<Arguments> = Stream.of(
         Arguments.of(
-            "true", emptySet<String>(), emptySet<String>(),
+            true, "dependency-component-first", "1.0.2", "", emptySet<String>(), emptySet<String>(), emptySet<String>(),
             loadObject("../test-data/releng/create-mandatory-update-1.json", object : TypeReference<MandatoryUpdateResponseDTO>() {})
         ),
         Arguments.of(
-            "true", setOf("main-component-second"), setOf("CLASSIC"),
+            true, "dependency-component-first", "1.0.2", "", emptySet<String>(), setOf("main-component-second"), setOf("CLASSIC"),
             loadObject("../test-data/releng/create-mandatory-update-2.json", object : TypeReference<MandatoryUpdateResponseDTO>() {})
         ),
         Arguments.of(
-            "false", emptySet<String>(), emptySet<String>(),
+            false, "dependency-component-first", "1.0.2", "", emptySet<String>(), emptySet<String>(), emptySet<String>(),
             loadObject("../test-data/releng/create-mandatory-update-3.json", object : TypeReference<MandatoryUpdateResponseDTO>() {})
+        ),
+        Arguments.of(
+            true, "dependency-component-first", "2.1.0", "", setOf("2.2"), emptySet<String>(), emptySet<String>(),
+            loadObject("../test-data/releng/create-mandatory-update-4.json", object : TypeReference<MandatoryUpdateResponseDTO>() {})
         )
     )
 }

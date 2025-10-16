@@ -61,6 +61,19 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .convert { it.toInt() }.required()
         .check("$ACTIVE_LINE_PERIOD must be non-negative") { it >= 0 }
 
+    private val startVersion by option(START_VERSION, help = "Start version")
+        .convert { it.trim() }
+        .default("")
+
+    private val excludeVersions by option(EXCLUDE_VERSIONS, help = "Exclude versions (comma-separated)")
+        .convert {
+            it.split(Regex(SPLIT_SYMBOLS))
+                .map(String::trim)
+                .filter(String::isNotEmpty)
+                .toSet()
+        }
+        .default(emptySet())
+
     private val excludeComponents by option(EXCLUDE_COMPONENTS, help = "Exclude components (comma-separated)")
         .convert {
             it.split(Regex(SPLIT_SYMBOLS))
@@ -95,6 +108,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
     override fun run() {
         val filter = MandatoryUpdateFilterDTO(
             activeLinePeriod = activeLinePeriod,
+            startVersion = startVersion,
+            excludeVersions = excludeVersions,
             excludeComponents = excludeComponents,
             excludeSystems = excludeSystems,
             isFullMatchSystems = isFullMatchSystems
@@ -131,6 +146,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         const val CUSTOMER = "--customer"
         const val NOTICE = "--notice"
         const val ACTIVE_LINE_PERIOD = "--active-line-period"
+        const val START_VERSION = "--start-version"
+        const val EXCLUDE_VERSIONS = "--exclude-versions"
         const val EXCLUDE_COMPONENTS = "--exclude-components"
         const val EXCLUDE_SYSTEMS = "--exclude-systems"
         const val IS_FULL_MATCH_SYSTEMS = "--is-full-match-systems"

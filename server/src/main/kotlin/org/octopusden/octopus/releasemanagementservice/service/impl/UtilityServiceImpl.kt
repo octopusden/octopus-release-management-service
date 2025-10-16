@@ -3,6 +3,7 @@ package org.octopusden.octopus.releasemanagementservice.service.impl
 import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateRelengFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.AlreadyExistsException
@@ -28,7 +29,11 @@ class UtilityServiceImpl(
     private val componentRegistryService: ComponentRegistryService
 ): UtilityService {
     override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO {
-        val builds = legacyRelengClient.getMandatoryUpdateBuilds(dto.component, dto.version, dto.filter.activeLinePeriod)
+        val builds = legacyRelengClient.getMandatoryUpdateBuilds(
+            dto.component,
+            dto.version,
+            MandatoryUpdateRelengFilterDTO(dto.filter.activeLinePeriod, dto.filter.startVersion, dto.filter.excludeVersions)
+        )
             .filter {
                 if (dto.filter.excludeComponents.contains(it.component)) return@filter false
                 val foundComponent = componentRegistryService.getById(it.component)
