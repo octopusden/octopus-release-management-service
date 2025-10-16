@@ -40,14 +40,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .check("$EPIC_NAME must not be empty") { it.isNotEmpty() }
 
     private val dueDate by option(DUE_DATE, help = "Due date (yyyy-MM-dd)")
-        .convert {
-            try {
-                SimpleDateFormat("yyyy-MM-dd").parse(it)
-            } catch (e: Exception) {
-                throw IllegalArgumentException("Invalid date format for $DUE_DATE: $it (expected yyyy-MM-dd)")
-            }
-        }
-        .required()
+        .convert { it.trim() }
+        .default("")
 
     private val customer by option(CUSTOMER, help = "Customer")
         .convert { it.trim() }.required()
@@ -106,6 +100,13 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .required()
 
     override fun run() {
+        val dueDate = dueDate.takeIf { it.isNotBlank() }?.let {
+            try {
+                SimpleDateFormat("yyyy-MM-dd").parse(it)
+            } catch (e: Exception) {
+                throw IllegalArgumentException("Invalid date format: $it")
+            }
+        }
         val filter = MandatoryUpdateFilterDTO(
             activeLinePeriod = activeLinePeriod,
             startVersion = startVersion,
