@@ -40,6 +40,27 @@
     }
 }
 
+"main-component-third" {
+    system = "CLASSIC"
+    componentDisplayName = "Main component third"
+    componentOwner = "jdoe"
+    releaseManager = "jdoe"
+    groupId = "corp.domain"
+    vcsUrl = "ssh://git@git.domain.corp/main/main-component-third.git"
+    solution = true
+    jira {
+        projectKey = 'MAIN'
+        lineVersionFormat = '$major.$minor'
+        majorVersionFormat = '$major.$minor'
+        releaseVersionFormat = '$major.$minor.$service'
+        displayName = 'Main component third'
+    }
+    distribution {
+        external = true
+        explicit = true
+    }
+}
+
 "main-component-not-external" {
     system = "NONE"
     componentDisplayName = "Main component not external"

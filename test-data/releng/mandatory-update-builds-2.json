@@ -1,0 +1,25 @@
+[
+  {
+    "component": "main-component-third",
+    "version": "2.1.0",
+    "status": "RC",
+    "parents": [],
+    "dependencies": [
+      {
+        "component": "dependency-component-first",
+        "version": "2.1.0",
+        "status": "RELEASE"
+      }
+    ],
+    "commits": [
+      {
+        "repository": "ssh://git@git.domain.corp/main/main-component-second.git",
+        "sha": "0da242ad739a01e7c50aeb522fd17e1eece77bb3"
+      }
+    ],
+    "statusHistory": {
+      "BUILD": "2025-06-04T13:12:17.000+00:00",
+      "RC": "2025-06-04T19:56:43.000+00:00"
+    }
+  }
+]

@@ -1,6 +1,14 @@
 releng:
   url: # set via EnvFile
 
+jira1:
+  host: # set via EnvFile
+  username: # set via EnvFile
+  password: # set via EnvFile
+
+components-registry-service:
+  url: # set via EnvFile
+
 management:
   endpoints:
     web:

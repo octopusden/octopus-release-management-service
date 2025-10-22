@@ -90,7 +90,8 @@ abstract class MigrateMockData : DefaultTask() {
             "/rest/release-engineering/3/component-management" to emptyMap<String, List<String>>() to "releng/components.json",
             "/rest/release-engineering/3/component-management/ReleaseManagementService" to emptyMap<String, List<String>>() to "releng/component_rm_service.json",
             "/rest/release-engineering/3/component-management/LegacyReleaseManagementService" to emptyMap<String, List<String>>() to "releng/component_legacy_rm_service.json",
-            "/rest/release-engineering/3/component/dependency-component-first/version/1.0.2/mandatory-update" to mapOf("activeLinePeriod" to listOf("180")) to "releng/mandatory-update-builds.json",
+            "/rest/release-engineering/3/component/dependency-component-first/version/1.0.2/mandatory-update" to mapOf("activeLinePeriod" to listOf("180")) to "releng/mandatory-update-builds-1.json",
+            "/rest/release-engineering/3/component/dependency-component-first/version/2.1.0/mandatory-update" to mapOf("activeLinePeriod" to listOf("180")) to "releng/mandatory-update-builds-2.json",
             "/rest/api/latest/issuetype" to emptyMap<String, List<String>>() to "jira/issue-types.json",
             "/rest/api/latest/field" to emptyMap<String, List<String>>() to "jira/fields.json",
             "/rest/api/latest/search" to emptyMap<String, List<String>>() to "jira/find-issues.json"

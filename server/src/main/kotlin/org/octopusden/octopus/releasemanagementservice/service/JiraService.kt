@@ -10,7 +10,7 @@ interface JiraService {
         summary: String,
         description: String,
         assignee: String,
-        dueDate: Date,
+        dueDate: Date?,
         extraFields: Map<String, Any>
     ): String
 

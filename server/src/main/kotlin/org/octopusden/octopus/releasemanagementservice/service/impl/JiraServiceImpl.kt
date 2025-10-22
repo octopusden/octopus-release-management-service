@@ -24,7 +24,7 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
         summary: String,
         description: String,
         assignee: String,
-        dueDate: Date,
+        dueDate: Date?,
         extraFields: Map<String, Any>
     ): String {
         val builder = IssueInputBuilder()
@@ -33,7 +33,9 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
             .setSummary(summary)
             .setDescription(description)
             .setAssigneeName(assignee)
-            .setDueDate(DateTime(dueDate))
+        if (dueDate != null) {
+            builder.setDueDate(DateTime(dueDate))
+        }
         extraFields.forEach { (fieldName, value) ->
             val fieldId = getField(fieldName).id
             builder.setFieldValue(fieldId, value)

@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateRelengFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 
 class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : LegacyRelengClient {
@@ -45,6 +46,6 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
     override fun updateComponent(component: String, dto: ComponentDTO): ComponentDTO =
         client.updateComponent(component, dto)
 
-    override fun getMandatoryUpdateBuilds(component: String, version: String, activeLinePeriod: Int) =
-        client.getMandatoryUpdateBuilds(component, version, activeLinePeriod)
+    override fun getMandatoryUpdateBuilds(component: String, version: String, filter: MandatoryUpdateRelengFilterDTO) =
+        client.getMandatoryUpdateBuilds(component, version, filter)
 }

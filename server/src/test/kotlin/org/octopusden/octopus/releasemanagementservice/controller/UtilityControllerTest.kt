@@ -60,49 +60,35 @@ class UtilityControllerTest: BaseUtilityControllerTest(), BaseControllerTest {
         )
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun stubCreateMandatoryUpdate() {
-        val cases = listOf(
-            Triple(
-                true,
-                MandatoryUpdateFilterDTO(
-                    activeLinePeriod = 180,
-                    excludeComponents = emptySet(),
-                    excludeSystems = emptySet()
-                ),
-                "../test-data/releng/create-mandatory-update-1.json"
-            ),
-            Triple(
-                true,
-                MandatoryUpdateFilterDTO(
-                    activeLinePeriod = 180,
-                    excludeComponents = setOf("main-component-second"),
-                    excludeSystems = setOf("CLASSIC")
-                ),
-                "../test-data/releng/create-mandatory-update-2.json"
-            ),
-            Triple(
-                false,
-                MandatoryUpdateFilterDTO(
-                    180,
-                    emptySet(),
-                    excludeSystems = emptySet()
-                ),
-                "../test-data/releng/create-mandatory-update-3.json"
-            )
-        )
+        val cases = mandatoryUpdateCases().map { it.get() }.toList()
 
-        cases.forEach { (dryRun, filterDto, expectedJson) ->
-            val expected: MandatoryUpdateResponseDTO = loadObject(
-                expectedJson,
-                object : TypeReference<MandatoryUpdateResponseDTO>() {}
+        cases.forEach { args ->
+            val dryRun = args[0] as Boolean
+            val component = args[1] as String
+            val version = args[2] as String
+            val startVersion = args[3] as String
+            val excludeVersions = args[4] as Set<String>
+            val excludeComponents = args[5] as Set<String>
+            val excludeSystems = args[6] as Set<String>
+            val expected = args[7] as MandatoryUpdateResponseDTO
+
+            val filter = MandatoryUpdateFilterDTO(
+                activeLinePeriod = 180,
+                startVersion = startVersion,
+                excludeVersions = excludeVersions,
+                excludeComponents = excludeComponents,
+                excludeSystems = excludeSystems
             )
+
             doReturn(expected).whenever(utilityService)
                 .createMandatoryUpdate(
                     eq(dryRun),
                     argThat { dto ->
-                        dto.component == "dependency-component-first" &&
-                                dto.version == "1.0.2" &&
-                                dto.filter == filterDto
+                        dto.component == component &&
+                                dto.version == version &&
+                                dto.filter == filter
                     }
                 )
         }

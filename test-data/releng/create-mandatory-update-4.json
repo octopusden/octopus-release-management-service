@@ -1,0 +1,10 @@
+{
+  "epicKey": null,
+  "builds": [
+    {
+      "component": "main-component-third",
+      "version": "2.1.0",
+      "status": "RC"
+    }
+  ]
+}

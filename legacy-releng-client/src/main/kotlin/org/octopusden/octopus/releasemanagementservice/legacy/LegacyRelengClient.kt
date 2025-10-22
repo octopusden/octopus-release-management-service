@@ -6,6 +6,7 @@ import feign.RequestLine
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateRelengFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 
 interface LegacyRelengClient {
@@ -25,10 +26,10 @@ interface LegacyRelengClient {
     @RequestLine("PUT rest/release-engineering/3/component-management/{component}")
     fun updateComponent(@Param("component") component: String, dto: ComponentDTO): ComponentDTO
 
-    @RequestLine("GET rest/release-engineering/3/component/{component}/version/{version}/mandatory-update?activeLinePeriod={activeLinePeriod}")
+    @RequestLine("GET rest/release-engineering/3/component/{component}/version/{version}/mandatory-update")
     fun getMandatoryUpdateBuilds(
         @Param("component") component: String,
         @Param("version") version: String,
-        @Param("activeLinePeriod") activeLinePeriod: Int
+        @QueryMap filter: MandatoryUpdateRelengFilterDTO
     ): Collection<BuildDTO>
 }

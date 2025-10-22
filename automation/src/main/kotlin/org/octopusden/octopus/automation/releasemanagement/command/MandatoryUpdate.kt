@@ -40,14 +40,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .check("$EPIC_NAME must not be empty") { it.isNotEmpty() }
 
     private val dueDate by option(DUE_DATE, help = "Due date (yyyy-MM-dd)")
-        .convert {
-            try {
-                SimpleDateFormat("yyyy-MM-dd").parse(it)
-            } catch (e: Exception) {
-                throw IllegalArgumentException("Invalid date format for $DUE_DATE: $it (expected yyyy-MM-dd)")
-            }
-        }
-        .required()
+        .convert { it.trim() }
+        .default("")
 
     private val customer by option(CUSTOMER, help = "Customer")
         .convert { it.trim() }.required()
@@ -60,6 +54,19 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
     private val activeLinePeriod by option(ACTIVE_LINE_PERIOD, help = "Active line period (days)")
         .convert { it.toInt() }.required()
         .check("$ACTIVE_LINE_PERIOD must be non-negative") { it >= 0 }
+
+    private val startVersion by option(START_VERSION, help = "Start version")
+        .convert { it.trim() }
+        .default("")
+
+    private val excludeVersions by option(EXCLUDE_VERSIONS, help = "Exclude versions (comma-separated)")
+        .convert {
+            it.split(Regex(SPLIT_SYMBOLS))
+                .map(String::trim)
+                .filter(String::isNotEmpty)
+                .toSet()
+        }
+        .default(emptySet())
 
     private val excludeComponents by option(EXCLUDE_COMPONENTS, help = "Exclude components (comma-separated)")
         .convert {
@@ -93,8 +100,17 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .required()
 
     override fun run() {
+        val dueDate = dueDate.takeIf { it.isNotBlank() }?.let {
+            try {
+                SimpleDateFormat("yyyy-MM-dd").parse(it)
+            } catch (e: Exception) {
+                throw IllegalArgumentException("Invalid date format: $it")
+            }
+        }
         val filter = MandatoryUpdateFilterDTO(
             activeLinePeriod = activeLinePeriod,
+            startVersion = startVersion,
+            excludeVersions = excludeVersions,
             excludeComponents = excludeComponents,
             excludeSystems = excludeSystems,
             isFullMatchSystems = isFullMatchSystems
@@ -131,6 +147,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         const val CUSTOMER = "--customer"
         const val NOTICE = "--notice"
         const val ACTIVE_LINE_PERIOD = "--active-line-period"
+        const val START_VERSION = "--start-version"
+        const val EXCLUDE_VERSIONS = "--exclude-versions"
         const val EXCLUDE_COMPONENTS = "--exclude-components"
         const val EXCLUDE_SYSTEMS = "--exclude-systems"
         const val IS_FULL_MATCH_SYSTEMS = "--is-full-match-systems"
