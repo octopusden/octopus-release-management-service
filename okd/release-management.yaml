@@ -8,10 +8,8 @@ objects:
     metadata:
       name: ${DEPLOYMENT_PREFIX}-release-management-config-data
     data:
-      application-ft.yml: |-
-        ${APPLICATION_FT_CONTENT}
-      bootstrap-ft.yml: |-
-        ${BOOTSTRAP_FT_CONTENT}
+      application-dev.yaml: |-
+        ${APPLICATION_DEV_CONTENT}
   - apiVersion: v1
     kind: Pod
     metadata:
@@ -37,33 +35,25 @@ objects:
             - name: SPRING_CONFIG_ADDITIONAL_LOCATION
               value: "/"
             - name: SPRING_PROFILES_ACTIVE
-              value: "ft"
+              value: "dev"
+            - name: SPRING_CLOUD_CONFIG_ENABLED
+              value: "false"
             - name: TEST_MOCKSERVER_HOST
               value: ${TEST_MOCKSERVER_HOST}
             - name: TEST_COMPONENTS_REGISTRY_HOST
               value: ${TEST_COMPONENTS_REGISTRY_HOST}
           volumeMounts:
-            - name: application-ft
-              mountPath: /application-ft.yml
-              subPath: application-ft.yml
-              readOnly: true
-            - name: bootstrap-ft
-              mountPath: /bootstrap-ft.yml
-              subPath: bootstrap-ft.yml
+            - name: application-dev
+              mountPath: /application-dev.yaml
+              subPath: application-dev.yaml
               readOnly: true
       volumes:
-        - name: application-ft
+        - name: application-dev
           configMap:
             name: ${DEPLOYMENT_PREFIX}-release-management-config-data
             items:
-              - key: application-ft.yml
-                path: application-ft.yml
-        - name: bootstrap-ft
-          configMap:
-            name: ${DEPLOYMENT_PREFIX}-release-management-config-data
-            items:
-              - key: bootstrap-ft.yml
-                path: bootstrap-ft.yml
+              - key: application-dev.yaml
+                path: application-dev.yaml
   - apiVersion: v1
     kind: Service
     metadata:
@@ -107,9 +97,6 @@ parameters:
   - description: Test components registry host
     name: TEST_COMPONENTS_REGISTRY_HOST
     required: true
-  - description: application-ft.yml content
-    name: APPLICATION_FT_CONTENT
-    required: true
-  - description: bootstrap-ft.yml content
-    name: BOOTSTRAP_FT_CONTENT
+  - description: application-dev.yaml content
+    name: APPLICATION_DEV_CONTENT
     required: true

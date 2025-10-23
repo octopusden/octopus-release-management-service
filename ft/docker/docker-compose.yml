@@ -7,11 +7,11 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./application-ft.yml:/application-ft.yml
-      - ./bootstrap-ft.yml:/bootstrap-ft.yml
+      - ./release-management-service.yaml:/application-ft.yaml
     environment:
       - SPRING_CONFIG_ADDITIONAL_LOCATION=/
       - SPRING_PROFILES_ACTIVE=ft
+      - SPRING_CLOUD_CONFIG_ENABLED=false
       - TEST_MOCKSERVER_HOST=${TEST_MOCKSERVER_HOST}
       - TEST_COMPONENTS_REGISTRY_HOST=${TEST_COMPONENTS_REGISTRY_HOST}
 

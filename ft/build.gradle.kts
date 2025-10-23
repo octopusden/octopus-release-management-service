@@ -139,7 +139,7 @@ ocTemplate {
                 "AGGREGATOR_GROOVY_CONTENT" to file("${componentsRegistryWorkDir}/Aggregator.groovy").readText(),
                 "DEFAULTS_GROOVY_CONTENT" to file("${componentsRegistryWorkDir}/Defaults.groovy").readText(),
                 "TEST_COMPONENTS_GROOVY_CONTENT" to file("${componentsRegistryWorkDir}/TestComponents.groovy").readText(),
-                "APPLICATION_FT_CONTENT" to layout.projectDirectory.dir("docker/components-registry-service.yaml").asFile.readText()
+                "APPLICATION_DEV_CONTENT" to layout.projectDirectory.dir("docker/components-registry-service.yaml").asFile.readText()
             ))
         }
     }
@@ -159,8 +159,7 @@ ocTemplate {
             parameters.set(commonOkdParameters + mapOf(
                 "RELEASE_MANAGEMENT_SERVICE_VERSION" to version as String,
                 "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
-                "APPLICATION_FT_CONTENT" to layout.projectDirectory.dir("docker/application-ft.yml").asFile.readText(),
-                "BOOTSTRAP_FT_CONTENT" to layout.projectDirectory.dir("docker/bootstrap-ft.yml").asFile.readText(),
+                "APPLICATION_DEV_CONTENT" to layout.projectDirectory.dir("docker/release-management-service.yaml").asFile.readText(),
                 "TEST_MOCKSERVER_HOST" to getOkdExternalHost("mockserver"),
                 "TEST_COMPONENTS_REGISTRY_HOST" to getOkdExternalHost("comp-reg")
             ))
