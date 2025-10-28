@@ -1,6 +1,5 @@
 package org.octopusden.octopus.releasemanagementservice.service.impl
 
-import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateRelengFilterDTO
@@ -11,12 +10,15 @@ import org.octopusden.octopus.releasemanagementservice.legacy.LegacyRelengClient
 import org.octopusden.octopus.releasemanagementservice.service.ComponentRegistryService
 import org.octopusden.octopus.releasemanagementservice.service.JiraService
 import org.octopusden.octopus.releasemanagementservice.service.UtilityService
+import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.CRN_REQUIRED_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.CUSTOMER_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_ISSUE
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_LINK_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_NAME_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.MANDATORY_UPDATE_ISSUE
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.jqlQuote
+import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.multiSelectOf
+import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.singleSelectOf
 import org.springframework.stereotype.Service
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -79,7 +81,11 @@ class UtilityServiceImpl(
 
     private fun createSubIssues(component: String, version: String, builds: List<ShortBuildDTO>, dto: MandatoryUpdateDTO, epicKey: String) {
         val buildsByComponent = builds.groupBy { it.component }
-        val extraFields = mapOf(CUSTOMER_FIELD to multiSelectOf(dto.customer), EPIC_LINK_FIELD to epicKey)
+        val extraFields = mapOf(
+            CUSTOMER_FIELD to multiSelectOf(dto.customer),
+            EPIC_LINK_FIELD to epicKey,
+            CRN_REQUIRED_FIELD to singleSelectOf(CRN_REQUIRED_FIELD_VALUE)
+        )
         for ((compId, compBuilds) in buildsByComponent) {
             val detailedComponent = componentRegistryService.getDetailedComponent(compId, compBuilds.first().version)
             val assignee = detailedComponent.componentOwner
@@ -105,9 +111,6 @@ class UtilityServiceImpl(
         return jiraService.findIssues(jql).any { it.summary == summary }
     }
 
-    private fun multiSelectOf(vararg values: String): List<ComplexIssueInputFieldValue> =
-        values.map { ComplexIssueInputFieldValue(mapOf("value" to it)) }
-
     private fun BuildDTO.toShortBuildDTO(): ShortBuildDTO =
         ShortBuildDTO(component = component, version = version, status = status)
 
@@ -119,5 +122,7 @@ class UtilityServiceImpl(
         private const val ISSUE_DESCRIPTION_TEMPLATE =
             "Component %s has the following versions eligible for mandatory update:\n%s\n\n" +
                     "Those versions are to be updated: please bump dependencies on %s to %s or a later version."
+
+        private const val CRN_REQUIRED_FIELD_VALUE = "No"
     }
 }

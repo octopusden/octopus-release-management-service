@@ -49,5 +49,22 @@
       "custom": "com.atlassian.jira.plugin.system.customfieldtypes:select",
       "customId": 13400
     }
+  },
+  {
+    "self" : "http://mockserver:1080/rest/api/latest/field/customfield_14202",
+    "id": "customfield_14202",
+    "name": "CRN Required",
+    "fieldType": "CUSTOM",
+    "custom": true,
+    "orderable": true,
+    "navigable": true,
+    "searchable": true,
+    "schema": {
+      "type": "option",
+      "items": null,
+      "system": null,
+      "custom": "com.atlassian.jira.plugin.system.customfieldtypes:select",
+      "customId": 14202
+    }
   }
 ]
