@@ -3,6 +3,7 @@ package org.octopusden.octopus.releasemanagementservice.service.impl
 import com.atlassian.jira.rest.client.api.domain.IssueType
 import com.atlassian.jira.rest.client.api.domain.Field
 import com.atlassian.jira.rest.client.api.domain.Issue
+import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory
 import org.joda.time.DateTime
@@ -62,8 +63,15 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
         const val CUSTOMER_FIELD = "Customer"
         const val EPIC_NAME_FIELD = "Epic Name"
         const val EPIC_LINK_FIELD = "Epic Link"
+        const val CRN_REQUIRED_FIELD = "CRN Required"
 
         fun jqlQuote(value: String): String =
             value.replace("\\", "\\\\").replace("\"", "\\\"")
+
+        fun multiSelectOf(vararg values: String): List<ComplexIssueInputFieldValue> =
+            values.map { ComplexIssueInputFieldValue(mapOf("value" to it)) }
+
+        fun singleSelectOf(value: String): ComplexIssueInputFieldValue =
+            ComplexIssueInputFieldValue(mapOf("value" to value))
     }
 }
