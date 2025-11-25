@@ -1,0 +1,20 @@
+{
+  "component": "ReleaseManagementService",
+  "version": "1.0.2",
+  "status": "RELEASE",
+  "parents": [],
+  "dependencies": [],
+  "commits": [
+    {
+      "repository": "ssh://git@github.com:octopusden/octopus-release-management-service.git",
+      "sha": "abc123def456789012345678901234567890abcd"
+    }
+  ],
+  "statusHistory": {
+    "BUILD": "2024-07-15T10:00:00.000+00:00",
+    "RC": "2024-07-15T14:30:00.000+00:00",
+    "RELEASE": "2024-07-15T16:00:00.000+00:00"
+  },
+  "hotfix": true
+}
+

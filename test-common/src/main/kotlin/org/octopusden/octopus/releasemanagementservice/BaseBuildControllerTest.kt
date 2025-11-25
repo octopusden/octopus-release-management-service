@@ -108,6 +108,12 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
             loadObject(
                 "../test-data/releng/builds-with-max-age-filter-3.json",
                 object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("versions" to listOf("1.0.2")),
+            loadObject(
+                "../test-data/releng/builds_1.0.2-hotfix.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
         )
     )
 
@@ -119,6 +125,10 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
         Arguments.of(
             "2.0.1",
             loadObject("../test-data/releng/build_2.0.1.json", object : TypeReference<BuildDTO>() {})
+        ),
+        Arguments.of(
+            "1.0.2",
+            loadObject("../test-data/releng/build_1.0.2-hotfix.json", object : TypeReference<BuildDTO>() {})
         )
     )
 }
