@@ -4,5 +4,5 @@ data class ShortBuildDTO(
     val component: String,
     val version: String,
     val status: BuildStatus,
-    val hotfix: Boolean = false
+    val hotfix: Boolean
 )

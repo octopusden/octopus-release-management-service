@@ -112,7 +112,7 @@ class UtilityServiceImpl(
     }
 
     private fun BuildDTO.toShortBuildDTO(): ShortBuildDTO =
-        ShortBuildDTO(component = component, version = version, status = status)
+        ShortBuildDTO(component = component, version = version, status = status, hotfix = hotfix)
 
     companion object {
         private const val EPIC_SUMMARY_TEMPLATE = "Bump Dependencies on %s %s"
