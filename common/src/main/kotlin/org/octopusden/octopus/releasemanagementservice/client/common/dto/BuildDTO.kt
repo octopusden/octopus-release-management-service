@@ -9,5 +9,6 @@ data class BuildDTO(
     val parents: Collection<ShortBuildDTO>,
     val dependencies: Collection<ShortBuildDTO>,
     val commits: Collection<CommitDTO>,
-    val statusHistory: Map<BuildStatus, Date>
+    val statusHistory: Map<BuildStatus, Date>,
+    val hotfix: Boolean
 )
