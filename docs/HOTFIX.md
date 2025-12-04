@@ -155,3 +155,45 @@ Same branch parent must be connected in the VCS graph. For hotfix build, it will
 |--------------|--------------------|
 | 1.0.2-123_RC | 1.0.2              |
 | 1.0.2-234_RC | 1.0.2-123_RC       |
+
+## Hotfix Client Release Notes
+Client release notes for hotfix builds will include:
+- Issues from the current hotfix build
+- Issues from previous hotfix builds in the same minor version (connected via same branch parent)
+- Issues starting from start version to the parent release build
+
+### Example
+![](images/hotfix-client-release-notes/hotfixCRN.png)
+**Results:**
+
+| Issue   | Fix Version(s) |
+|---------|----------------|
+| issue1  | 1.0.1          |
+| issue2  | 1.0.2          |
+| issue3  | 1.0.3          |
+| issue4  | 1.0.4          |
+| issue21 | 1.0.2-123      |
+| issue22 | 1.0.2-345      |
+| issue23 | 1.0.2-345      |
+| issue31 | 1.0.3-123      |
+| issue32 | 1.0.3-345      |
+| issue33 | 1.0.3-345      |
+
+**Same Branch Parent:**
+
+| Release/RC   | Same Branch Parent |
+|--------------|--------------------|
+| 1.0.2        | 1.0.1              |
+| 1.0.3        | 1.0.2              |
+| 1.0.4        | 1.0.3              |
+| 1.0.2-123    | 1.0.2              |
+| 1.0.2-345    | 1.0.2-123          |
+| 1.0.3-123    | 1.0.3              |
+| 1.0.3-345    | 1.0.3-123          |
+
+**Client Release Notes:**
+
+| Start Version | Component Version | Included Version(s)                       | Included Issue(s)                                 |
+|---------------|-------------------|-------------------------------------------|---------------------------------------------------|
+| 1.0.0         | 1.0.2-345         | 1.0.1, 1.0.2, 1.0.2-123, 1.0.2-345        | issue1, issue2, issue21, issue22, issue23         |
+| 1.0.0         | 1.0.3-345         | 1.0.1, 1.0.2, 1.0.3, 1.0.3-123, 1.0.3-345 | issue1, issue2, issue3, issue31, issue32, issue33 |
