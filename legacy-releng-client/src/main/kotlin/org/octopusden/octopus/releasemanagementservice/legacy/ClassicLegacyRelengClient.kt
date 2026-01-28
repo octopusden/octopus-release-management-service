@@ -10,6 +10,7 @@ import feign.httpclient.ApacheHttpClient
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
+import org.apache.http.impl.client.HttpClientBuilder
 import java.util.concurrent.TimeUnit
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
@@ -25,7 +26,11 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
     })
 
     private val client = Builder()
-        .client(ApacheHttpClient())
+        .client(ApacheHttpClient(
+            HttpClientBuilder.create()
+                .disableCookieManagement()
+                .build()
+        ))
         .options(Request.Options(5, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, true))
         .encoder(JacksonEncoder(objectMapper))
         .decoder(JacksonDecoder(objectMapper))
