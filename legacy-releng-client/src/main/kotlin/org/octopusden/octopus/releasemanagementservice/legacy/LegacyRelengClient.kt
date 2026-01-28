@@ -34,5 +34,5 @@ interface LegacyRelengClient {
     ): Collection<BuildDTO>
 
     @RequestLine("GET rest/release-engineering/3/component-management")
-    fun getHealth()
+    fun getHealth(): Collection<ComponentDTO>
 }
