@@ -33,6 +33,6 @@ interface LegacyRelengClient {
         @QueryMap filter: MandatoryUpdateRelengFilterDTO
     ): Collection<BuildDTO>
 
-    @RequestLine("GET rest/troubleshooting/1.0/check")
+    @RequestLine("GET rest/release-engineering/3/component-management")
     fun getHealth()
 }
