@@ -32,4 +32,7 @@ interface LegacyRelengClient {
         @Param("version") version: String,
         @QueryMap filter: MandatoryUpdateRelengFilterDTO
     ): Collection<BuildDTO>
+
+    @RequestLine("GET rest/troubleshooting/1.0/check")
+    fun getHealth()
 }

@@ -53,4 +53,6 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
 
     override fun getMandatoryUpdateBuilds(component: String, version: String, filter: MandatoryUpdateRelengFilterDTO) =
         client.getMandatoryUpdateBuilds(component, version, filter)
+
+    override fun getHealth() = client.getHealth()
 }
