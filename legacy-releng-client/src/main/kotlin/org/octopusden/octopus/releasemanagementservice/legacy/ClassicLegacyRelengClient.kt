@@ -10,7 +10,6 @@ import feign.httpclient.ApacheHttpClient
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
-import org.apache.http.impl.client.DefaultRedirectStrategy
 import org.apache.http.impl.client.HttpClientBuilder
 import java.util.concurrent.TimeUnit
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
@@ -30,14 +29,10 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
         .client(ApacheHttpClient(
             HttpClientBuilder.create()
                 .disableCookieManagement()
-                .setRedirectStrategy(object : DefaultRedirectStrategy() {
-                    override fun isRedirectable(method: String): Boolean {
-                        return false
-                    }
-                })
+                .disableRedirectHandling()
                 .build()
         ))
-        .options(Request.Options(5, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, true))
+        .options(Request.Options(5, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, false))
         .encoder(JacksonEncoder(objectMapper))
         .decoder(JacksonDecoder(objectMapper))
         .errorDecoder(LegacyRelengErrorDecoder(objectMapper))
