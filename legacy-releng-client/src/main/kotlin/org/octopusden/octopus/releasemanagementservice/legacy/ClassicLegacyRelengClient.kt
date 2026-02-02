@@ -10,6 +10,7 @@ import feign.httpclient.ApacheHttpClient
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
+import org.apache.http.impl.client.HttpClientBuilder
 import java.util.concurrent.TimeUnit
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
@@ -25,8 +26,13 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
     })
 
     private val client = Builder()
-        .client(ApacheHttpClient())
-        .options(Request.Options(5, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, true))
+        .client(ApacheHttpClient(
+            HttpClientBuilder.create()
+                .disableCookieManagement()
+                .disableRedirectHandling()
+                .build()
+        ))
+        .options(Request.Options(5, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, false))
         .encoder(JacksonEncoder(objectMapper))
         .decoder(JacksonDecoder(objectMapper))
         .errorDecoder(LegacyRelengErrorDecoder(objectMapper))
@@ -48,4 +54,6 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
 
     override fun getMandatoryUpdateBuilds(component: String, version: String, filter: MandatoryUpdateRelengFilterDTO) =
         client.getMandatoryUpdateBuilds(component, version, filter)
+
+    override fun getHealth() = client.getHealth()
 }
