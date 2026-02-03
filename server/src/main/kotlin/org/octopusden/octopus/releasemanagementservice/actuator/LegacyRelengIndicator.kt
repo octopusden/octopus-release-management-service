@@ -1,23 +1,31 @@
 package org.octopusden.octopus.releasemanagementservice.actuator
 
 import org.octopusden.octopus.releasemanagementservice.legacy.LegacyRelengClient
-import org.springframework.boot.actuate.health.Health
-import org.springframework.boot.actuate.health.HealthIndicator
+import org.springframework.boot.actuate.availability.ReadinessStateHealthIndicator
+import org.springframework.boot.actuate.health.Health.Builder
+import org.springframework.boot.availability.ApplicationAvailability
+import org.springframework.boot.availability.ReadinessState.ACCEPTING_TRAFFIC
+import org.springframework.boot.availability.ReadinessState.REFUSING_TRAFFIC
 import org.springframework.stereotype.Component
 
 @Component
 class LegacyRelengIndicator(
-    private val legacyRelengClient: LegacyRelengClient
-): HealthIndicator {
-    override fun health(): Health {
-        return try {
+    private val legacyRelengClient: LegacyRelengClient, availability: ApplicationAvailability?
+): ReadinessStateHealthIndicator(availability) {
+    override fun doHealthCheck(builder: Builder) {
+        try {
             legacyRelengClient.getHealth()
-            Health.up().build()
+            builder
+                .up()
+                .withDetail("legacyReleng", "Available")
+                .withDetail("readinessState", ACCEPTING_TRAFFIC)
+
         } catch (e: Exception) {
-            Health.down()
-                .withDetail("message", "Legacy Releng Service is unavailable")
+            builder
+                .down()
+                .withDetail("legacyReleng", "Unavailable")
                 .withException(e)
-                .build()
+                .withDetail("readinessState", REFUSING_TRAFFIC)
         }
     }
 }
