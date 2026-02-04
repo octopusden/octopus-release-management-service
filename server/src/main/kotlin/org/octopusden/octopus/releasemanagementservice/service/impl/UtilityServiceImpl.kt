@@ -81,16 +81,19 @@ class UtilityServiceImpl(
 
     private fun createSubIssues(component: String, version: String, builds: List<ShortBuildDTO>, dto: MandatoryUpdateDTO, epicKey: String) {
         val buildsByComponent = builds.groupBy { it.component }
-        val extraFields = mapOf(
-            CUSTOMER_FIELD to multiSelectOf(dto.customer),
-            EPIC_LINK_FIELD to epicKey,
-            CRN_REQUIRED_FIELD to singleSelectOf(CRN_REQUIRED_FIELD_VALUE)
-        )
         for ((compId, compBuilds) in buildsByComponent) {
             val detailedComponent = componentRegistryService.getDetailedComponent(compId, compBuilds.first().version)
             val assignee = detailedComponent.componentOwner
             val currentProjectKey = detailedComponent.jiraComponentVersion.component.projectKey
             val versions = compBuilds.joinToString(separator = "\n") { "- ${it.version}" }
+            val extraFields = mutableMapOf(
+                CUSTOMER_FIELD to multiSelectOf(dto.customer),
+                EPIC_LINK_FIELD to epicKey
+            )
+            val solution = detailedComponent.solution ?: false
+            if (!solution) {
+                extraFields[CRN_REQUIRED_FIELD] = singleSelectOf(CRN_REQUIRED_FIELD_VALUE)
+            }
             jiraService.createIssue(
                 currentProjectKey,
                 MANDATORY_UPDATE_ISSUE,

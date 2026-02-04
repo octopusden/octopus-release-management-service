@@ -5,7 +5,7 @@
     releaseManager = "jdoe"
     groupId = "corp.domain"
     vcsUrl = "ssh://git@git.domain.corp/main/main-component-first.git"
-    solution = true
+    solution = false
     jira {
         projectKey = 'MAIN'
         lineVersionFormat = '$major.$minor'
@@ -26,7 +26,7 @@
     releaseManager = "jdoe"
     groupId = "corp.domain"
     vcsUrl = "ssh://git@git.domain.corp/main/main-component-second.git"
-    solution = true
+    solution = false
     jira {
         projectKey = 'MAIN'
         lineVersionFormat = '$major.$minor'
@@ -47,13 +47,34 @@
     releaseManager = "jdoe"
     groupId = "corp.domain"
     vcsUrl = "ssh://git@git.domain.corp/main/main-component-third.git"
-    solution = true
+    solution = false
     jira {
         projectKey = 'MAIN'
         lineVersionFormat = '$major.$minor'
         majorVersionFormat = '$major.$minor'
         releaseVersionFormat = '$major.$minor.$service'
         displayName = 'Main component third'
+    }
+    distribution {
+        external = true
+        explicit = true
+    }
+}
+
+"main-component-solution" {
+    system = "CLASSIC"
+    componentDisplayName = "Main component solution"
+    componentOwner = "jdoe"
+    releaseManager = "jdoe"
+    groupId = "corp.domain"
+    vcsUrl = "ssh://git@git.domain.corp/main/main-component-solution.git"
+    solution = true
+    jira {
+        projectKey = 'MAIN'
+        lineVersionFormat = '$major.$minor'
+        majorVersionFormat = '$major.$minor'
+        releaseVersionFormat = '$major.$minor.$service'
+        displayName = 'Main component solution'
     }
     distribution {
         external = true
@@ -68,7 +89,7 @@
     releaseManager = "jdoe"
     groupId = "corp.domain"
     vcsUrl = "ssh://git@git.domain.corp/main/main-component-ne.git"
-    solution = true
+    solution = false
     jira {
         projectKey = 'MAIN'
         lineVersionFormat = '$major.$minor'
@@ -89,7 +110,7 @@
     releaseManager = "jdoe"
     groupId = "corp.domain"
     vcsUrl = "ssh://git@git.domain.corp/dep/dependency-component-first.git"
-    solution = true
+    solution = false
     jira {
         projectKey = 'DEP'
         lineVersionFormat = '$major.$minor'

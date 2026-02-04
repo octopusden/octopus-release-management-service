@@ -21,5 +21,29 @@
       "BUILD": "2025-06-04T13:12:17.000+00:00",
       "RC": "2025-06-04T19:56:43.000+00:00"
     }
+  },
+  {
+    "component": "main-component-solution",
+    "version": "2.1.0",
+    "status": "RELEASE",
+    "parents": [],
+    "dependencies": [
+      {
+        "component": "dependency-component-first",
+        "version": "2.1.0",
+        "status": "RELEASE"
+      }
+    ],
+    "commits": [
+      {
+        "repository": "ssh://git@git.domain.corp/main/main-component-solution.git",
+        "sha": "0da242ad739a01e7c50aeb522fd17e1eece77bb3"
+      }
+    ],
+    "statusHistory": {
+      "BUILD": "2025-06-04T13:12:17.000+00:00",
+      "RC": "2025-06-04T19:56:43.000+00:00",
+      "RELEASE": "2025-06-04T20:14:37.000+00:00"
+    }
   }
 ]
