@@ -29,7 +29,6 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
         .client(ApacheHttpClient(
             HttpClientBuilder.create()
                 .disableCookieManagement()
-                .disableRedirectHandling()
                 .build()
         ))
         .options(Request.Options(5, TimeUnit.MINUTES, 5, TimeUnit.MINUTES, false))
