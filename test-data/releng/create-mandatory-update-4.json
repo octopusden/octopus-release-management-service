@@ -5,6 +5,11 @@
       "component": "main-component-third",
       "version": "2.1.0",
       "status": "RC"
+    },
+    {
+      "component": "main-component-solution",
+      "version": "2.1.0",
+      "status": "RELEASE"
     }
   ]
 }
