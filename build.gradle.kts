@@ -28,6 +28,13 @@ val defaultVersion = "${
     }
 }-SNAPSHOT"
 
+fun requiredIntProperty(propertyName: String): Int {
+    val value = findProperty(propertyName)?.toString()?.trim()
+        ?: throw IllegalStateException("Missing Gradle property '$propertyName' required for Kover verification")
+    return value.toIntOrNull()
+        ?: throw IllegalStateException("Gradle property '$propertyName' must be an integer, but was '$value'")
+}
+
 allprojects {
     group = "org.octopusden.octopus.release-management-service"
     if (version == "unspecified") {
@@ -63,14 +70,14 @@ kover {
         verify {
             rule("Line coverage") {
                 bound {
-                    minValue.set((findProperty("coverage.line.min") as String).toInt())
+                    minValue.set(requiredIntProperty("coverage.line.min"))
                     coverageUnits = CoverageUnit.LINE
                     aggregationForGroup = AggregationType.COVERED_PERCENTAGE
                 }
             }
             rule("Branch coverage") {
                 bound {
-                    minValue.set((findProperty("coverage.branch.min") as String).toInt())
+                    minValue.set(requiredIntProperty("coverage.branch.min"))
                     coverageUnits = CoverageUnit.BRANCH
                     aggregationForGroup = AggregationType.COVERED_PERCENTAGE
                 }
@@ -83,7 +90,7 @@ dependencyCheck {
     failBuildOnCVSS = 11.0F
     suppressionFile = "$rootDir/config/owasp/suppressions.xml"
     formats = listOf("HTML", "JSON", "SARIF")
-    outputDirectory = "${layout.buildDirectory.get().asFile}/reports/dependency-check"
+    outputDirectory.set(layout.buildDirectory.dir("reports/dependency-check"))
 }
 
 tasks.register("qualityStatic") {
