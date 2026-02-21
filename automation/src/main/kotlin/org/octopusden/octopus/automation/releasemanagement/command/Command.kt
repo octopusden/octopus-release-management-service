@@ -11,19 +11,27 @@ import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManage
 import org.slf4j.LoggerFactory
 
 class Command : CliktCommand(name = "") {
-    private val url by option(URL_OPTION, help = "Release Management Service URL").convert { it.trim() }.required()
+    private val url by option(URL_OPTION, help = "Release Management Service URL")
+        .convert { it.trim() }
+        .required()
         .check("$URL_OPTION is empty") { it.isNotEmpty() }
 
     private val context by findOrSetObject { mutableMapOf<String, Any>() }
 
     override fun run() {
         val log = LoggerFactory.getLogger(Command::class.java)
-        val client = ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
-            override fun getApiUrl() = url
-            override fun getTimeRetryInMillis() = 180000
-            override fun getConnectTimeoutInMillis() = 30000
-            override fun getReadTimeoutInMillis() = 90000
-        })
+        val client =
+            ClassicReleaseManagementServiceClient(
+                object : ReleaseManagementServiceClientParametersProvider {
+                    override fun getApiUrl() = url
+
+                    override fun getTimeRetryInMillis() = 180000
+
+                    override fun getConnectTimeoutInMillis() = 30000
+
+                    override fun getReadTimeoutInMillis() = 90000
+                },
+            )
 
         context[LOG] = log
         context[CLIENT] = client
