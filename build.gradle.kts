@@ -107,6 +107,10 @@ tasks.register("qualityCheck") {
     dependsOn("qualityStatic", "qualityCoverage")
 }
 
+tasks.named("check") {
+    dependsOn(tasks.matching { it.name == "koverXmlReport" || it.name == "koverHtmlReport" })
+}
+
 tasks.register("securityReport") {
     group = "verification"
     description = "Runs security checks in report-only mode."
