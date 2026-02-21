@@ -33,6 +33,5 @@
     <ID>ProtectedMemberInFinalClass:UtilityControllerTest.kt$UtilityControllerTest$@Autowired protected lateinit var mvc: MockMvc</ID>
     <ID>SpreadOperator:ReleaseManagementServiceApplication.kt$(ReleaseManagementServiceApplication::class.java, *args)</ID>
     <ID>TooGenericExceptionCaught:LegacyRelengIndicator.kt$LegacyRelengIndicator$e: Exception</ID>
-    <ID>UnusedPrivateProperty:BaseControllerTest.kt$BaseControllerTest.Companion$private val FORMATTER = DateTimeFormatter.ofPattern(ISO_PATTERN) .withZone(ZoneId.systemDefault())</ID>
   </CurrentIssues>
 </SmellBaseline>
