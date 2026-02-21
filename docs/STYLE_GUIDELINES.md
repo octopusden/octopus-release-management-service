@@ -12,24 +12,45 @@ Obvious checks like `unused*` are intentionally omitted.
 
 ## Enabled Checks (CI Gate)
 
-Statistics below are based on current detekt baselines.
+Statistics below are based on:
+- current detekt baselines;
+- current ktlint baselines.
 
-| Rule | Open violations |
-| --- | --- |
-| `detekt:style:ClassOrdering` | 0 |
-| `detekt:style:ForbiddenComment` | 0 |
-| `detekt:style:MaxLineLength` | 12 |
-| `detekt:style:NewLineAtEndOfFile` | 64 |
-| `detekt:style:ProtectedMemberInFinalClass` | 16 |
-| `detekt:style:WildcardImport` | 0 |
-| `detekt:style:UseCheckOrError` | 2 |
-| `detekt:naming:TopLevelPropertyNaming` | 0 |
+| Rule | Open violations | Source |
+| --- | --- | --- |
+| `detekt:style:ClassOrdering` | 0 | baseline |
+| `detekt:style:ForbiddenComment` | 0 | baseline |
+| `detekt:style:MaxLineLength` | 12 | baseline |
+| `detekt:style:NewLineAtEndOfFile` | 64 | baseline |
+| `detekt:style:ProtectedMemberInFinalClass` | 16 | baseline |
+| `detekt:style:WildcardImport` | 0 | baseline |
+| `detekt:style:UseCheckOrError` | 2 | baseline |
+| `detekt:naming:TopLevelPropertyNaming` | 0 | baseline |
+| `ktlint:standard:chain-method-continuation` | 50 | baseline |
 
 For enabled checks, code links are listed only for not-yet-fixed cases.
 
 ### `ktlint` numeric criteria (active)
 
 - `max_line_length = 140` (from `.editorconfig`, for `*.kt` and `*.kts`)
+
+### `ktlint:standard:chain-method-continuation` (newly enforced after ktlint upgrade)
+
+Meaning:
+- In multiline call chains, place a newline before `.` (dot starts the next line).
+
+Wrong:
+```kotlin
+val value = source.map { it.id }.filter { it > 0 }
+```
+
+Right:
+```kotlin
+val value =
+    source
+        .map { it.id }
+        .filter { it > 0 }
+```
 
 ### `detekt:style:ClassOrdering`
 
