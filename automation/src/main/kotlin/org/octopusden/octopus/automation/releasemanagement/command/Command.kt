@@ -17,7 +17,7 @@ class Command : CliktCommand(name = "") {
     private val context by findOrSetObject { mutableMapOf<String, Any>() }
 
     override fun run() {
-        val log = LoggerFactory.getLogger(Command::class.java.`package`.name)
+        val log = LoggerFactory.getLogger(Command::class.java)
         val client = ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
             override fun getApiUrl() = url
             override fun getTimeRetryInMillis() = 180000

@@ -54,6 +54,6 @@ class VelocityEngine {
     }
 
     companion object {
-        private val LOG = LoggerFactory.getLogger(VelocityEngine::class.java.`package`.name)
+        private val LOG = LoggerFactory.getLogger(VelocityEngine::class.java)
     }
 }
