@@ -7,6 +7,14 @@ plugins {
     id("org.octopusden.octopus.oc-template")
 }
 
+kover {
+    currentProject {
+        instrumentation {
+            disabledForTestTasks.add("ft")
+        }
+    }
+}
+
 sourceSets {
     create("ft") {
         compileClasspath += sourceSets.main.get().output
