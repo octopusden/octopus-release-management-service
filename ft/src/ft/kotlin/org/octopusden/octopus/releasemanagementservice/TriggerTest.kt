@@ -30,7 +30,8 @@ class TriggerTest {
             """.trimIndent()
         )
         Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
-        with(readBuilds(buildType.id)) { //TODO: enhance TeamcityClient (support builds)
+        // TD-002: switch to TeamcityClient builds API once supported (see docs/TECH_DEBT.md).
+        with(readBuilds(buildType.id)) {
             Assertions.assertTrue(
                 statusCode() / 100 == 2,
                 "Unable to get builds of build type '${buildType.id}':\n${body()}"
@@ -53,7 +54,8 @@ class TriggerTest {
             """.trimIndent()
         )
         Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
-        with(readBuilds(buildType.id)) { //TODO: enhance TeamcityClient (support builds)
+        // TD-002: switch to TeamcityClient builds API once supported (see docs/TECH_DEBT.md).
+        with(readBuilds(buildType.id)) {
             Assertions.assertTrue(
                 statusCode() / 100 == 2,
                 "Unable to get builds of build type '${buildType.id}':\n${body()}"
@@ -162,7 +164,7 @@ class TriggerTest {
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
-            // TODO: enhance TeamcityClient (support agents)
+            // TD-003: switch to TeamcityClient agents API once supported (see docs/TECH_DEBT.md).
             with(
                 httpClient.send(
                     HttpRequest.newBuilder()

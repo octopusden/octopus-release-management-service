@@ -2,7 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ForbiddenComment:Application.kt$//TODO: More commands</ID>
     <ID>MaxLineLength:MandatoryUpdate.kt$MandatoryUpdate$"true - exclude only if component systems fully match exclude-systems; false - exclude if component has any system from exclude-systems"</ID>
     <ID>NewLineAtEndOfFile:Application.kt$org.octopusden.octopus.automation.releasemanagement.Application.kt</ID>
     <ID>NewLineAtEndOfFile:Command.kt$org.octopusden.octopus.automation.releasemanagement.command.Command.kt</ID>

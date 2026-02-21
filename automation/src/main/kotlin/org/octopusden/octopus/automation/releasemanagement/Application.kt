@@ -10,7 +10,7 @@ const val SPLIT_SYMBOLS = "[,;]"
 fun main(args: Array<String>) {
     Command().subcommands(
         DependenciesStatus(),
-        MandatoryUpdate()
-        //TODO: More commands
+        MandatoryUpdate(),
+        // TD-001: add remaining automation commands (see docs/TECH_DEBT.md).
     ).main(args)
 }

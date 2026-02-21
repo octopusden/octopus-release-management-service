@@ -9,6 +9,12 @@
 ./gradlew securityReport
 ```
 
+Style guide for enforced rules:
+- `docs/STYLE_GUIDELINES.md`
+
+Technical debt register for code references (`TD-xxx`):
+- `docs/TECH_DEBT.md`
+
 ## Coverage thresholds
 
 - `coverage.line.min` in `gradle.properties`

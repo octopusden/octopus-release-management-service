@@ -22,7 +22,7 @@ complexity:
 
 naming:
   TopLevelPropertyNaming:
-    active: false
+    active: true
 
 performance:
   SpreadOperator:
@@ -36,12 +36,12 @@ style:
   MagicNumber:
     active: false
   MaxLineLength:
-    active: false
+    active: true
     maxLineLength: 140
   NewLineAtEndOfFile:
-    active: false
+    active: true
   ProtectedMemberInFinalClass:
-    active: false
+    active: true
   ReturnCount:
     active: false
   UnusedPrivateMember:
