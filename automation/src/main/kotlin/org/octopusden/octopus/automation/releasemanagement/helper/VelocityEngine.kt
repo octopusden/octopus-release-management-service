@@ -13,9 +13,6 @@ import org.slf4j.LoggerFactory
 
 
 class VelocityEngine {
-    companion object {
-        private val LOG = LoggerFactory.getLogger(VelocityEngine::class.java.`package`.name)
-    }
 
     fun generate(contextMap: Map<String, Any>, templateFile: String, escapeHtml: Boolean = false): String {
         LOG.info("Loading $templateFile")
@@ -54,5 +51,9 @@ class VelocityEngine {
             context.put(key, contextMap[key])
         }
         return context
+    }
+
+    companion object {
+        private val LOG = LoggerFactory.getLogger(VelocityEngine::class.java.`package`.name)
     }
 }

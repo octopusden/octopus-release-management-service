@@ -39,11 +39,12 @@ class UtilityControllerTest: BaseUtilityControllerTest(), BaseControllerTest {
 
     @Autowired
     protected lateinit var mapper: ObjectMapper
-    override fun getMockMvc(): MockMvc = mvc
-    override fun getObjectMapper(): ObjectMapper = mapper
 
     @SpyBean
     lateinit var utilityService: UtilityServiceImpl
+
+    override fun getMockMvc(): MockMvc = mvc
+    override fun getObjectMapper(): ObjectMapper = mapper
 
     @BeforeEach
     fun setupStubs() {
