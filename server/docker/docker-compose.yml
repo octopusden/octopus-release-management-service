@@ -5,4 +5,4 @@ services:
     container_name: release-management-service-ut-mockserver
     image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-${MOCKSERVER_VERSION}
     ports:
-      - "1080:1080"
+      - "${TEST_MOCKSERVER_PORT:-1080}:1080"

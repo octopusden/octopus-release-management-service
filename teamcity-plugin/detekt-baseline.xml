@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>LongMethod:ReleaseManagementBuildTriggerService.kt$ReleaseManagementBuildTriggerService.&lt;no name provided&gt;$override fun triggerBuild(context: PolledTriggerContext)</ID>
+    <ID>MagicNumber:ReleaseManagementBuildTriggerService.kt$ReleaseManagementBuildTriggerService.&lt;no name provided&gt;$1_000L</ID>
+    <ID>MagicNumber:ReleaseManagementBuildTriggerService.kt$ReleaseManagementBuildTriggerService.&lt;no name provided&gt;$253</ID>
+    <ID>MagicNumber:ReleaseManagementBuildTriggerService.kt$ReleaseManagementBuildTriggerService.&lt;no name provided&gt;$257</ID>
+    <ID>MaxLineLength:ReleaseManagementBuildTriggerService.kt$ReleaseManagementBuildTriggerService.&lt;no name provided&gt;$"${it.version} ['${it.selection.component}'|${it.selection.status}" + if (it.selection.minor == null) "]" else "|${it.selection.minor}]"</ID>
+    <ID>MaxLineLength:ReleaseManagementBuildTriggerService.kt$ReleaseManagementBuildTriggerService.&lt;no name provided&gt;$"Unable to retrieve latest version of '${it.component}' with status no less than ${it.status}" + if (it.minor == null) "" else " and minor equals ${it.minor}"</ID>
+    <ID>NewLineAtEndOfFile:ReleaseManagementBuildTriggerService.kt$org.octopusden.octopus.releasemanagementservice.teamcity.plugin.ReleaseManagementBuildTriggerService.kt</ID>
+    <ID>SwallowedException:ReleaseManagementBuildTriggerService.kt$ReleaseManagementBuildTriggerService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ReleaseManagementBuildTriggerService.kt$ReleaseManagementBuildTriggerService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ReleaseManagementBuildTriggerService.kt$ReleaseManagementBuildTriggerService.&lt;no name provided&gt;$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>
