@@ -52,6 +52,25 @@ val value =
         .filter { it > 0 }
 ```
 
+### Other Newly Baselined `ktlint` Checks (after upgrade)
+
+These checks are enabled and currently have temporary baseline exceptions.
+
+| Rule | New baseline entries | What it enforces | Criteria |
+| --- | ---: | --- | --- |
+| `standard:class-signature` | 71 | multiline class/constructor signatures must be wrapped consistently | n/a |
+| `standard:final-newline` | 28 | file must end with newline | `insert_final_newline = true` |
+| `standard:function-expression-body` | 22 | single-expression functions should use `=` expression body | n/a |
+| `standard:binary-expression-wrapping` | 5 | long binary expressions should be wrapped consistently | n/a |
+| `standard:string-template-indent` | 4 | multiline string template interpolation must be correctly indented | n/a |
+| `standard:max-line-length` | 4 | line length limit | `max_line_length = 140` |
+| `standard:function-literal` | 2 | lambda formatting in complex expressions | n/a |
+| `standard:argument-list-wrapping` | 2 | long argument lists should be wrapped consistently | n/a |
+| `standard:block-comment-initial-star-alignment` | 1 | `*` alignment in block comments | n/a |
+
+Total new baseline entries for these checks: `139`  
+(`50` for `chain-method-continuation` is tracked separately above; total new ktlint baseline entries in upgrade commit: `189`).
+
 ### `detekt:style:ClassOrdering`
 
 `companion object` should be placed at the end of class body.
