@@ -1,4 +1,5 @@
 import com.avast.gradle.dockercompose.ComposeExtension
+import org.gradle.api.GradleException
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
 import org.gradle.testing.jacoco.tasks.JacocoReport
@@ -18,8 +19,25 @@ val ftServerJacocoExecFile = ftServerJacocoOutputDir.map { it.file("ft-server.ex
 val isTeamCityBuild = !System.getenv("TEAMCITY_VERSION").isNullOrBlank()
 val isTeamCityDockerBuild = isTeamCityBuild && (project.ext["testPlatform"] as String) == "docker"
 
-fun percentPropertyAsRatio(propertyName: String): BigDecimal =
-    BigDecimal((findProperty(propertyName) as String)).movePointLeft(2)
+fun percentPropertyAsRatio(propertyName: String): BigDecimal {
+    val rawProperty = findProperty(propertyName)
+        ?: throw GradleException("Missing Gradle property '$propertyName' required by percentPropertyAsRatio")
+    val propertyValue = (rawProperty as? String)?.trim()
+        ?: throw GradleException(
+            "Gradle property '$propertyName' must be a String, but was ${rawProperty::class.qualifiedName}"
+        )
+    if (propertyValue.isBlank()) {
+        throw GradleException("Gradle property '$propertyName' must not be blank")
+    }
+    return try {
+        BigDecimal(propertyValue).movePointLeft(2)
+    } catch (e: NumberFormatException) {
+        throw GradleException(
+            "Gradle property '$propertyName' must be a numeric percent value, but was '$propertyValue'",
+            e
+        )
+    }
+}
 
 val prepareFtServerCoverageAgent = tasks.register<Sync>("prepareFtServerCoverageAgent") {
     from({

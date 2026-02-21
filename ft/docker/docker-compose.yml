@@ -16,6 +16,9 @@ services:
       - SPRING_CLOUD_CONFIG_ENABLED=false
       - TEST_MOCKSERVER_HOST=${TEST_MOCKSERVER_HOST}
       - TEST_COMPONENTS_REGISTRY_HOST=${TEST_COMPONENTS_REGISTRY_HOST}
+      # JaCoCo agent is injected via JAVA_TOOL_OPTIONS intentionally:
+      # current server image ENTRYPOINT starts a single JVM process only.
+      # If startup switches to a multi-JVM wrapper, move -javaagent to the app JVM args.
       - JAVA_TOOL_OPTIONS=-javaagent:/opt/coverage/jacocoagent.jar=destfile=/jacoco-output/ft-server.exec,append=false,output=file
 
   mockserver:
