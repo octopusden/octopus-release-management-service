@@ -15,15 +15,22 @@ class ActuatorTest : BaseActuatorTest(), BaseReleaseManagementServiceFuncTest {
     companion object {
         private val hostReleaseManagement = System.getProperty("test.release-management-host")
             ?: throw Exception("System property 'test.release-management-host' must be defined")
+
         @JvmStatic
         private val mapper = jacksonObjectMapper()
+
         @JvmStatic
         private val client =
-            ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
-                override fun getApiUrl() = "http://$hostReleaseManagement"
-                override fun getTimeRetryInMillis() = 180000
-                override fun getConnectTimeoutInMillis() = 30000
-                override fun getReadTimeoutInMillis() = 30000
-            })
+            ClassicReleaseManagementServiceClient(
+                object : ReleaseManagementServiceClientParametersProvider {
+                    override fun getApiUrl() = "http://$hostReleaseManagement"
+
+                    override fun getTimeRetryInMillis() = 180000
+
+                    override fun getConnectTimeoutInMillis() = 30000
+
+                    override fun getReadTimeoutInMillis() = 30000
+                },
+            )
     }
 }

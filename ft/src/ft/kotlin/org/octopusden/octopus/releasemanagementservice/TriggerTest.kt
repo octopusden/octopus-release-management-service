@@ -162,17 +162,18 @@ class TriggerTest {
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
-            with( //TODO: enhance TeamcityClient (support agents)
+            // TODO: enhance TeamcityClient (support agents)
+            with(
                 httpClient.send(
                     HttpRequest.newBuilder()
-                        .uri(URI("${teamcityApiUrl}/agents/name:test-agent/authorized"))
+                        .uri(URI("$teamcityApiUrl/agents/name:test-agent/authorized"))
                         .header("Origin", teamcityUrl)
                         .header("Authorization", TEAMCITY_AUTHORIZATION)
                         .header("Content-Type", "text/plain")
                         .method("PUT", HttpRequest.BodyPublishers.ofString("true"))
                         .build(),
-                    HttpResponse.BodyHandlers.ofString()
-                )
+                    HttpResponse.BodyHandlers.ofString(),
+                ),
             ) {
                 if (statusCode() / 100 != 2) {
                     throw RuntimeException("Unable to authorize 'test-agent':\n${body()}")

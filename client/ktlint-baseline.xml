@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <baseline version="1.0">
-    <file name="build.gradle.kts">
-        <error line="68" column="6" source="standard:block-comment-initial-star-alignment" />
-    </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/DateToISOExpander.kt">
         <error line="23" column="33" source="standard:multiline-expression-wrapping" />
     </file>
@@ -26,22 +23,16 @@
         <error line="28" column="65" source="standard:function-signature" />
         <error line="28" column="88" source="standard:parameter-list-wrapping" />
         <error line="28" column="88" source="standard:function-signature" />
-        <error line="31" column="24" source="standard:function-return-type-spacing" />
-        <error line="31" column="25" source="standard:colon-spacing" />
         <error line="34" column="22" source="standard:parameter-list-wrapping" />
         <error line="34" column="22" source="standard:function-signature" />
         <error line="34" column="59" source="standard:parameter-list-wrapping" />
         <error line="34" column="59" source="standard:function-signature" />
-        <error line="34" column="60" source="standard:function-return-type-spacing" />
-        <error line="34" column="61" source="standard:colon-spacing" />
         <error line="37" column="25" source="standard:parameter-list-wrapping" />
         <error line="37" column="25" source="standard:function-signature" />
         <error line="37" column="64" source="standard:parameter-list-wrapping" />
         <error line="37" column="64" source="standard:function-signature" />
         <error line="37" column="81" source="standard:parameter-list-wrapping" />
         <error line="37" column="81" source="standard:function-signature" />
-        <error line="37" column="82" source="standard:function-return-type-spacing" />
-        <error line="37" column="83" source="standard:colon-spacing" />
     </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceErrorDecoder.kt">
         <error line="3" column="1" source="standard:import-ordering" />
@@ -53,14 +44,7 @@
         <error line="41" column="73" source="standard:trailing-comma-on-call-site" />
     </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceRetry.kt">
-        <error line="10" column="11" source="standard:property-naming" />
-        <error line="11" column="11" source="standard:property-naming" />
-        <error line="12" column="11" source="standard:property-naming" />
         <error line="13" column="1" source="standard:blank-line-before-declaration" />
-        <error line="21" column="1" source="standard:no-empty-first-line-in-method-block" />
-        <error line="38" column="1" source="standard:no-blank-line-before-rbrace" />
-        <error line="49" column="34" source="standard:multiline-expression-wrapping" />
-        <error line="61" column="14" source="standard:trailing-comma-on-call-site" />
     </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/impl/ClassicReleaseManagementServiceClient.kt">
         <error line="3" column="1" source="standard:import-ordering" />
