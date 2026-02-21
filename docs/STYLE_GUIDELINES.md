@@ -290,17 +290,29 @@ Example in code:
 
 ### `detekt:performance:SpreadOperator`
 
-Wrong:
-```kotlin
-SpringApplication.run(App::class.java, *args)
-```
+Rule status:
+- `active: false` (disabled globally), guidance below is informational.
 
-Right:
+How to write:
+- Use `*array` only when API expects `vararg` and you only have an `Array`.
+- Do not use `*` when API expects `Array`.
+- Do not create temporary arrays only to unpack them with `*`.
+
+Case 1: API expects `vararg`, source is `Array` -> use `*`:
 ```kotlin
-@Suppress("SpreadOperator")
 fun main(args: Array<String>) {
     SpringApplication.run(App::class.java, *args)
 }
+```
+
+Case 2: API expects `Array` -> pass as is (without `*`):
+```kotlin
+fun execute(arguments: Array<String>) = run(arguments)
+```
+
+Case 3: Known fixed arguments -> pass directly (without temporary array):
+```kotlin
+run("--spring.profiles.active=test", "--debug")
 ```
 
 Example in code:
