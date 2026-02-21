@@ -1,7 +1,9 @@
 import com.avast.gradle.dockercompose.ComposeExtension
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
 import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.octopusden.task.MigrateMockData
+import java.math.BigDecimal
 
 plugins {
     id("com.avast.gradle.docker-compose")
@@ -13,6 +15,11 @@ val ftServerJacocoAgentDir = layout.buildDirectory.dir("jacoco-agent")
 val ftServerJacocoAgentJar = ftServerJacocoAgentDir.map { it.file("jacocoagent.jar") }
 val ftServerJacocoOutputDir = layout.buildDirectory.dir("jacoco")
 val ftServerJacocoExecFile = ftServerJacocoOutputDir.map { it.file("ft-server.exec") }
+val isTeamCityBuild = !System.getenv("TEAMCITY_VERSION").isNullOrBlank()
+val isTeamCityDockerBuild = isTeamCityBuild && (project.ext["testPlatform"] as String) == "docker"
+
+fun percentPropertyAsRatio(propertyName: String): BigDecimal =
+    BigDecimal((findProperty(propertyName) as String)).movePointLeft(2)
 
 val prepareFtServerCoverageAgent = tasks.register<Sync>("prepareFtServerCoverageAgent") {
     from({
@@ -59,6 +66,51 @@ val ftServerCoverageReport = tasks.register<JacocoReport>("ftServerCoverageRepor
 
     onlyIf {
         "testPlatform".getExt() == "docker" && ftServerJacocoExecFile.get().asFile.exists()
+    }
+}
+
+val ftServerCoverageVerify = tasks.register<JacocoCoverageVerification>("ftServerCoverageVerify") {
+    group = "verification"
+    description = "Verifies minimum FT server coverage (TeamCity docker runs only)."
+    dependsOn(":release-management-service:classes")
+    dependsOn("ft")
+    executionData(ftServerJacocoExecFile)
+
+    val serverProject = rootProject.project(":release-management-service")
+    classDirectories.setFrom(
+        serverProject.layout.buildDirectory.dir("classes/kotlin/main"),
+        serverProject.layout.buildDirectory.dir("classes/java/main")
+    )
+    sourceDirectories.setFrom(
+        serverProject.layout.projectDirectory.dir("src/main/kotlin"),
+        serverProject.layout.projectDirectory.dir("src/main/java")
+    )
+
+    violationRules {
+        rule {
+            element = "BUNDLE"
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = percentPropertyAsRatio("coverage.ft.server.line.min")
+            }
+            limit {
+                counter = "BRANCH"
+                value = "COVEREDRATIO"
+                minimum = percentPropertyAsRatio("coverage.ft.server.branch.min")
+            }
+        }
+    }
+
+    onlyIf {
+        isTeamCityDockerBuild
+    }
+
+    doFirst {
+        val execFile = ftServerJacocoExecFile.get().asFile
+        check(execFile.exists()) {
+            "FT server coverage data is missing: ${execFile.absolutePath}"
+        }
     }
 }
 
@@ -319,13 +371,22 @@ val ft by tasks.creating(Test::class) {
             systemProperties["test.release-management-host-for-teamcity"] = "release-management-service:8080"
             systemProperties["test.teamcity-2022-host"] = "localhost:8111"
             dependsOn("migrateMockData")
-            finalizedBy("composeLogs", "composeDown", "ftServerCoverageReport")
+            if (isTeamCityDockerBuild) {
+                finalizedBy("composeLogs", "composeDown", "ftServerCoverageReport", "ftServerCoverageVerify")
+            } else {
+                finalizedBy("composeLogs", "composeDown", "ftServerCoverageReport")
+            }
         }
     }
 }
 
 tasks.named("ftServerCoverageReport") {
     mustRunAfter("composeDown")
+}
+
+tasks.named("ftServerCoverageVerify") {
+    mustRunAfter("composeDown")
+    mustRunAfter("ftServerCoverageReport")
 }
 
 idea.module {
