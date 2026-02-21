@@ -5,6 +5,7 @@ import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.net.InetAddress
 import java.util.zip.CRC32
 
@@ -185,6 +186,10 @@ subprojects {
     extensions.configure<KtlintExtension> {
         ignoreFailures.set(false)
         outputToConsole.set(true)
+        reporters {
+            reporter(ReporterType.PLAIN)
+            reporter(ReporterType.CHECKSTYLE)
+        }
         baseline.set(file("$projectDir/ktlint-baseline.xml"))
         filter {
             exclude("**/generated/**")
