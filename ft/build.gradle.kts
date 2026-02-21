@@ -85,6 +85,19 @@ val ftServerCoverageReport = tasks.register<JacocoReport>("ftServerCoverageRepor
     onlyIf {
         "testPlatform".getExt() == "docker" && ftServerJacocoExecFile.get().asFile.exists()
     }
+
+    doLast {
+        if (isTeamCityDockerBuild) {
+            // Import FT JaCoCo coverage into TeamCity Coverage tab.
+            println(
+                "##teamcity[jacocoReport " +
+                    "dataPath='ft/build/jacoco/ft-server.exec' " +
+                    "classpath='+:server/build/classes/kotlin/main/** +:server/build/classes/java/main/**' " +
+                    "sources='server/src/main/kotlin server/src/main/java' " +
+                    "toolVersion='0.8.7']"
+            )
+        }
+    }
 }
 
 val ftServerCoverageVerify = tasks.register<JacocoCoverageVerification>("ftServerCoverageVerify") {
