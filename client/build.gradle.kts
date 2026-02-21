@@ -53,7 +53,6 @@ tasks.withType<KotlinCompile>().configureEach {
 
 dependencyManagement {
     imports {
-        mavenBom("io.github.openfeign:feign-bom:${properties["openfeign.version"]}")
         mavenBom("org.springframework.boot:spring-boot-dependencies:${properties["spring-boot.version"]}")
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${properties["spring-cloud.version"]}")
     }
@@ -61,10 +60,7 @@ dependencyManagement {
 
 dependencies {
     api(project(":common"))
-    // These dependencies are added to :common due to there are usages at server side
-    // api("io.github.openfeign:feign-httpclient")
-    // api("io.github.openfeign:feign-jackson")
-    // api("io.github.openfeign:feign-slf4j")
+    // Feign dependencies are provided transitively by :common.
     api("com.fasterxml.jackson.module:jackson-module-kotlin")
     api("com.fasterxml.jackson.core:jackson-databind")
 }
