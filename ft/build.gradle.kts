@@ -1,10 +1,65 @@
 import com.avast.gradle.dockercompose.ComposeExtension
 import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.testing.jacoco.tasks.JacocoReport
 import org.octopusden.task.MigrateMockData
 
 plugins {
     id("com.avast.gradle.docker-compose")
+    jacoco
     id("org.octopusden.octopus.oc-template")
+}
+
+val ftServerJacocoAgentDir = layout.buildDirectory.dir("jacoco-agent")
+val ftServerJacocoAgentJar = ftServerJacocoAgentDir.map { it.file("jacocoagent.jar") }
+val ftServerJacocoOutputDir = layout.buildDirectory.dir("jacoco")
+val ftServerJacocoExecFile = ftServerJacocoOutputDir.map { it.file("ft-server.exec") }
+
+val prepareFtServerCoverageAgent = tasks.register<Sync>("prepareFtServerCoverageAgent") {
+    from({
+        zipTree(configurations["jacocoAgent"].singleFile)
+    }) {
+        include("jacocoagent.jar")
+    }
+    into(ftServerJacocoAgentDir)
+}
+
+val prepareFtServerCoverageOutputDir = tasks.register("prepareFtServerCoverageOutputDir") {
+    outputs.dir(ftServerJacocoOutputDir)
+    doLast {
+        val outputDir = ftServerJacocoOutputDir.get().asFile
+        outputDir.mkdirs()
+        ftServerJacocoExecFile.get().asFile.delete()
+    }
+}
+
+val ftServerCoverageReport = tasks.register<JacocoReport>("ftServerCoverageReport") {
+    group = "verification"
+    description = "Builds Jacoco coverage report for server code exercised by FT in Docker."
+    dependsOn(":release-management-service:classes")
+    dependsOn("ft")
+    executionData(ftServerJacocoExecFile)
+
+    val serverProject = rootProject.project(":release-management-service")
+    classDirectories.setFrom(
+        serverProject.layout.buildDirectory.dir("classes/kotlin/main"),
+        serverProject.layout.buildDirectory.dir("classes/java/main")
+    )
+    sourceDirectories.setFrom(
+        serverProject.layout.projectDirectory.dir("src/main/kotlin"),
+        serverProject.layout.projectDirectory.dir("src/main/java")
+    )
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+        xml.outputLocation.set(layout.buildDirectory.file("reports/jacoco/ft-server/report.xml"))
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/ft-server/html"))
+    }
+
+    onlyIf {
+        "testPlatform".getExt() == "docker" && ftServerJacocoExecFile.get().asFile.exists()
+    }
 }
 
 kover {
@@ -49,7 +104,9 @@ configure<ComposeExtension> {
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
             "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
             "TEST_MOCKSERVER_HOST" to "mockserver:1080",
-            "TEST_COMPONENTS_REGISTRY_HOST" to "components-registry-service:4567"
+            "TEST_COMPONENTS_REGISTRY_HOST" to "components-registry-service:4567",
+            "FT_SERVER_JACOCO_AGENT_PATH" to ftServerJacocoAgentJar.get().asFile.absolutePath,
+            "FT_SERVER_JACOCO_OUTPUT_DIR" to ftServerJacocoOutputDir.get().asFile.absolutePath
         )
     )
 }
@@ -64,6 +121,8 @@ tasks.register<Copy>("deployTeamcity2022Plugin") {
 tasks.named("composeUp") {
     dependsOn(":release-management-service:dockerBuildImage")
     dependsOn("deployTeamcity2022Plugin")
+    dependsOn(prepareFtServerCoverageAgent)
+    dependsOn(prepareFtServerCoverageOutputDir)
 }
 
 val prepareTeamcity2022Data = tasks.register<Sync>("prepareTeamcity2022Data") {
@@ -260,9 +319,13 @@ val ft by tasks.creating(Test::class) {
             systemProperties["test.release-management-host-for-teamcity"] = "release-management-service:8080"
             systemProperties["test.teamcity-2022-host"] = "localhost:8111"
             dependsOn("migrateMockData")
-            finalizedBy("composeLogs", "composeDown")
+            finalizedBy("composeLogs", "composeDown", "ftServerCoverageReport")
         }
     }
+}
+
+tasks.named("ftServerCoverageReport") {
+    mustRunAfter("composeDown")
 }
 
 idea.module {
