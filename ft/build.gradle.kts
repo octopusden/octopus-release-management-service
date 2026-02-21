@@ -10,7 +10,9 @@ plugins {
 kover {
     currentProject {
         instrumentation {
-            disabledForTestTasks.add("ft")
+            // Velocity validates runtime constants via reflection and fails on coverage fields like "__$hits$__".
+            // Keep FT coverage enabled, but skip instrumentation for Velocity classes.
+            excludedClasses.add("org.apache.velocity.*")
         }
     }
 }
