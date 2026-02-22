@@ -59,6 +59,13 @@ jobs:
         uses: github/codeql-action/analyze@v3
         with:
           category: "/language:java-kotlin"
+      - name: Upload CodeQL report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-sarif
+          path: ../results/*.sarif
+          if-no-files-found: warn
 
   trivy:
     name: security/trivy
