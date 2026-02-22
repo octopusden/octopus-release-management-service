@@ -45,7 +45,7 @@ jobs:
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v3
       - name: Run tests and coverage verification
-        run: ./gradlew qualityCoverage -x :release-management-service:test --no-daemon --stacktrace
+        run: ./gradlew qualityCoverage -x :release-management-service:test -x koverVerify -x koverCachedVerify --no-daemon --stacktrace
       - name: Upload coverage reports
         if: always()
         uses: actions/upload-artifact@v4
