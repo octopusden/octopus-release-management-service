@@ -35,7 +35,7 @@ jobs:
         if: inputs.flow-type == 'hybrid' && inputs.skip-tests
         run: |
           echo "Hybrid flow, skip tests"
-          echo "SKIP_TESTS=-x test -x koverVerify -x koverCachedVerify -x koverXmlReport -x koverHtmlReport -x koverMergedVerify -x koverMergedXmlReport -x koverMergedHtmlReport" >> "$GITHUB_ENV"
+          echo "SKIP_TESTS=-x test -x koverVerify -x koverCachedVerify -x koverXmlReport -x koverHtmlReport" >> "$GITHUB_ENV"
 
       - name: Unknown flow
         if: inputs.flow-type != 'public' && inputs.flow-type != 'hybrid'
