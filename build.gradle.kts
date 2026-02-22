@@ -43,6 +43,10 @@ allprojects {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 nexusPublishing {
     repositories {
         sonatype {
