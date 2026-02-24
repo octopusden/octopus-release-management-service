@@ -3,9 +3,6 @@
   <ManuallySuppressedIssues/>
   <CurrentIssues>
     <ID>MaxLineLength:MandatoryUpdate.kt$MandatoryUpdate$"true - exclude only if component systems fully match exclude-systems; false - exclude if component has any system from exclude-systems"</ID>
-    <ID>NewLineAtEndOfFile:Application.kt$org.octopusden.octopus.automation.releasemanagement.Application.kt</ID>
-    <ID>NewLineAtEndOfFile:Command.kt$org.octopusden.octopus.automation.releasemanagement.command.Command.kt</ID>
-    <ID>NewLineAtEndOfFile:MandatoryUpdate.kt$org.octopusden.octopus.automation.releasemanagement.command.MandatoryUpdate.kt</ID>
     <ID>SwallowedException:MandatoryUpdate.kt$MandatoryUpdate$e: Exception</ID>
     <ID>TooGenericExceptionCaught:MandatoryUpdate.kt$MandatoryUpdate$e: Exception</ID>
   </CurrentIssues>

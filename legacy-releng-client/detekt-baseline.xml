@@ -3,7 +3,6 @@
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>MagicNumber:ClassicLegacyRelengClient.kt$ClassicLegacyRelengClient$5</ID>
-    <ID>NewLineAtEndOfFile:ClassicLegacyRelengClient.kt$org.octopusden.octopus.releasemanagementservice.legacy.ClassicLegacyRelengClient.kt</ID>
     <ID>TooGenericExceptionCaught:LegacyRelengErrorDecoder.kt$LegacyRelengErrorDecoder$e: Exception</ID>
   </CurrentIssues>
 </SmellBaseline>

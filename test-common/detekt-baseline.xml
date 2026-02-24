@@ -8,7 +8,6 @@
     <ID>MagicNumber:BaseBuildControllerTest.kt$BaseBuildControllerTest$28</ID>
     <ID>MagicNumber:BaseUtilityControllerTest.kt$BaseUtilityControllerTest$10</ID>
     <ID>MaxLineLength:BaseActuatorTest.kt$BaseActuatorTest$val expected = ServiceInfoDTO(ServiceInfoDTO.Build(ServiceInfoDTO.ServiceName.RELEASE_MANAGEMENT_SERVICE, releaseManagementServiceVersion))</ID>
-    <ID>NewLineAtEndOfFile:BaseActuatorTest.kt$org.octopusden.octopus.releasemanagementservice.BaseActuatorTest.kt</ID>
     <ID>NewLineAtEndOfFile:BaseBuildControllerTest.kt$org.octopusden.octopus.releasemanagementservice.BaseBuildControllerTest.kt</ID>
     <ID>NewLineAtEndOfFile:BaseSupportControllerTest.kt$org.octopusden.octopus.releasemanagementservice.BaseSupportControllerTest.kt</ID>
     <ID>NewLineAtEndOfFile:BaseUtilityControllerTest.kt$org.octopusden.octopus.releasemanagementservice.BaseUtilityControllerTest.kt</ID>

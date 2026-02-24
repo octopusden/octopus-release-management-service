@@ -20,11 +20,11 @@ Statistics below are based on:
 | --- | --- | --- |
 | `detekt:style:ClassOrdering` | 0 | baseline |
 | `detekt:style:ForbiddenComment` | 0 | baseline |
-| `detekt:style:MaxLineLength` | 12 | baseline |
-| `detekt:style:NewLineAtEndOfFile` | 64 | baseline |
-| `detekt:style:ProtectedMemberInFinalClass` | 16 | baseline |
+| `detekt:style:MaxLineLength` | 6 | baseline |
+| `detekt:style:NewLineAtEndOfFile` | 25 | baseline |
+| `detekt:style:ProtectedMemberInFinalClass` | 8 | baseline |
 | `detekt:style:WildcardImport` | 0 | baseline |
-| `detekt:style:UseCheckOrError` | 2 | baseline |
+| `detekt:style:UseCheckOrError` | 1 | baseline |
 | `detekt:naming:TopLevelPropertyNaming` | 0 | baseline |
 | `ktlint:standard:chain-method-continuation` | 50 | baseline |
 
@@ -59,16 +59,16 @@ All checks in this section are enabled `ktlint` checks (same category as `chain-
 | Rule | Violations |
 | --- | ---: |
 | `standard:class-signature` | 71 |
-| `standard:final-newline` | 28 |
+| `standard:final-newline` | 29 |
 | `standard:function-expression-body` | 22 |
 | `standard:binary-expression-wrapping` | 5 |
-| `standard:string-template-indent` | 4 |
+| `standard:string-template-indent` | 10 |
 | `standard:max-line-length` | 4 |
 | `standard:function-literal` | 2 |
-| `standard:argument-list-wrapping` | 2 |
+| `standard:argument-list-wrapping` | 67 |
 | `standard:block-comment-initial-star-alignment` | 1 |
 
-Total baseline violations for checks in this section: `139`.
+Total baseline violations for checks in this section: `211`.
 
 ### `ktlint:standard:class-signature`
 
@@ -333,7 +333,7 @@ const val TIME_DELAY_ATTEMPT: Int = 300
 ```
 
 Reference in current code:
-- `client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceRetry.kt:10`
+- none.
 
 ## Disabled Checks (Review Candidates)
 
@@ -341,13 +341,13 @@ These rules are currently `active: false` in detekt and are tracked in baselines
 
 | Rule | Violations |
 | --- | --- |
-| `MagicNumber` | 20 |
-| `LongParameterList` | 6 |
-| `LongMethod` | 4 |
-| `NestedBlockDepth` | 2 |
-| `ReturnCount` | 2 |
-| `SpreadOperator` | 2 |
-| **Total** | **36** |
+| `MagicNumber` | 10 |
+| `LongParameterList` | 3 |
+| `LongMethod` | 2 |
+| `NestedBlockDepth` | 1 |
+| `ReturnCount` | 1 |
+| `SpreadOperator` | 1 |
+| **Total** | **18** |
 
 ### Disabled But To Be Discussed First
 

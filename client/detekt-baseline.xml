@@ -7,8 +7,5 @@
     <ID>ReturnCount:DateToISOExpander.kt$DateToISOExpander$override fun expand(value: Any?): String</ID>
     <ID>SwallowedException:ReleaseManagementServiceErrorDecoder.kt$ReleaseManagementServiceErrorDecoder$e: Exception</ID>
     <ID>TooGenericExceptionCaught:ReleaseManagementServiceErrorDecoder.kt$ReleaseManagementServiceErrorDecoder$e: Exception</ID>
-    <ID>TopLevelPropertyNaming:ReleaseManagementServiceRetry.kt$const val attempts: Int = 5</ID>
-    <ID>TopLevelPropertyNaming:ReleaseManagementServiceRetry.kt$const val iterations: Int = 5</ID>
-    <ID>TopLevelPropertyNaming:ReleaseManagementServiceRetry.kt$const val timeDelayAttempt: Int = 300</ID>
   </CurrentIssues>
 </SmellBaseline>

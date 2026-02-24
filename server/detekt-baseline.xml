@@ -20,7 +20,6 @@
     <ID>NewLineAtEndOfFile:SupportController.kt$org.octopusden.octopus.releasemanagementservice.controller.SupportController.kt</ID>
     <ID>NewLineAtEndOfFile:SupportControllerTest.kt$org.octopusden.octopus.releasemanagementservice.controller.SupportControllerTest.kt</ID>
     <ID>NewLineAtEndOfFile:UtilityController.kt$org.octopusden.octopus.releasemanagementservice.controller.UtilityController.kt</ID>
-    <ID>NewLineAtEndOfFile:UtilityControllerTest.kt$org.octopusden.octopus.releasemanagementservice.controller.UtilityControllerTest.kt</ID>
     <ID>NewLineAtEndOfFile:UtilityService.kt$org.octopusden.octopus.releasemanagementservice.service.UtilityService.kt</ID>
     <ID>NewLineAtEndOfFile:UtilityServiceImpl.kt$org.octopusden.octopus.releasemanagementservice.service.impl.UtilityServiceImpl.kt</ID>
     <ID>ProtectedMemberInFinalClass:ActuatorTest.kt$ActuatorTest$@Autowired protected lateinit var mapper: ObjectMapper</ID>
