@@ -34,7 +34,7 @@ For enabled checks, code links are listed only for not-yet-fixed cases.
 
 - `max_line_length = 140` (from `.editorconfig`, for `*.kt` and `*.kts`)
 
-### `ktlint:standard:chain-method-continuation` (newly enforced after ktlint upgrade)
+### `ktlint:standard:chain-method-continuation`
 
 Meaning:
 - In multiline call chains, place a newline before `.` (dot starts the next line).
@@ -52,24 +52,198 @@ val value =
         .filter { it > 0 }
 ```
 
-### Other Newly Baselined `ktlint` Checks (after upgrade)
+### `ktlint` Checks With Baseline Violations
 
-These checks are enabled and currently have temporary baseline exceptions.
+All checks in this section are enabled `ktlint` checks (same category as `chain-method-continuation`).
 
-| Rule | New baseline entries | What it enforces | Criteria |
-| --- | ---: | --- | --- |
-| `standard:class-signature` | 71 | multiline class/constructor signatures must be wrapped consistently | n/a |
-| `standard:final-newline` | 28 | file must end with newline | `insert_final_newline = true` |
-| `standard:function-expression-body` | 22 | single-expression functions should use `=` expression body | n/a |
-| `standard:binary-expression-wrapping` | 5 | long binary expressions should be wrapped consistently | n/a |
-| `standard:string-template-indent` | 4 | multiline string template interpolation must be correctly indented | n/a |
-| `standard:max-line-length` | 4 | line length limit | `max_line_length = 140` |
-| `standard:function-literal` | 2 | lambda formatting in complex expressions | n/a |
-| `standard:argument-list-wrapping` | 2 | long argument lists should be wrapped consistently | n/a |
-| `standard:block-comment-initial-star-alignment` | 1 | `*` alignment in block comments | n/a |
+| Rule | Violations |
+| --- | ---: |
+| `standard:class-signature` | 71 |
+| `standard:final-newline` | 28 |
+| `standard:function-expression-body` | 22 |
+| `standard:binary-expression-wrapping` | 5 |
+| `standard:string-template-indent` | 4 |
+| `standard:max-line-length` | 4 |
+| `standard:function-literal` | 2 |
+| `standard:argument-list-wrapping` | 2 |
+| `standard:block-comment-initial-star-alignment` | 1 |
 
-Total new baseline entries for these checks: `139`  
-(`50` for `chain-method-continuation` is tracked separately above; total new ktlint baseline entries in upgrade commit: `189`).
+Total baseline violations for checks in this section: `139`.
+
+### `ktlint:standard:class-signature`
+
+Meaning:
+- Wrap multiline class/constructor signatures consistently.
+
+Wrong:
+```kotlin
+data class CommitDTO(val id: String, val author: String, val message: String)
+```
+
+Right:
+```kotlin
+data class CommitDTO(
+    val id: String,
+    val author: String,
+    val message: String,
+)
+```
+
+### `ktlint:standard:final-newline`
+
+Criteria:
+- File must end with a newline (`insert_final_newline = true`).
+
+Wrong:
+```kotlin
+class Example
+```
+File ends immediately after `Example` with no trailing newline.
+
+Right:
+```kotlin
+class Example
+```
+File ends with one trailing newline.
+
+### `ktlint:standard:function-expression-body`
+
+Meaning:
+- Prefer expression body for single-expression functions.
+
+Wrong:
+```kotlin
+fun isEmpty(value: String): Boolean {
+    return value.isEmpty()
+}
+```
+
+Right:
+```kotlin
+fun isEmpty(value: String): Boolean = value.isEmpty()
+```
+
+### `ktlint:standard:binary-expression-wrapping`
+
+Meaning:
+- Wrap long binary expressions (`&&`, `||`, `+`, etc.) consistently.
+
+Wrong:
+```kotlin
+val allowed = isEnabled &&
+user.isActive && user.hasRole("ADMIN")
+```
+
+Right:
+```kotlin
+val allowed =
+    isEnabled &&
+        user.isActive &&
+        user.hasRole("ADMIN")
+```
+
+### `ktlint:standard:string-template-indent`
+
+Meaning:
+- Keep indentation in multiline string templates consistent.
+
+Wrong:
+```kotlin
+val message = """
+    Build: ${buildId}
+  Status: ${status}
+""".trimIndent()
+```
+
+Right:
+```kotlin
+val message = """
+    Build: ${buildId}
+    Status: ${status}
+""".trimIndent()
+```
+
+### `ktlint:standard:max-line-length`
+
+Criteria:
+- `max_line_length = 140`.
+
+Wrong:
+```kotlin
+val longMessage = "This line is intentionally too long ... (more than 140 characters) ... to illustrate max-line-length violation"
+```
+
+Right:
+```kotlin
+val longMessage =
+    "This line is split " +
+        "to keep each line length below 140 characters."
+```
+
+### `ktlint:standard:function-literal`
+
+Meaning:
+- Keep lambda literal formatting consistent in multiline expressions.
+
+Wrong:
+```kotlin
+val names = values.map({
+    it.name
+})
+```
+
+Right:
+```kotlin
+val names =
+    values.map {
+        it.name
+    }
+```
+
+### `ktlint:standard:argument-list-wrapping`
+
+Meaning:
+- Wrap long argument lists consistently when call spans multiple lines.
+
+Wrong:
+```kotlin
+client.createMandatoryUpdate(dryRun, component, version, projectKey, epicName, dueDate, notice, customer)
+```
+
+Right:
+```kotlin
+client.createMandatoryUpdate(
+    dryRun,
+    component,
+    version,
+    projectKey,
+    epicName,
+    dueDate,
+    notice,
+    customer,
+)
+```
+
+### `ktlint:standard:block-comment-initial-star-alignment`
+
+Meaning:
+- Align leading `*` in block comments.
+
+Wrong:
+```kotlin
+/*
+* first line
+  * second line
+ */
+```
+
+Right:
+```kotlin
+/*
+ * first line
+ * second line
+ */
+```
 
 ### `detekt:style:ClassOrdering`
 
