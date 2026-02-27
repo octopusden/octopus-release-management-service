@@ -36,6 +36,10 @@ fun requiredIntProperty(propertyName: String): Int {
         ?: throw IllegalStateException("Gradle property '$propertyName' must be an integer, but was '$value'")
 }
 
+val testsExcludedFromBuild = gradle.startParameter.excludedTaskNames.any { excludedTask ->
+    excludedTask == "test" || excludedTask.endsWith(":test")
+}
+
 allprojects {
     group = "org.octopusden.octopus.release-management-service"
     if (version == "unspecified") {
@@ -117,10 +121,6 @@ tasks.register("qualityCheck") {
     group = "verification"
     description = "Runs all mandatory quality gates."
     dependsOn("qualityStatic", "qualityCoverage")
-}
-
-tasks.named("check") {
-    dependsOn(tasks.matching { it.name == "koverXmlReport" || it.name == "koverHtmlReport" })
 }
 
 tasks.register("securityReport") {
@@ -217,6 +217,14 @@ subprojects {
             info.events = setOf(TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED)
         }
         systemProperties["release-management-service.version"] = version
+    }
+
+    if (testsExcludedFromBuild) {
+        tasks.configureEach {
+            if (name.startsWith("kover")) {
+                enabled = false
+            }
+        }
     }
 
     ext {
