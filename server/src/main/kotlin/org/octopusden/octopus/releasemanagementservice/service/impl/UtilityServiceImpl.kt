@@ -12,6 +12,7 @@ import org.octopusden.octopus.releasemanagementservice.service.JiraService
 import org.octopusden.octopus.releasemanagementservice.service.UtilityService
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.CRN_REQUIRED_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.CUSTOMER_FIELD
+import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.DEVELOPMENT_PROJECT_CATEGORY
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_ISSUE
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_LINK_FIELD
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.EPIC_NAME_FIELD
@@ -19,6 +20,7 @@ import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceI
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.jqlQuote
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.multiSelectOf
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.singleSelectOf
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -35,18 +37,17 @@ class UtilityServiceImpl(
             dto.component,
             dto.version,
             MandatoryUpdateRelengFilterDTO(dto.filter.activeLinePeriod, dto.filter.startVersion, dto.filter.excludeVersions)
-        )
-            .filter {
-                if (dto.filter.excludeComponents.contains(it.component)) return@filter false
-                val foundComponent = componentRegistryService.getById(it.component)
-                val excludeBySystems = if (dto.filter.isFullMatchSystems) {
-                    dto.filter.excludeSystems == foundComponent.system
-                } else {
-                    foundComponent.system.intersect(dto.filter.excludeSystems).isNotEmpty()
-                }
-                foundComponent.distribution?.external == true && !excludeBySystems
+        ).filter {
+            if (dto.filter.excludeComponents.contains(it.component)) return@filter false
+            val foundComponent = componentRegistryService.getDetailedComponent(it.component, it.version)
+            val excludeBySystems = if (dto.filter.isFullMatchSystems) {
+                dto.filter.excludeSystems == foundComponent.system
+            } else {
+                foundComponent.system.intersect(dto.filter.excludeSystems).isNotEmpty()
             }
-            .map { it.toShortBuildDTO() }
+            val projectCategory = jiraService.getProjectCategory(foundComponent.jiraComponentVersion.component.projectKey)?.name
+            foundComponent.distribution?.external == true && projectCategory == DEVELOPMENT_PROJECT_CATEGORY && !excludeBySystems
+        }.map { it.toShortBuildDTO() }
         if (builds.isEmpty() || dryRun) {
             return MandatoryUpdateResponseDTO(null, builds)
         }
@@ -68,6 +69,7 @@ class UtilityServiceImpl(
         }
         val assignee = componentRegistryService.getById(component).let { it.releaseManager ?: it.componentOwner }
         val extraFields = mapOf(CUSTOMER_FIELD to multiSelectOf(dto.customer), EPIC_NAME_FIELD to dto.epicName)
+        logger.debug("Creating MU epic issue. component='{}', version'{}', project='{}'", component, version, dto.projectKey)
         return jiraService.createIssue(
             dto.projectKey,
             EPIC_ISSUE,
@@ -81,24 +83,25 @@ class UtilityServiceImpl(
 
     private fun createSubIssues(component: String, version: String, builds: List<ShortBuildDTO>, dto: MandatoryUpdateDTO, epicKey: String) {
         val buildsByComponent = builds.groupBy { it.component }
-        for ((compId, compBuilds) in buildsByComponent) {
-            val detailedComponent = componentRegistryService.getDetailedComponent(compId, compBuilds.first().version)
+        for ((componentId, componentBuilds) in buildsByComponent) {
+            val detailedComponent = componentRegistryService.getDetailedComponent(componentId, componentBuilds.first().version)
             val assignee = detailedComponent.componentOwner
             val currentProjectKey = detailedComponent.jiraComponentVersion.component.projectKey
-            val versions = compBuilds.joinToString(separator = "\n") { "- ${it.version}" }
+            val versions = componentBuilds.joinToString(separator = "\n") { "- ${it.version}" }
             val extraFields = mutableMapOf(
                 CUSTOMER_FIELD to multiSelectOf(dto.customer),
                 EPIC_LINK_FIELD to epicKey
             )
-            val solution = detailedComponent.solution ?: false
-            if (!solution) {
+            val isSolution = detailedComponent.solution ?: false
+            if (!isSolution) {
                 extraFields[CRN_REQUIRED_FIELD] = singleSelectOf(CRN_REQUIRED_FIELD_VALUE)
             }
+            logger.debug("Creating MU sub-issue. component='{}', project='{}', epic='{}'", componentId, currentProjectKey, epicKey)
             jiraService.createIssue(
                 currentProjectKey,
                 MANDATORY_UPDATE_ISSUE,
-                ISSUE_SUMMARY_TEMPLATE.format(compId, component, version),
-                ISSUE_DESCRIPTION_TEMPLATE.format(compId, versions, component, version),
+                ISSUE_SUMMARY_TEMPLATE.format(dto.epicName, componentId, component, version),
+                ISSUE_DESCRIPTION_TEMPLATE.format(componentId, versions, component, version),
                 assignee,
                 dto.dueDate,
                 extraFields
@@ -121,11 +124,13 @@ class UtilityServiceImpl(
         private const val EPIC_SUMMARY_TEMPLATE = "Bump Dependencies on %s %s"
         private const val EPIC_DESCRIPTION_TEMPLATE =
             "Bump Dependencies on %s to %s or a later version. Components eligible for update are listed in the epic's issues."
-        private const val ISSUE_SUMMARY_TEMPLATE = "%s: Bump Dependencies on %s to %s or a later version."
+        private const val ISSUE_SUMMARY_TEMPLATE = "%s. %s: Bump Dependencies on %s to %s or a later version."
         private const val ISSUE_DESCRIPTION_TEMPLATE =
             "Component %s has the following versions eligible for mandatory update:\n%s\n\n" +
                     "Those versions are to be updated: please bump dependencies on %s to %s or a later version."
 
         private const val CRN_REQUIRED_FIELD_VALUE = "No"
+
+        private val logger = LoggerFactory.getLogger(UtilityServiceImpl::class.java)
     }
 }
