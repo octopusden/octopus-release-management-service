@@ -368,7 +368,7 @@ tasks.named<MigrateMockData>("migrateMockData") {
         "docker" -> {
             host.set("localhost")
             port.set(1080)
-            dependsOn("composeUp")
+            mustRunAfter("composeUp")
         }
     }
 }
@@ -409,11 +409,17 @@ val ft by tasks.creating(Test::class) {
             systemProperties["test.teamcity-2022-host"] = "localhost:8111"
             dependsOn("migrateMockData")
             if (isTeamCityDockerBuild) {
-                finalizedBy("composeLogs", "composeDown", "ftServerCoverageReport", "ftServerCoverageVerify")
+                finalizedBy("composeLogs", "ftServerCoverageReport", "ftServerCoverageVerify")
             } else {
-                finalizedBy("composeLogs", "composeDown", "ftServerCoverageReport")
+                finalizedBy("composeLogs", "ftServerCoverageReport")
             }
         }
+    }
+}
+
+if ("testPlatform".getExt() == "docker") {
+    configure<ComposeExtension> {
+        isRequiredBy(ft)
     }
 }
 
