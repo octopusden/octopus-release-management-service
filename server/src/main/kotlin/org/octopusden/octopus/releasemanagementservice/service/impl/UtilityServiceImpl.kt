@@ -69,7 +69,7 @@ class UtilityServiceImpl(
         }
         val assignee = componentRegistryService.getById(component).let { it.releaseManager ?: it.componentOwner }
         val extraFields = mapOf(CUSTOMER_FIELD to multiSelectOf(dto.customer), EPIC_NAME_FIELD to dto.epicName)
-        logger.debug("Creating MU epic issue. component='{}', version'{}', project='{}'", component, version, dto.projectKey)
+        logger.debug("Creating MU epic issue. component='{}', version='{}', project='{}'", component, version, dto.projectKey)
         return jiraService.createIssue(
             dto.projectKey,
             EPIC_ISSUE,
