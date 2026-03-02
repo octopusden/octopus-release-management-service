@@ -18,8 +18,11 @@ val ftServerJacocoOutputDir = layout.buildDirectory.dir("jacoco")
 val ftServerJacocoExecFile = ftServerJacocoOutputDir.map { it.file("ft-server.exec") }
 val isTeamCityBuild = !System.getenv("TEAMCITY_VERSION").isNullOrBlank()
 val isTeamCityDockerBuild = isTeamCityBuild && (project.ext["testPlatform"] as String) == "docker"
-val testsExcludedFromBuild = gradle.startParameter.excludedTaskNames.any { excludedTask ->
-    excludedTask == "test" || excludedTask.endsWith(":test")
+val ftExcludedFromBuild = gradle.startParameter.excludedTaskNames.any { excludedTask ->
+    excludedTask == "test" ||
+        excludedTask.endsWith(":test") ||
+        excludedTask == "ft" ||
+        excludedTask.endsWith(":ft")
 }
 
 fun percentPropertyAsRatio(propertyName: String): BigDecimal {
@@ -414,19 +417,20 @@ val ft by tasks.creating(Test::class) {
     }
 }
 
-if (testsExcludedFromBuild) {
+val ftInfrastructureTasks = setOf(
+    "ft",
+    "migrateMockData",
+    "prepareFtServerCoverageAgent",
+    "prepareFtServerCoverageOutputDir",
+    "ftServerCoverageReport",
+    "ftServerCoverageVerify",
+    "deployTeamcity2022Plugin",
+    "prepareTeamcity2022Data"
+)
+
+if (ftExcludedFromBuild) {
     tasks.configureEach {
-        if (
-            name == "ft" ||
-            name == "migrateMockData" ||
-            name == "prepareFtServerCoverageAgent" ||
-            name == "prepareFtServerCoverageOutputDir" ||
-            name == "ftServerCoverageReport" ||
-            name == "ftServerCoverageVerify" ||
-            name == "deployTeamcity2022Plugin" ||
-            name == "prepareTeamcity2022Data" ||
-            name.startsWith("compose")
-        ) {
+        if (name in ftInfrastructureTasks || name.startsWith("compose")) {
             enabled = false
         }
     }
