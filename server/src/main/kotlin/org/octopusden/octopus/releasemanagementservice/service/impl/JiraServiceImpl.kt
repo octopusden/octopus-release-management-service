@@ -25,7 +25,7 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
     private val client = AsynchronousJiraRestClientFactory()
         .createWithBasicHttpAuthentication(URI(jiraClientProperties.host), jiraClientProperties.username, jiraClientProperties.password)
 
-    private val customClient = JiraClassicClient(
+    private val jiraClient = JiraClassicClient(
         object : ClientParametersProvider {
             override fun getApiUrl(): String = jiraClientProperties.host
             override fun getAuth(): CredentialProvider =
@@ -70,7 +70,7 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
     }
 
     override fun getProjectCategory(projectKey: String): ProjectCategory? {
-        return customClient.getProject(projectKey).projectCategory
+        return jiraClient.getProject(projectKey).projectCategory
     }
 
     private fun getIssueType(name: String): IssueType {

@@ -69,7 +69,7 @@ class UtilityServiceImpl(
         }
         val assignee = componentRegistryService.getById(component).let { it.releaseManager ?: it.componentOwner }
         val extraFields = mapOf(CUSTOMER_FIELD to multiSelectOf(dto.customer), EPIC_NAME_FIELD to dto.epicName)
-        logger.debug("Creating MU epic issue. component='{}', version='{}', project='{}'", component, version, dto.projectKey)
+        logger.debug("Creating Mandatory Update epic issue. component='{}', version='{}', project='{}'", component, version, dto.projectKey)
         return jiraService.createIssue(
             dto.projectKey,
             EPIC_ISSUE,
@@ -96,7 +96,7 @@ class UtilityServiceImpl(
             if (!isSolution) {
                 extraFields[CRN_REQUIRED_FIELD] = singleSelectOf(CRN_REQUIRED_FIELD_VALUE)
             }
-            logger.debug("Creating MU sub-issue. component='{}', project='{}', epic='{}'", componentId, currentProjectKey, epicKey)
+            logger.debug("Creating Mandatory Update sub-issue. component='{}', project='{}', epic='{}'", componentId, currentProjectKey, epicKey)
             jiraService.createIssue(
                 currentProjectKey,
                 MANDATORY_UPDATE_ISSUE,
