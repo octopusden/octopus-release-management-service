@@ -1,7 +1,6 @@
 # Style Guidelines
 
-This document describes non-obvious style-related checks and current violation statistics.
-Obvious checks like `unused*` are intentionally omitted.
+This document describes enabled and review-candidate style-related checks and current violation statistics.
 
 ## Scope
 
@@ -23,8 +22,12 @@ Statistics below are based on:
 | `detekt:style:MaxLineLength` | 6 | baseline |
 | `detekt:style:NewLineAtEndOfFile` | 25 | baseline |
 | `detekt:style:ProtectedMemberInFinalClass` | 8 | baseline |
+| `detekt:style:SwallowedException` | 3 | baseline |
+| `detekt:style:UnusedPrivateMember` | 1 | baseline |
+| `detekt:style:UnusedPrivateProperty` | 0 | baseline |
 | `detekt:style:WildcardImport` | 0 | baseline |
 | `detekt:style:UseCheckOrError` | 1 | baseline |
+| `detekt:exceptions:TooGenericExceptionCaught` | 6 | baseline |
 | `detekt:naming:TopLevelPropertyNaming` | 0 | baseline |
 | `ktlint:standard:chain-method-continuation` | 50 | baseline |
 
@@ -313,6 +316,101 @@ check(prop != null) { "Property must be provided" }
 
 Open code reference:
 - `test-common/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/BaseActuatorTest.kt:9`
+
+### `detekt:style:UnusedPrivateMember` (open)
+
+Do not keep private functions or properties that are never used.
+
+Wrong:
+```kotlin
+private fun build(): Stream<Arguments> = Stream.empty()
+```
+
+Right:
+```kotlin
+private fun buildArguments(): Stream<Arguments> = Stream.empty()
+
+@MethodSource("buildArguments")
+fun shouldBuildCorrectly(arguments: Arguments) { /* ... */ }
+```
+
+Open code reference:
+- `test-common/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/BaseBuildControllerTest.kt:120`
+
+### `detekt:style:UnusedPrivateProperty`
+
+Do not keep unused private properties.
+
+Wrong:
+```kotlin
+private val mapper = ObjectMapper()
+```
+
+Right:
+```kotlin
+private val mapper = ObjectMapper()
+
+fun serialize(value: Any): String = mapper.writeValueAsString(value)
+```
+
+Reference in current code:
+- none.
+
+### `detekt:style:SwallowedException` (open)
+
+Do not catch an exception and silently ignore it. Either handle it explicitly, log it with context, or rethrow a more specific exception.
+
+Wrong:
+```kotlin
+try {
+    update()
+} catch (e: Exception) {
+}
+```
+
+Right:
+```kotlin
+try {
+    update()
+} catch (e: IOException) {
+    log.warn("Mandatory update failed for component {}", component, e)
+}
+```
+
+Open code references:
+- `automation/src/main/kotlin/org/octopusden/octopus/automation/releasemanagement/command/MandatoryUpdate.kt:116`
+- `client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceErrorDecoder.kt:19`
+- `teamcity-plugin/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/teamcity/plugin/ReleaseManagementBuildTriggerService.kt:60`
+
+### `detekt:exceptions:TooGenericExceptionCaught` (open)
+
+Catch the narrowest exception type that the code can actually handle.
+
+Wrong:
+```kotlin
+try {
+    loadVersion()
+} catch (e: Exception) {
+    return null
+}
+```
+
+Right:
+```kotlin
+try {
+    loadVersion()
+} catch (e: FeignException.NotFound) {
+    return null
+}
+```
+
+Open code references:
+- `automation/src/main/kotlin/org/octopusden/octopus/automation/releasemanagement/command/MandatoryUpdate.kt:116`
+- `client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceErrorDecoder.kt:19`
+- `legacy-releng-client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/LegacyRelengErrorDecoder.kt:18`
+- `legacy-releng-client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/legacy/LegacyRelengErrorDecoder.kt:15`
+- `server/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/actuator/LegacyRelengIndicator.kt:16`
+- `teamcity-plugin/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/teamcity/plugin/ReleaseManagementBuildTriggerService.kt:60`
 
 ### `detekt:naming:TopLevelPropertyNaming`
 
