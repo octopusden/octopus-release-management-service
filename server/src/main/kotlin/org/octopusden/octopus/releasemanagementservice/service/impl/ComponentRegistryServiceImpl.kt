@@ -6,11 +6,12 @@ import org.octopusden.octopus.components.registry.core.dto.ComponentV1
 import org.octopusden.octopus.components.registry.core.dto.DetailedComponent
 import org.octopusden.octopus.releasemanagementservice.service.ComponentRegistryService
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
 class ComponentRegistryServiceImpl(
-    @Value("\${components-registry-service.url}")
+    @param:Value("\${components-registry-service.url}")
     private val componentsRegistryServiceUrl: String
 ): ComponentRegistryService {
     private val client = ClassicComponentsRegistryServiceClient(
@@ -23,6 +24,7 @@ class ComponentRegistryServiceImpl(
         return client.getById(id)
     }
 
+    @Cacheable(value = ["detailedComponentCache"], key = "#component + ':' + #version")
     override fun getDetailedComponent(component: String, version: String): DetailedComponent {
         return client.getDetailedComponent(component, version)
     }
