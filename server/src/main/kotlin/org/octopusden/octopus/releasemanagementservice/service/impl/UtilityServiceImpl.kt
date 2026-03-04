@@ -47,8 +47,9 @@ class UtilityServiceImpl(
             } else {
                 foundComponent.system.intersect(dto.filter.excludeSystems).isNotEmpty()
             }
-            val projectCategory = projectCategoryCache.getOrPut(it.component) {
-                jiraService.getProjectCategory(foundComponent.jiraComponentVersion.component.projectKey)?.name
+            val projectKey = foundComponent.jiraComponentVersion.component.projectKey
+            val projectCategory = projectCategoryCache.getOrPut(projectKey) {
+                jiraService.getProjectCategory(projectKey)?.name
             }
             foundComponent.distribution?.external == true && projectCategory == DEVELOPMENT_PROJECT_CATEGORY && !excludeBySystems
         }.map { it.toShortBuildDTO() }
