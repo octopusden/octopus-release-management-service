@@ -103,6 +103,27 @@
     }
 }
 
+"another-project-component" {
+    system = "CLASSIC"
+    componentDisplayName = "Another project component"
+    componentOwner = "jdoe"
+    releaseManager = "jdoe"
+    groupId = "corp.domain"
+    vcsUrl = "ssh://git@git.domain.corp/main/another-project-component.git"
+    solution = false
+    jira {
+        projectKey = 'ANOTHER'
+        lineVersionFormat = '$major.$minor'
+        majorVersionFormat = '$major.$minor'
+        releaseVersionFormat = '$major.$minor.$service'
+        displayName = 'Another project component'
+    }
+    distribution {
+        external = true
+        explicit = true
+    }
+}
+
 "dependency-component-first" {
     system = "NONE"
     componentDisplayName = "Dependency component first"

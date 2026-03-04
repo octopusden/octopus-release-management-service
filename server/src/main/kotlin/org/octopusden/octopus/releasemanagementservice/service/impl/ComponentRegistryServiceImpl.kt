@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ComponentRegistryServiceImpl(
-    @Value("\${components-registry-service.url}")
+    @param:Value("\${components-registry-service.url}")
     private val componentsRegistryServiceUrl: String
 ): ComponentRegistryService {
     private val client = ClassicComponentsRegistryServiceClient(
