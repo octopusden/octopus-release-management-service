@@ -22,8 +22,6 @@ import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceI
 import org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.Companion.singleSelectOf
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.Optional
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
@@ -35,9 +33,8 @@ class UtilityServiceImpl(
     private val componentRegistryService: ComponentRegistryService
 ): UtilityService {
 
-    private val projectCategoryCache = ConcurrentHashMap<String, Optional<String>>()
-
     override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO {
+        val projectCategoryCache = mutableMapOf<String, String?>()
         val builds = legacyRelengClient.getMandatoryUpdateBuilds(
             dto.component,
             dto.version,
@@ -50,7 +47,9 @@ class UtilityServiceImpl(
             } else {
                 foundComponent.system.intersect(dto.filter.excludeSystems).isNotEmpty()
             }
-            val projectCategory = getProjectCategoryNameCached(foundComponent.jiraComponentVersion.component.projectKey)
+            val projectCategory = projectCategoryCache.getOrPut(it.component) {
+                jiraService.getProjectCategory(foundComponent.jiraComponentVersion.component.projectKey)?.name
+            }
             foundComponent.distribution?.external == true && projectCategory == DEVELOPMENT_PROJECT_CATEGORY && !excludeBySystems
         }.map { it.toShortBuildDTO() }
         if (builds.isEmpty() || dryRun) {
@@ -120,12 +119,6 @@ class UtilityServiceImpl(
             AND summary ~ "\"${jqlQuote(summary)}\""
         """.trimIndent()
         return jiraService.findIssues(jql).any { it.summary == summary }
-    }
-
-    private fun getProjectCategoryNameCached(projectKey: String): String? {
-        return projectCategoryCache.computeIfAbsent(projectKey) {
-            Optional.ofNullable(jiraService.getProjectCategory(projectKey)?.name)
-        }.orElse(null)
     }
 
     private fun BuildDTO.toShortBuildDTO(): ShortBuildDTO =
