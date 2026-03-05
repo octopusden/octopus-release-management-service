@@ -20,11 +20,6 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBu
 
 class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : LegacyRelengClient {
 
-    constructor(url: String) : this(url, with(jacksonObjectMapper()) {
-        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        this
-    })
-
     private val client = Builder()
         .client(ApacheHttpClient(
             HttpClientBuilder.create()
@@ -38,6 +33,11 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
         .logger(Slf4jLogger(LegacyRelengClient::class.java))
         .logLevel(Logger.Level.BASIC)
         .target(LegacyRelengClient::class.java, url)
+
+    constructor(url: String) : this(url, with(jacksonObjectMapper()) {
+        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        this
+    })
 
     override fun getBuilds(component: String, filter: BuildFilterDTO): Collection<ShortBuildDTO> =
         client.getBuilds(component, filter)

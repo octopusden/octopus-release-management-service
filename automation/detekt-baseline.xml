@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>MaxLineLength:MandatoryUpdate.kt$MandatoryUpdate$"true - exclude only if component systems fully match exclude-systems; false - exclude if component has any system from exclude-systems"</ID>
+    <ID>SwallowedException:MandatoryUpdate.kt$MandatoryUpdate$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:MandatoryUpdate.kt$MandatoryUpdate$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>

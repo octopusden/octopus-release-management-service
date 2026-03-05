@@ -1,8 +1,6 @@
 package org.octopusden.octopus.releasemanagementservice.controller
 
 import com.fasterxml.jackson.core.type.TypeReference
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import org.octopusden.octopus.releasemanagementservice.BaseReleaseManagementServiceTest
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockHttpServletResponse
@@ -10,8 +8,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.util.LinkedMultiValueMap
-
-private const val ISO_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
 
 interface BaseControllerTest : BaseReleaseManagementServiceTest {
 
@@ -77,9 +73,4 @@ interface BaseControllerTest : BaseReleaseManagementServiceTest {
 
     fun <T> MockHttpServletResponse.toObject(typeReference: TypeReference<T>): T =
         getObjectMapper().readValue(this.contentAsByteArray, typeReference)
-
-    companion object {
-        private val FORMATTER = DateTimeFormatter.ofPattern(ISO_PATTERN)
-            .withZone(ZoneId.systemDefault())
-    }
 }

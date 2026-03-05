@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>MaxLineLength:ClassicReleaseManagementServiceClient.kt$ClassicReleaseManagementServiceClient.Companion$.</ID>
+    <ID>NestedBlockDepth:ReleaseManagementServiceErrorDecoder.kt$ReleaseManagementServiceErrorDecoder$private fun getErrorResponse(response: Response?): ErrorResponse?</ID>
+    <ID>ReturnCount:DateToISOExpander.kt$DateToISOExpander$override fun expand(value: Any?): String</ID>
+    <ID>SwallowedException:ReleaseManagementServiceErrorDecoder.kt$ReleaseManagementServiceErrorDecoder$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ReleaseManagementServiceErrorDecoder.kt$ReleaseManagementServiceErrorDecoder$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>

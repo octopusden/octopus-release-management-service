@@ -28,11 +28,11 @@ interface ReleaseManagementServiceClient {
     fun createMandatoryUpdate(@Param("dryRun") dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO
 
     @RequestLine("GET /rest/api/1/support/components")
-    fun getComponents() : Collection<ComponentDTO>
+    fun getComponents(): Collection<ComponentDTO>
 
     @RequestLine("GET /rest/api/1/support/components/{component}")
-    fun getComponent(@Param("component") component: String) : ComponentDTO
+    fun getComponent(@Param("component") component: String): ComponentDTO
 
     @RequestLine("PUT /rest/api/1/support/components/{component}")
-    fun updateComponent(@Param("component") component: String, dto: ComponentDTO) : ComponentDTO
+    fun updateComponent(@Param("component") component: String, dto: ComponentDTO): ComponentDTO
 }

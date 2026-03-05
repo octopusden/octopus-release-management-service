@@ -6,11 +6,13 @@ data class ServiceInfoDTO(val build: Build) {
     @Suppress("unused")
     enum class ServiceName(
         @get:JsonValue
-        val jsonValue: String
-    ) { RELEASE_MANAGEMENT_SERVICE("release-management-service") }
+        val jsonValue: String,
+    ) {
+        RELEASE_MANAGEMENT_SERVICE("release-management-service"),
+    }
 
     data class Build(
         val name: ServiceName,
-        val version: String
+        val version: String,
     )
 }

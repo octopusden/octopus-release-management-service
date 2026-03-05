@@ -1,0 +1,96 @@
+name: Security Reports
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  dependency-check:
+    name: security/dependency-check
+    # TODO: Re-enable after dependency-check stability is fixed (NVD API/source reliability).
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v3
+      - name: Run OWASP Dependency-Check (report-only)
+        run: ./gradlew securityReport --no-daemon --stacktrace
+      - name: Upload Dependency-Check SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: build/reports/dependency-check/dependency-check-report.sarif
+      - name: Upload Dependency-Check reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-reports
+          path: build/reports/dependency-check/**
+
+  codeql:
+    name: security/codeql
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java-kotlin
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:java-kotlin"
+      - name: Upload CodeQL report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-sarif
+          path: results/**/*.sarif
+          if-no-files-found: warn
+
+  trivy:
+    name: security/trivy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy filesystem scan (report-only)
+        uses: aquasecurity/trivy-action@0.34.1
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,misconfig,secret
+          format: sarif
+          output: trivy-results.sarif
+          severity: MEDIUM,HIGH,CRITICAL
+      - name: Upload Trivy SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+      - name: Upload Trivy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-sarif
+          path: trivy-results.sarif

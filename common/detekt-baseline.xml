@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>MagicNumber:HandledResponseCode.kt$HandledResponseCode.BAD_REQUESTS$400</ID>
+    <ID>MagicNumber:HandledResponseCode.kt$HandledResponseCode.INTERNAL_SERVER_ERROR$500</ID>
+    <ID>NewLineAtEndOfFile:AlreadyExistsException.kt$org.octopusden.octopus.releasemanagementservice.client.common.exception.AlreadyExistsException.kt</ID>
+    <ID>NewLineAtEndOfFile:MandatoryUpdateDTO.kt$org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO.kt</ID>
+    <ID>NewLineAtEndOfFile:MandatoryUpdateFilterDTO.kt$org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateFilterDTO.kt</ID>
+    <ID>NewLineAtEndOfFile:MandatoryUpdateRelengFilterDTO.kt$org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateRelengFilterDTO.kt</ID>
+    <ID>NewLineAtEndOfFile:MandatoryUpdateResponseDTO.kt$org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO.kt</ID>
+  </CurrentIssues>
+</SmellBaseline>

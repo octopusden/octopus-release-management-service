@@ -1,5 +1,11 @@
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+import kotlinx.kover.gradle.plugin.dsl.AggregationType
+import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.net.InetAddress
 import java.util.zip.CRC32
 
@@ -9,6 +15,10 @@ plugins {
     id("io.spring.dependency-management")
     id("org.jetbrains.kotlin.jvm")
     id("io.github.gradle-nexus.publish-plugin")
+    id("org.jetbrains.kotlinx.kover")
+    id("org.owasp.dependencycheck")
+    id("io.gitlab.arturbosch.detekt") apply false
+    id("org.jlleitschuh.gradle.ktlint") apply false
     signing
 }
 
@@ -19,11 +29,26 @@ val defaultVersion = "${
     }
 }-SNAPSHOT"
 
+fun requiredIntProperty(propertyName: String): Int {
+    val value = findProperty(propertyName)?.toString()?.trim()
+        ?: throw IllegalStateException("Missing Gradle property '$propertyName' required for Kover verification")
+    return value.toIntOrNull()
+        ?: throw IllegalStateException("Gradle property '$propertyName' must be an integer, but was '$value'")
+}
+
+val testsExcludedFromBuild = gradle.startParameter.excludedTaskNames.any { excludedTask ->
+    excludedTask == "test" || excludedTask.endsWith(":test")
+}
+
 allprojects {
     group = "org.octopusden.octopus.release-management-service"
     if (version == "unspecified") {
         version = defaultVersion
     }
+}
+
+repositories {
+    mavenCentral()
 }
 
 nexusPublishing {
@@ -37,11 +62,87 @@ nexusPublishing {
     }
 }
 
+dependencies {
+    val coverageProjects = listOf(
+        ":automation",
+        ":client",
+        ":common",
+        ":legacy-releng-client",
+        ":release-management-service",
+        ":release-management-teamcity-plugin"
+    )
+    coverageProjects.forEach { add("kover", project(it)) }
+}
+
+kover {
+    reports {
+        verify {
+            rule("Line coverage") {
+                bound {
+                    minValue.set(requiredIntProperty("coverage.line.min"))
+                    coverageUnits = CoverageUnit.LINE
+                    aggregationForGroup = AggregationType.COVERED_PERCENTAGE
+                }
+            }
+            rule("Branch coverage") {
+                bound {
+                    minValue.set(requiredIntProperty("coverage.branch.min"))
+                    coverageUnits = CoverageUnit.BRANCH
+                    aggregationForGroup = AggregationType.COVERED_PERCENTAGE
+                }
+            }
+        }
+    }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 11.0F
+    suppressionFile = "$rootDir/config/owasp/suppressions.xml"
+    formats = listOf("HTML", "JSON", "SARIF")
+    outputDirectory.set(layout.buildDirectory.dir("reports/dependency-check"))
+}
+
+tasks.register("qualityStatic") {
+    group = "verification"
+    description = "Runs static analysis checks for all modules."
+    dependsOn(subprojects.map { "${it.path}:detekt" })
+    dependsOn(subprojects.map { "${it.path}:ktlintCheck" })
+}
+
+tasks.register("qualityCoverage") {
+    group = "verification"
+    description = "Runs tests, generates merged Kover XML report and verifies coverage thresholds."
+    dependsOn(subprojects.map { "${it.path}:test" })
+    dependsOn(tasks.matching { it.name == "koverMergedXmlReport" || it.name == "koverXmlReport" })
+    dependsOn(tasks.matching { it.name == "koverMergedVerify" || it.name == "koverVerify" })
+}
+
+tasks.register("qualityCheck") {
+    group = "verification"
+    description = "Runs all mandatory quality gates."
+    dependsOn("qualityStatic", "qualityCoverage")
+}
+
+tasks.register("securityReport") {
+    group = "verification"
+    description = "Runs security checks in report-only mode."
+    dependsOn(
+        if (tasks.names.contains("dependencyCheckAggregate")) {
+            "dependencyCheckAggregate"
+        } else {
+            "dependencyCheckAnalyze"
+        }
+    )
+}
+
 subprojects {
     apply(plugin = "java")
     apply(plugin = "idea")
     apply(plugin = "io.spring.dependency-management")
     apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlinx.kover")
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "signing")
 
     repositories {
@@ -69,6 +170,47 @@ subprojects {
         }
     }
 
+    extensions.configure<DetektExtension> {
+        buildUponDefaultConfig = true
+        allRules = false
+        config.setFrom(rootProject.file("config/detekt/detekt.yml"))
+        baseline = file("$projectDir/detekt-baseline.xml")
+        ignoreFailures = false
+    }
+
+    tasks.withType<Detekt>().configureEach {
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+            sarif.required.set(true)
+            txt.required.set(false)
+        }
+    }
+
+    extensions.configure<KtlintExtension> {
+        ignoreFailures.set(false)
+        outputToConsole.set(true)
+        reporters {
+            reporter(ReporterType.PLAIN)
+            reporter(ReporterType.CHECKSTYLE)
+        }
+        baseline.set(file("$projectDir/ktlint-baseline.xml"))
+        filter {
+            exclude("**/generated/**")
+            exclude("**/build/**")
+            include("**/src/**/*.kt")
+        }
+    }
+
+    tasks.matching {
+        it.name == "runKtlintCheckOverKotlinScripts" ||
+                it.name == "ktlintKotlinScriptCheck" ||
+                it.name == "runKtlintFormatOverKotlinScripts" ||
+                it.name == "ktlintKotlinScriptFormat"
+    }.configureEach {
+        enabled = false
+    }
+
     tasks.withType<Test> {
         useJUnitPlatform()
         testLogging{
@@ -77,10 +219,19 @@ subprojects {
         systemProperties["release-management-service.version"] = version
     }
 
+    if (testsExcludedFromBuild) {
+        tasks.configureEach {
+            if (name.startsWith("kover")) {
+                enabled = false
+            }
+        }
+    }
+
     ext {
         System.getenv().let {
             set("signingRequired", it.containsKey("ORG_GRADLE_PROJECT_signingKey") && it.containsKey("ORG_GRADLE_PROJECT_signingPassword"))
             set("testPlatform", it.getOrDefault("TEST_PLATFORM", properties["test.platform"]))
+            set("testMockserverPort", it.getOrDefault("TEST_MOCKSERVER_PORT", properties["test.mockserver.port"]))
             set("dockerRegistry", it.getOrDefault("DOCKER_REGISTRY", properties["docker.registry"]))
             set("octopusGithubDockerRegistry", it.getOrDefault("OCTOPUS_GITHUB_DOCKER_REGISTRY", project.properties["octopus.github.docker.registry"]))
             set("okdActiveDeadlineSeconds", it.getOrDefault("OKD_ACTIVE_DEADLINE_SECONDS", properties["okd.active-deadline-seconds"]))

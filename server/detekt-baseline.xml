@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>LongParameterList:BaseControllerTest.kt$BaseControllerTest$( code: Int, typeReference: TypeReference&lt;T&gt;, path: String, params: Map&lt;String, Any&gt;, body: Any?, vararg uriVars: String )</ID>
+    <ID>LongParameterList:JiraService.kt$JiraService$( projectKey: String, issueTypeName: String, summary: String, description: String, assignee: String, dueDate: Date?, extraFields: Map&lt;String, Any&gt; )</ID>
+    <ID>MagicNumber:ExceptionInfoHandler.kt$ExceptionInfoHandler$100</ID>
+    <ID>MaxLineLength:JiraServiceImpl.kt$JiraServiceImpl$return client.metadataClient.issueTypes.claim().find { it.name == name } ?: throw NotFoundException("Issues type '$name' is not found!")</ID>
+    <ID>NewLineAtEndOfFile:BuildControllerTest.kt$org.octopusden.octopus.releasemanagementservice.controller.BuildControllerTest.kt</ID>
+    <ID>NewLineAtEndOfFile:BuildService.kt$org.octopusden.octopus.releasemanagementservice.service.BuildService.kt</ID>
+    <ID>NewLineAtEndOfFile:BuildServiceImpl.kt$org.octopusden.octopus.releasemanagementservice.service.impl.BuildServiceImpl.kt</ID>
+    <ID>NewLineAtEndOfFile:ComponentRegistryService.kt$org.octopusden.octopus.releasemanagementservice.service.ComponentRegistryService.kt</ID>
+    <ID>NewLineAtEndOfFile:ComponentRegistryServiceImpl.kt$org.octopusden.octopus.releasemanagementservice.service.impl.ComponentRegistryServiceImpl.kt</ID>
+    <ID>NewLineAtEndOfFile:ComponentService.kt$org.octopusden.octopus.releasemanagementservice.service.ComponentService.kt</ID>
+    <ID>NewLineAtEndOfFile:ComponentServiceImpl.kt$org.octopusden.octopus.releasemanagementservice.service.impl.ComponentServiceImpl.kt</ID>
+    <ID>NewLineAtEndOfFile:JiraClientProperties.kt$org.octopusden.octopus.releasemanagementservice.config.JiraClientProperties.kt</ID>
+    <ID>NewLineAtEndOfFile:JiraService.kt$org.octopusden.octopus.releasemanagementservice.service.JiraService.kt</ID>
+    <ID>NewLineAtEndOfFile:JiraServiceImpl.kt$org.octopusden.octopus.releasemanagementservice.service.impl.JiraServiceImpl.kt</ID>
+    <ID>NewLineAtEndOfFile:LegacyRelengIndicator.kt$org.octopusden.octopus.releasemanagementservice.actuator.LegacyRelengIndicator.kt</ID>
+    <ID>NewLineAtEndOfFile:SupportController.kt$org.octopusden.octopus.releasemanagementservice.controller.SupportController.kt</ID>
+    <ID>NewLineAtEndOfFile:SupportControllerTest.kt$org.octopusden.octopus.releasemanagementservice.controller.SupportControllerTest.kt</ID>
+    <ID>NewLineAtEndOfFile:UtilityController.kt$org.octopusden.octopus.releasemanagementservice.controller.UtilityController.kt</ID>
+    <ID>NewLineAtEndOfFile:UtilityService.kt$org.octopusden.octopus.releasemanagementservice.service.UtilityService.kt</ID>
+    <ID>NewLineAtEndOfFile:UtilityServiceImpl.kt$org.octopusden.octopus.releasemanagementservice.service.impl.UtilityServiceImpl.kt</ID>
+    <ID>ProtectedMemberInFinalClass:ActuatorTest.kt$ActuatorTest$@Autowired protected lateinit var mapper: ObjectMapper</ID>
+    <ID>ProtectedMemberInFinalClass:ActuatorTest.kt$ActuatorTest$@Autowired protected lateinit var mvc: MockMvc</ID>
+    <ID>ProtectedMemberInFinalClass:BuildControllerTest.kt$BuildControllerTest$@Autowired protected lateinit var mapper: ObjectMapper</ID>
+    <ID>ProtectedMemberInFinalClass:BuildControllerTest.kt$BuildControllerTest$@Autowired protected lateinit var mvc: MockMvc</ID>
+    <ID>ProtectedMemberInFinalClass:SupportControllerTest.kt$SupportControllerTest$@Autowired protected lateinit var mapper: ObjectMapper</ID>
+    <ID>ProtectedMemberInFinalClass:SupportControllerTest.kt$SupportControllerTest$@Autowired protected lateinit var mvc: MockMvc</ID>
+    <ID>ProtectedMemberInFinalClass:UtilityControllerTest.kt$UtilityControllerTest$@Autowired protected lateinit var mapper: ObjectMapper</ID>
+    <ID>ProtectedMemberInFinalClass:UtilityControllerTest.kt$UtilityControllerTest$@Autowired protected lateinit var mvc: MockMvc</ID>
+    <ID>SpreadOperator:ReleaseManagementServiceApplication.kt$(ReleaseManagementServiceApplication::class.java, *args)</ID>
+    <ID>TooGenericExceptionCaught:LegacyRelengIndicator.kt$LegacyRelengIndicator$e: Exception</ID>
+  </CurrentIssues>
+</SmellBaseline>

@@ -57,7 +57,8 @@ configure<ComposeExtension> {
     environment.putAll(
         mapOf(
             "MOCKSERVER_VERSION" to properties["mockserver.version"],
-            "DOCKER_REGISTRY" to "dockerRegistry".getExt()
+            "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
+            "TEST_MOCKSERVER_PORT" to "testMockserverPort".getExt()
         )
     )
 }
@@ -101,14 +102,15 @@ when ("testPlatform".getExt()) {
         }
     }
     "docker" -> {
+        val mockserverPort = "testMockserverPort".getExt().toInt()
         tasks.named<MigrateMockData>("migrateMockData") {
             testDataDir.set(rootDir.toString() + File.separator + "test-data")
             host.set("localhost")
-            port.set(1080)
+            port.set(mockserverPort)
             dependsOn("composeUp")
         }
         tasks.withType<Test> {
-            systemProperties["test.mockserver-host"] = "localhost:1080"
+            systemProperties["test.mockserver-host"] = "localhost:$mockserverPort"
             dependsOn("migrateMockData")
             finalizedBy("composeLogs", "composeDown")
         }

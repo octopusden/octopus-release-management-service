@@ -24,19 +24,23 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
     private val log by lazy { context[Command.LOG] as Logger }
 
     private val component by option(COMPONENT, help = "Component name")
-        .convert { it.trim() }.required()
+        .convert { it.trim() }
+        .required()
         .check("$COMPONENT must not be empty") { it.isNotEmpty() }
 
     private val version by option(VERSION, help = "Component version")
-        .convert { it.trim() }.required()
+        .convert { it.trim() }
+        .required()
         .check("$VERSION must not be empty") { it.isNotEmpty() }
 
     private val projectKey by option(PROJECT_KEY, help = "Project key in which the epic will be created")
-        .convert { it.trim() }.required()
+        .convert { it.trim() }
+        .required()
         .check("$PROJECT_KEY must not be empty") { it.isNotEmpty() }
 
     private val epicName by option(EPIC_NAME, help = "Epic name")
-        .convert { it.trim() }.required()
+        .convert { it.trim() }
+        .required()
         .check("$EPIC_NAME must not be empty") { it.isNotEmpty() }
 
     private val dueDate by option(DUE_DATE, help = "Due date (yyyy-MM-dd)")
@@ -44,7 +48,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .default("")
 
     private val customer by option(CUSTOMER, help = "Customer")
-        .convert { it.trim() }.required()
+        .convert { it.trim() }
+        .required()
         .check("$CUSTOMER must not be empty") { it.isNotEmpty() }
 
     private val notice by option(NOTICE, help = "Additional notice")
@@ -52,7 +57,8 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .default("")
 
     private val activeLinePeriod by option(ACTIVE_LINE_PERIOD, help = "Active line period (days)")
-        .convert { it.toInt() }.required()
+        .convert { it.toInt() }
+        .required()
         .check("$ACTIVE_LINE_PERIOD must be non-negative") { it >= 0 }
 
     private val startVersion by option(START_VERSION, help = "Start version")
@@ -61,34 +67,37 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
 
     private val excludeVersions by option(EXCLUDE_VERSIONS, help = "Exclude versions (comma-separated)")
         .convert {
-            it.split(Regex(SPLIT_SYMBOLS))
+            it
+                .split(Regex(SPLIT_SYMBOLS))
                 .map(String::trim)
                 .filter(String::isNotEmpty)
                 .toSet()
-        }
-        .default(emptySet())
+        }.default(emptySet())
 
     private val excludeComponents by option(EXCLUDE_COMPONENTS, help = "Exclude components (comma-separated)")
         .convert {
-            it.split(Regex(SPLIT_SYMBOLS))
+            it
+                .split(Regex(SPLIT_SYMBOLS))
                 .map(String::trim)
                 .filter(String::isNotEmpty)
                 .toSet()
-        }
-        .default(emptySet())
+        }.default(emptySet())
 
     private val excludeSystems by option(EXCLUDE_SYSTEMS, help = "Systems with which components will be excluded (comma-separated)")
         .convert {
-            it.split(Regex(SPLIT_SYMBOLS))
+            it
+                .split(Regex(SPLIT_SYMBOLS))
                 .map(String::trim)
                 .filter(String::isNotEmpty)
                 .toSet()
-        }
-        .default(emptySet())
+        }.default(emptySet())
 
-    private val isFullMatchSystems by option(IS_FULL_MATCH_SYSTEMS, help = "Exclude components by systems match strategy: " +
-            "true - exclude only if component systems fully match exclude-systems; false - exclude if component has any system from exclude-systems")
-        .convert { it.toBooleanStrictOrNull() ?: throw IllegalArgumentException("$IS_FULL_MATCH_SYSTEMS must be 'true' or 'false'") }
+    private val isFullMatchSystems by option(
+        IS_FULL_MATCH_SYSTEMS,
+        help =
+            "Exclude components by systems match strategy: " +
+                "true - exclude only if component systems fully match exclude-systems; false - exclude if component has any system from exclude-systems",
+    ).convert { it.toBooleanStrictOrNull() ?: throw IllegalArgumentException("$IS_FULL_MATCH_SYSTEMS must be 'true' or 'false'") }
         .required()
 
     private val outputFile by option(OUTPUT_FILE, help = "File to save result")
@@ -100,36 +109,40 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .required()
 
     override fun run() {
-        val dueDate = dueDate.takeIf { it.isNotBlank() }?.let {
-            try {
-                SimpleDateFormat("yyyy-MM-dd").parse(it)
-            } catch (e: Exception) {
-                throw IllegalArgumentException("Invalid date format: $it")
+        val dueDate =
+            dueDate.takeIf { it.isNotBlank() }?.let {
+                try {
+                    SimpleDateFormat("yyyy-MM-dd").parse(it)
+                } catch (e: Exception) {
+                    throw IllegalArgumentException("Invalid date format: $it")
+                }
             }
-        }
-        val filter = MandatoryUpdateFilterDTO(
-            activeLinePeriod = activeLinePeriod,
-            startVersion = startVersion,
-            excludeVersions = excludeVersions,
-            excludeComponents = excludeComponents,
-            excludeSystems = excludeSystems,
-            isFullMatchSystems = isFullMatchSystems
-        )
-        val dto = MandatoryUpdateDTO(
-            component = component,
-            version = version,
-            projectKey = projectKey,
-            epicName = epicName,
-            dueDate = dueDate,
-            notice = notice,
-            customer = customer,
-            filter = filter
-        )
+        val filter =
+            MandatoryUpdateFilterDTO(
+                activeLinePeriod = activeLinePeriod,
+                startVersion = startVersion,
+                excludeVersions = excludeVersions,
+                excludeComponents = excludeComponents,
+                excludeSystems = excludeSystems,
+                isFullMatchSystems = isFullMatchSystems,
+            )
+        val dto =
+            MandatoryUpdateDTO(
+                component = component,
+                version = version,
+                projectKey = projectKey,
+                epicName = epicName,
+                dueDate = dueDate,
+                notice = notice,
+                customer = customer,
+                filter = filter,
+            )
         log.info("Executing mandatory update: dto={} dryRun={}", dto, dryRun)
-        val result = jacksonObjectMapper()
-            .registerKotlinModule()
-            .enable(SerializationFeature.INDENT_OUTPUT)
-            .writeValueAsString(client.createMandatoryUpdate(dryRun, dto))
+        val result =
+            jacksonObjectMapper()
+                .registerKotlinModule()
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .writeValueAsString(client.createMandatoryUpdate(dryRun, dto))
         if (outputFile.isNotEmpty()) {
             File(outputFile).writeText(result)
             log.info("Result is written to file: {}", outputFile)

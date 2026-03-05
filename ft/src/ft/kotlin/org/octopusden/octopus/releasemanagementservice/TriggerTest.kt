@@ -30,7 +30,8 @@ class TriggerTest {
             """.trimIndent()
         )
         Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
-        with(readBuilds(buildType.id)) { //TODO: enhance TeamcityClient (support builds)
+        // TD-002: switch to TeamcityClient builds API once supported (see docs/TECH_DEBT.md).
+        with(readBuilds(buildType.id)) {
             Assertions.assertTrue(
                 statusCode() / 100 == 2,
                 "Unable to get builds of build type '${buildType.id}':\n${body()}"
@@ -53,7 +54,8 @@ class TriggerTest {
             """.trimIndent()
         )
         Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
-        with(readBuilds(buildType.id)) { //TODO: enhance TeamcityClient (support builds)
+        // TD-002: switch to TeamcityClient builds API once supported (see docs/TECH_DEBT.md).
+        with(readBuilds(buildType.id)) {
             Assertions.assertTrue(
                 statusCode() / 100 == 2,
                 "Unable to get builds of build type '${buildType.id}':\n${body()}"
@@ -162,17 +164,18 @@ class TriggerTest {
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
-            with( //TODO: enhance TeamcityClient (support agents)
+            // TD-003: switch to TeamcityClient agents API once supported (see docs/TECH_DEBT.md).
+            with(
                 httpClient.send(
                     HttpRequest.newBuilder()
-                        .uri(URI("${teamcityApiUrl}/agents/name:test-agent/authorized"))
+                        .uri(URI("$teamcityApiUrl/agents/name:test-agent/authorized"))
                         .header("Origin", teamcityUrl)
                         .header("Authorization", TEAMCITY_AUTHORIZATION)
                         .header("Content-Type", "text/plain")
                         .method("PUT", HttpRequest.BodyPublishers.ofString("true"))
                         .build(),
-                    HttpResponse.BodyHandlers.ofString()
-                )
+                    HttpResponse.BodyHandlers.ofString(),
+                ),
             ) {
                 if (statusCode() / 100 != 2) {
                     throw RuntimeException("Unable to authorize 'test-agent':\n${body()}")

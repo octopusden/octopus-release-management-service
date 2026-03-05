@@ -11,6 +11,10 @@ pluginManagement {
         id("io.github.rodm.teamcity-server") version (extra["rodm-teamcity-plugin.version"] as String)
         id("com.github.johnrengelman.shadow") version ("8.1.1")
         id("org.octopusden.octopus.oc-template") version (extra["octopus-oc-template.version"] as String)
+        id("io.gitlab.arturbosch.detekt") version (extra["detekt.version"] as String)
+        id("org.jlleitschuh.gradle.ktlint") version (extra["ktlint-gradle.version"] as String)
+        id("org.jetbrains.kotlinx.kover") version (extra["kover.version"] as String)
+        id("org.owasp.dependencycheck") version (extra["owasp-dependency-check.version"] as String)
     }
     repositories {
         gradlePluginPortal()

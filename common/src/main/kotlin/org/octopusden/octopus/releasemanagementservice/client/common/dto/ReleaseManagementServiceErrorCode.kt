@@ -5,10 +5,11 @@ import org.octopusden.octopus.releasemanagementservice.client.common.exception.A
 import org.octopusden.octopus.releasemanagementservice.client.common.exception.NotFoundException
 
 enum class ReleaseManagementServiceErrorCode(private val function: (message: String) -> Exception, val simpleMessage: String) {
-    OTHER({ m -> IllegalStateException(m) }, "Internal server error"),
-    NOT_FOUND({ m -> NotFoundException(m) }, "Not Found"),
-    ALREADY_EXISTS({m -> AlreadyExistsException(m) }, "Already exists"),
-    ARGUMENTS_NOT_COMPATIBLE({ m -> ArgumentsNotCompatibleException(m) }, "Arguments not compatible");
+    OTHER(::IllegalStateException, "Internal server error"),
+    NOT_FOUND(::NotFoundException, "Not Found"),
+    ALREADY_EXISTS(::AlreadyExistsException, "Already exists"),
+    ARGUMENTS_NOT_COMPATIBLE(::ArgumentsNotCompatibleException, "Arguments not compatible"),
+    ;
 
     fun getException(message: String): Exception {
         return function.invoke(message)
