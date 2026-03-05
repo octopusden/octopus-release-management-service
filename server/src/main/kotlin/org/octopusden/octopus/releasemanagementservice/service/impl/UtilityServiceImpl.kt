@@ -101,7 +101,12 @@ class UtilityServiceImpl(
             if (!isSolution) {
                 extraFields[CRN_REQUIRED_FIELD] = singleSelectOf(CRN_REQUIRED_FIELD_VALUE)
             }
-            logger.debug("Creating Mandatory Update sub-issue. component='{}', project='{}', epic='{}'", componentId, currentProjectKey, epicKey)
+            logger.debug(
+                "Creating Mandatory Update sub-issue. component='{}', project='{}', epic='{}'",
+                componentId,
+                currentProjectKey,
+                epicKey,
+            )
             jiraService.createIssue(
                 currentProjectKey,
                 MANDATORY_UPDATE_ISSUE,

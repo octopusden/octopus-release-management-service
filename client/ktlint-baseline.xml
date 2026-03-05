@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <baseline version="1.0">
-    <file name="build.gradle.kts">
-        <error line="68" column="6" source="standard:block-comment-initial-star-alignment" />
-    </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/DateToISOExpander.kt">
         <error line="23" column="33" source="standard:multiline-expression-wrapping" />
         <error line="23" column="50" source="standard:chain-method-continuation" />

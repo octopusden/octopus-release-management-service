@@ -19,17 +19,17 @@ Statistics below are based on:
 | --- | --- | --- |
 | `detekt:style:ClassOrdering` | 0 | baseline |
 | `detekt:style:ForbiddenComment` | 0 | baseline |
-| `detekt:style:MaxLineLength` | 6 | baseline |
-| `detekt:style:NewLineAtEndOfFile` | 25 | baseline |
+| `detekt:style:MaxLineLength` | 4 | baseline |
+| `detekt:style:NewLineAtEndOfFile` | 21 | baseline |
 | `detekt:style:ProtectedMemberInFinalClass` | 8 | baseline |
 | `detekt:style:SwallowedException` | 3 | baseline |
-| `detekt:style:UnusedPrivateMember` | 1 | baseline |
+| `detekt:style:UnusedPrivateMember` | 0 | baseline |
 | `detekt:style:UnusedPrivateProperty` | 0 | baseline |
 | `detekt:style:WildcardImport` | 0 | baseline |
-| `detekt:style:UseCheckOrError` | 1 | baseline |
+| `detekt:style:UseCheckOrError` | 0 | baseline |
 | `detekt:exceptions:TooGenericExceptionCaught` | 6 | baseline |
 | `detekt:naming:TopLevelPropertyNaming` | 0 | baseline |
-| `ktlint:standard:chain-method-continuation` | 50 | baseline |
+| `ktlint:standard:chain-method-continuation` | 49 | baseline |
 
 For enabled checks, code links are listed only for not-yet-fixed cases.
 
@@ -62,16 +62,16 @@ All checks in this section are enabled `ktlint` checks (same category as `chain-
 | Rule | Violations |
 | --- | ---: |
 | `standard:class-signature` | 71 |
-| `standard:final-newline` | 29 |
-| `standard:function-expression-body` | 22 |
-| `standard:binary-expression-wrapping` | 5 |
+| `standard:final-newline` | 25 |
+| `standard:function-expression-body` | 23 |
+| `standard:binary-expression-wrapping` | 4 |
 | `standard:string-template-indent` | 10 |
-| `standard:max-line-length` | 4 |
-| `standard:function-literal` | 2 |
-| `standard:argument-list-wrapping` | 67 |
-| `standard:block-comment-initial-star-alignment` | 1 |
+| `standard:max-line-length` | 3 |
+| `standard:function-literal` | 0 |
+| `standard:argument-list-wrapping` | 65 |
+| `standard:block-comment-initial-star-alignment` | 0 |
 
-Total baseline violations for checks in this section: `211`.
+Total baseline violations for checks in this section: `201`.
 
 ### `ktlint:standard:class-signature`
 
@@ -298,7 +298,7 @@ Right:
 // TD-002: switch to TeamcityClient builds API once supported (see docs/TECH_DEBT.md).
 ```
 
-### `detekt:style:UseCheckOrError` (open)
+### `detekt:style:UseCheckOrError`
 
 Use `require/check/error` instead of manual `throw IllegalStateException(...)` for condition checks.
 
@@ -314,10 +314,10 @@ Right:
 check(prop != null) { "Property must be provided" }
 ```
 
-Open code reference:
-- `test-common/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/BaseActuatorTest.kt:9`
+Reference in current code:
+- none.
 
-### `detekt:style:UnusedPrivateMember` (open)
+### `detekt:style:UnusedPrivateMember`
 
 Do not keep private functions or properties that are never used.
 
@@ -334,8 +334,8 @@ private fun buildArguments(): Stream<Arguments> = Stream.empty()
 fun shouldBuildCorrectly(arguments: Arguments) { /* ... */ }
 ```
 
-Open code reference:
-- `test-common/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/BaseBuildControllerTest.kt:120`
+Reference in current code:
+- none.
 
 ### `detekt:style:UnusedPrivateProperty`
 
@@ -379,8 +379,8 @@ try {
 
 Open code references:
 - `automation/src/main/kotlin/org/octopusden/octopus/automation/releasemanagement/command/MandatoryUpdate.kt:116`
-- `client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceErrorDecoder.kt:19`
-- `teamcity-plugin/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/teamcity/plugin/ReleaseManagementBuildTriggerService.kt:60`
+- `client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceErrorDecoder.kt:29`
+- `teamcity-plugin/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/teamcity/plugin/ReleaseManagementBuildTriggerService.kt:95`
 
 ### `detekt:exceptions:TooGenericExceptionCaught` (open)
 
@@ -406,11 +406,11 @@ try {
 
 Open code references:
 - `automation/src/main/kotlin/org/octopusden/octopus/automation/releasemanagement/command/MandatoryUpdate.kt:116`
-- `client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceErrorDecoder.kt:19`
+- `client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceErrorDecoder.kt:29`
 - `legacy-releng-client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/LegacyRelengErrorDecoder.kt:18`
 - `legacy-releng-client/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/legacy/LegacyRelengErrorDecoder.kt:15`
 - `server/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/actuator/LegacyRelengIndicator.kt:16`
-- `teamcity-plugin/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/teamcity/plugin/ReleaseManagementBuildTriggerService.kt:60`
+- `teamcity-plugin/src/main/kotlin/org/octopusden/octopus/releasemanagementservice/teamcity/plugin/ReleaseManagementBuildTriggerService.kt:95`
 
 ### `detekt:naming:TopLevelPropertyNaming`
 
@@ -435,17 +435,17 @@ Reference in current code:
 
 ## Disabled Checks (Review Candidates)
 
-These rules are currently `active: false` in detekt and are tracked in baselines.
+These rules are currently `active: false` in detekt and currently have no baseline violations.
 
 | Rule | Violations |
 | --- | --- |
-| `MagicNumber` | 10 |
-| `LongParameterList` | 3 |
-| `LongMethod` | 2 |
-| `NestedBlockDepth` | 1 |
-| `ReturnCount` | 1 |
-| `SpreadOperator` | 1 |
-| **Total** | **18** |
+| `MagicNumber` | 0 |
+| `LongParameterList` | 0 |
+| `LongMethod` | 0 |
+| `NestedBlockDepth` | 0 |
+| `ReturnCount` | 0 |
+| `SpreadOperator` | 0 |
+| **Total** | **0** |
 
 ### Disabled But To Be Discussed First
 

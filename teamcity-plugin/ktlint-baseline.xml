@@ -31,14 +31,10 @@
         <error line="133" column="42" source="standard:chain-method-continuation" />
         <error line="133" column="70" source="standard:chain-method-continuation" />
         <error line="135" column="36" source="standard:chain-method-continuation" />
-        <error line="150" column="9" source="standard:comment-spacing" />
-        <error line="154" column="9" source="standard:comment-spacing" />
-        <error line="160" column="9" source="standard:comment-spacing" />
         <error line="169" column="51" source="standard:multiline-expression-wrapping" />
         <error line="171" column="17" source="standard:blank-line-before-declaration" />
         <error line="172" column="17" source="standard:blank-line-before-declaration" />
         <error line="173" column="17" source="standard:blank-line-before-declaration" />
-        <error line="176" column="1" source="standard:final-newline" />
     </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/teamcity/plugin/dto/BuildSelectionDTO.kt">
         <error line="10" column="41" source="standard:trailing-comma-on-declaration-site" />

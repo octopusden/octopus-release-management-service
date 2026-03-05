@@ -82,13 +82,12 @@
         <error line="116" column="71" source="standard:trailing-comma-on-call-site" />
         <error line="116" column="72" source="standard:trailing-comma-on-call-site" />
         <error line="117" column="10" source="standard:trailing-comma-on-call-site" />
-        <error line="120" column="46" source="standard:multiline-expression-wrapping" />
-        <error line="120" column="46" source="standard:function-signature" />
+        <error line="120" column="48" source="standard:multiline-expression-wrapping" />
+        <error line="120" column="48" source="standard:function-signature" />
         <error line="123" column="102" source="standard:trailing-comma-on-call-site" />
         <error line="127" column="102" source="standard:trailing-comma-on-call-site" />
         <error line="131" column="109" source="standard:trailing-comma-on-call-site" />
         <error line="132" column="10" source="standard:trailing-comma-on-call-site" />
-        <error line="134" column="1" source="standard:final-newline" />
     </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/BaseReleaseManagementServiceTest.kt">
         <error line="10" column="1" source="standard:no-empty-first-line-in-class-body" />

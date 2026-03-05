@@ -147,17 +147,17 @@ class ReleaseManagementBuildTriggerService(
     companion object {
         const val DESCRIPTION = "Trigger build when detecting new versions of components in release management"
 
-        //Basic settings
+        // Basic settings
         const val SERVICE_URL = "release.management.build.trigger.service.url"
         const val SELECTIONS = "release.management.build.trigger.selections"
 
-        //Advanced settings
+        // Advanced settings
         const val BRANCH = "release.management.build.trigger.branch"
         const val POLL_INTERVAL = "release.management.build.trigger.poll.interval"
         const val QUEUE_OPTIMIZATION = "release.management.build.trigger.queue.optimization"
         const val QUIET_PERIOD = "release.management.build.trigger.quiet.period"
 
-        //Custom data
+        // Custom data
         const val VERSIONS = "release.management.build.trigger.versions"
         const val QUEUED_BUILD = "release.management.build.trigger.queued.build"
 
