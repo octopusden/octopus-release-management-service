@@ -117,7 +117,7 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
         )
     )
 
-    private fun build(): Stream<Arguments> = Stream.of(
+    protected fun build(): Stream<Arguments> = Stream.of(
         Arguments.of(
             "1.0.1",
             loadObject("../test-data/releng/build_1.0.1.json", object : TypeReference<BuildDTO>() {})

@@ -74,11 +74,13 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
     }
 
     private fun getIssueType(name: String): IssueType {
-        return client.metadataClient.issueTypes.claim().find { it.name == name } ?: throw NotFoundException("Issues type '$name' is not found!")
+        return client.metadataClient.issueTypes.claim().find { it.name == name }
+            ?: throw NotFoundException("Issues type '$name' is not found!")
     }
 
     private fun getField(name: String): Field {
-        return client.metadataClient.fields.claim().find { it.name == name } ?: throw NotFoundException("Field '$name' is not found!")
+        return client.metadataClient.fields.claim().find { it.name == name }
+            ?: throw NotFoundException("Field '$name' is not found!")
     }
 
     companion object {
