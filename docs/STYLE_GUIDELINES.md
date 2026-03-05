@@ -17,18 +17,11 @@ Statistics below are based on:
 
 | Rule | Open violations | Source |
 | --- | --- | --- |
-| `detekt:style:ClassOrdering` | 0 | baseline |
-| `detekt:style:ForbiddenComment` | 0 | baseline |
 | `detekt:style:MaxLineLength` | 4 | baseline |
 | `detekt:style:NewLineAtEndOfFile` | 21 | baseline |
 | `detekt:style:ProtectedMemberInFinalClass` | 8 | baseline |
 | `detekt:style:SwallowedException` | 3 | baseline |
-| `detekt:style:UnusedPrivateMember` | 0 | baseline |
-| `detekt:style:UnusedPrivateProperty` | 0 | baseline |
-| `detekt:style:WildcardImport` | 0 | baseline |
-| `detekt:style:UseCheckOrError` | 0 | baseline |
 | `detekt:exceptions:TooGenericExceptionCaught` | 6 | baseline |
-| `detekt:naming:TopLevelPropertyNaming` | 0 | baseline |
 | `ktlint:standard:chain-method-continuation` | 49 | baseline |
 
 For enabled checks, code links are listed only for not-yet-fixed cases.
@@ -67,9 +60,7 @@ All checks in this section are enabled `ktlint` checks (same category as `chain-
 | `standard:binary-expression-wrapping` | 4 |
 | `standard:string-template-indent` | 10 |
 | `standard:max-line-length` | 3 |
-| `standard:function-literal` | 0 |
 | `standard:argument-list-wrapping` | 65 |
-| `standard:block-comment-initial-star-alignment` | 0 |
 
 Total baseline violations for checks in this section: `201`.
 
@@ -314,9 +305,6 @@ Right:
 check(prop != null) { "Property must be provided" }
 ```
 
-Reference in current code:
-- none.
-
 ### `detekt:style:UnusedPrivateMember`
 
 Do not keep private functions or properties that are never used.
@@ -334,9 +322,6 @@ private fun buildArguments(): Stream<Arguments> = Stream.empty()
 fun shouldBuildCorrectly(arguments: Arguments) { /* ... */ }
 ```
 
-Reference in current code:
-- none.
-
 ### `detekt:style:UnusedPrivateProperty`
 
 Do not keep unused private properties.
@@ -352,9 +337,6 @@ private val mapper = ObjectMapper()
 
 fun serialize(value: Any): String = mapper.writeValueAsString(value)
 ```
-
-Reference in current code:
-- none.
 
 ### `detekt:style:SwallowedException` (open)
 
@@ -430,22 +412,9 @@ const val ATTEMPTS: Int = 5
 const val TIME_DELAY_ATTEMPT: Int = 300
 ```
 
-Reference in current code:
-- none.
-
 ## Disabled Checks (Review Candidates)
 
-These rules are currently `active: false` in detekt and currently have no baseline violations.
-
-| Rule | Violations |
-| --- | --- |
-| `MagicNumber` | 0 |
-| `LongParameterList` | 0 |
-| `LongMethod` | 0 |
-| `NestedBlockDepth` | 0 |
-| `ReturnCount` | 0 |
-| `SpreadOperator` | 0 |
-| **Total** | **0** |
+These rules are currently `active: false` in detekt.
 
 ### Disabled But To Be Discussed First
 
