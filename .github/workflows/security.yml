@@ -78,6 +78,7 @@ jobs:
         continue-on-error: true
         uses: aquasecurity/trivy-action@0.34.1
         with:
+          version: v0.69.3
           scan-type: fs
           scan-ref: .
           scanners: vuln,misconfig,secret
