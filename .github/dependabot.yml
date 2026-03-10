@@ -24,4 +24,4 @@ updates:
           - "org.octopusden.octopus.oc-template:*"
     labels:
       - "dependencies"
-      - "octopusden"
+      - "build"
