@@ -6,6 +6,7 @@ import feign.RequestLine
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.IssueReleasesDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateRelengFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 
@@ -32,6 +33,9 @@ interface LegacyRelengClient {
         @Param("version") version: String,
         @QueryMap filter: MandatoryUpdateRelengFilterDTO
     ): Collection<BuildDTO>
+
+    @RequestLine("GET rest/release-engineering/3/admin/issue/{issueKey}/releaseInformation")
+    fun getIssueReleases(@Param("issueKey") issueKey: String): IssueReleasesDTO
 
     @RequestLine("GET rest/release-engineering/3/component-management")
     fun getHealth(): Collection<ComponentDTO>

@@ -7,6 +7,7 @@ import feign.RequestLine
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.IssueReleasesDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
@@ -35,4 +36,7 @@ interface ReleaseManagementServiceClient {
 
     @RequestLine("PUT /rest/api/1/support/components/{component}")
     fun updateComponent(@Param("component") component: String, dto: ComponentDTO): ComponentDTO
+
+    @RequestLine("GET /rest/api/1/issues/{issueKey}/releases")
+    fun getIssueReleases(@Param("issueKey") issueKey: String): IssueReleasesDTO
 }
