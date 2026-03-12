@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   quality:
-    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-quality-gates.yml@1c60001b6508a4a9a6f904c8fac5417a3299a991
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-quality-gates.yml@feature/common-quality-gates
     with:
       java-version: "21"
       coverage-command: ./gradlew qualityCoverage -x :release-management-service:test -x koverVerify -x koverCachedVerify --no-daemon --stacktrace

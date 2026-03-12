@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   security:
-    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-security-reports.yml@1c60001b6508a4a9a6f904c8fac5417a3299a991
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-security-reports.yml@feature/common-quality-gates
     with:
       java-version: "21"
       # Keep dependency-check disabled until its data sources stabilize.
