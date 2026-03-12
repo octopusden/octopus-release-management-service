@@ -11,46 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  static:
-    name: quality/static
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
-      - uses: gradle/actions/setup-gradle@v3
-      - name: Run static checks
-        run: ./gradlew qualityStatic --no-daemon --stacktrace
-      - name: Upload static analysis reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: static-analysis-reports
-          path: |
-            **/build/reports/detekt/**
-            **/build/reports/ktlint/**
-
-  tests-coverage:
-    name: quality/tests-coverage
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
-      - uses: gradle/actions/setup-gradle@v3
-      - name: Run tests and coverage verification
-        run: ./gradlew qualityCoverage -x :release-management-service:test -x koverVerify -x koverCachedVerify --no-daemon --stacktrace
-      - name: Upload coverage reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-reports
-          path: |
-            **/build/reports/kover/**
-            **/build/reports/tests/**
+  quality:
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-quality-gates.yml@1c60001b6508a4a9a6f904c8fac5417a3299a991
+    with:
+      java-version: "21"
+      coverage-command: ./gradlew qualityCoverage -x :release-management-service:test -x koverVerify -x koverCachedVerify --no-daemon --stacktrace
