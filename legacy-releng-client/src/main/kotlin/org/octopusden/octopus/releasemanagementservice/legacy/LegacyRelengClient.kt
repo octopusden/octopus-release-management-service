@@ -44,7 +44,7 @@ interface LegacyRelengClient {
         @QueryMap filter: MandatoryUpdateRelengFilterDTO,
     ): Collection<BuildDTO>
 
-    @RequestLine("GET rest/release-engineering/3/admin/issue/{issueKey}/releaseInformation")
+    @RequestLine("GET rest/release-engineering/3/admin/issue/{issueKey}/release-information")
     fun getIssueReleases(
         @Param("issueKey") issueKey: String,
     ): IssueReleasesDTO
