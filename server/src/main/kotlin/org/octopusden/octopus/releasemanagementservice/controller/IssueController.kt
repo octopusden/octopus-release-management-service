@@ -11,10 +11,16 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("rest/api/1/issues")
-class IssueController(private val issueService: IssueService) {
-
-    @GetMapping("{issueKey}/releases", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getIssueReleases(@PathVariable issueKey: String): IssueReleasesDTO {
+class IssueController(
+    private val issueService: IssueService,
+) {
+    @GetMapping(
+        "{issueKey}/releases",
+        produces = [MediaType.APPLICATION_JSON_VALUE],
+    )
+    fun getIssueReleases(
+        @PathVariable issueKey: String,
+    ): IssueReleasesDTO {
         log.info("Get issue releases for '{}'", issueKey)
         return issueService.getIssueReleases(issueKey)
     }
@@ -22,5 +28,4 @@ class IssueController(private val issueService: IssueService) {
     companion object {
         private val log = LoggerFactory.getLogger(IssueController::class.java)
     }
-
 }

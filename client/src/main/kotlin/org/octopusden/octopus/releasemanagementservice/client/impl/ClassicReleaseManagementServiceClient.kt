@@ -10,7 +10,6 @@ import feign.httpclient.ApacheHttpClient
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import feign.slf4j.Slf4jLogger
-import java.util.concurrent.TimeUnit
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceErrorDecoder
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceRetry
@@ -22,10 +21,11 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.Mandato
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ServiceInfoDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
+import java.util.concurrent.TimeUnit
 
 class ClassicReleaseManagementServiceClient(
     apiParametersProvider: ReleaseManagementServiceClientParametersProvider,
-    private val mapper: ObjectMapper
+    private val mapper: ObjectMapper,
 ) : ReleaseManagementServiceClient {
     private var client =
         createClient(
@@ -33,66 +33,88 @@ class ClassicReleaseManagementServiceClient(
             mapper,
             apiParametersProvider.getTimeRetryInMillis(),
             apiParametersProvider.getConnectTimeoutInMillis(),
-            apiParametersProvider.getReadTimeoutInMillis()
+            apiParametersProvider.getReadTimeoutInMillis(),
         )
 
     constructor(apiParametersProvider: ReleaseManagementServiceClientParametersProvider) : this(
         apiParametersProvider,
-        getMapper()
+        getMapper(),
     )
 
-    override fun getBuilds(component: String, filter: BuildFilterDTO): Collection<ShortBuildDTO> =
-        client.getBuilds(component, filter)
+    override fun getBuilds(
+        component: String,
+        filter: BuildFilterDTO,
+    ): Collection<ShortBuildDTO> = client.getBuilds(component, filter)
 
-    override fun getBuild(component: String, version: String): BuildDTO = client.getBuild(component, version)
+    override fun getBuild(
+        component: String,
+        version: String,
+    ): BuildDTO = client.getBuild(component, version)
 
     override fun getComponents(): Collection<ComponentDTO> = client.getComponents()
 
     override fun getComponent(component: String): ComponentDTO = client.getComponent(component)
 
-    override fun updateComponent(component: String, dto: ComponentDTO): ComponentDTO =
-        client.updateComponent(component, dto)
+    override fun updateComponent(
+        component: String,
+        dto: ComponentDTO,
+    ): ComponentDTO = client.updateComponent(component, dto)
 
-    override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO =
-        client.createMandatoryUpdate(dryRun, dto)
+    override fun createMandatoryUpdate(
+        dryRun: Boolean,
+        dto: MandatoryUpdateDTO,
+    ): MandatoryUpdateResponseDTO = client.createMandatoryUpdate(dryRun, dto)
 
-    override fun getIssueReleases(issueKey: String): IssueReleasesDTO =
-        client.getIssueReleases(issueKey)
+    override fun getIssueReleases(issueKey: String): IssueReleasesDTO = client.getIssueReleases(issueKey)
 
-    fun setUrl(apiUrl: String, timeRetryInMillis: Int, connectTimeoutInMillis: Int, readTimeoutInMillis: Int) {
-        client = createClient(
-            apiUrl,
-            mapper,
-            timeRetryInMillis,
-            connectTimeoutInMillis,
-            readTimeoutInMillis
-        )
+    fun setUrl(
+        apiUrl: String,
+        timeRetryInMillis: Int,
+        connectTimeoutInMillis: Int,
+        readTimeoutInMillis: Int,
+    ) {
+        client =
+            createClient(
+                apiUrl,
+                mapper,
+                timeRetryInMillis,
+                connectTimeoutInMillis,
+                readTimeoutInMillis,
+            )
     }
 
     override fun getServiceInfo(): ServiceInfoDTO = client.getServiceInfo()
 
     companion object {
-        private fun getMapper(): ObjectMapper = with(jacksonObjectMapper()) {
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        }
+        private fun getMapper(): ObjectMapper =
+            with(jacksonObjectMapper()) {
+                configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            }
 
         private fun createClient(
             apiUrl: String,
             objectMapper: ObjectMapper,
             timeRetryInMillis: Int,
             connectTimeoutInMillis: Int,
-            readTimeoutInMillis: Int
-        ): ReleaseManagementServiceClient {
-            return Feign.builder()
+            readTimeoutInMillis: Int,
+        ): ReleaseManagementServiceClient =
+            Feign
+                .builder()
                 .client(ApacheHttpClient())
-                .options(Request.Options(connectTimeoutInMillis.toLong(), TimeUnit.MILLISECONDS, readTimeoutInMillis.toLong(), TimeUnit.MILLISECONDS, true))
-                .encoder(JacksonEncoder(objectMapper))
+                .options(
+                    Request.Options(
+                        connectTimeoutInMillis.toLong(),
+                        TimeUnit.MILLISECONDS,
+                        readTimeoutInMillis.toLong(),
+                        TimeUnit.MILLISECONDS,
+                        true,
+                    ),
+                ).encoder(JacksonEncoder(objectMapper))
                 .decoder(JacksonDecoder(objectMapper))
                 .errorDecoder(ReleaseManagementServiceErrorDecoder(objectMapper))
                 .retryer(ReleaseManagementServiceRetry(timeRetryInMillis))
                 .logger(Slf4jLogger(ReleaseManagementServiceClient::class.java))
                 .logLevel(Logger.Level.FULL)
                 .target(ReleaseManagementServiceClient::class.java, apiUrl)
-        }
     }
 }

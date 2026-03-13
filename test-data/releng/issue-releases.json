@@ -1,0 +1,21 @@
+{
+  "releases": [
+    {
+      "component": "ReleaseManagementService",
+      "version": "1.0.1",
+      "parents": [
+        {
+          "component": "parent-component",
+          "version": "2.0.0",
+          "parents": []
+        }
+      ]
+    },
+    {
+      "component": "AnotherComponent",
+      "version": "3.5.2",
+      "parents": []
+    }
+  ]
+}
+
