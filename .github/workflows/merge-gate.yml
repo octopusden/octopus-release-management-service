@@ -24,23 +24,6 @@ jobs:
     needs: [build, quality, security]
     runs-on: ubuntu-latest
     steps:
-      - name: Validate gate results
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          results='${{ toJson(needs) }}'
-          failed="$(jq -r 'to_entries[] | select(.value.result != "success") | "\(.key): \(.value.result)"' <<<"${results}")"
-
-          {
-            echo "### Merge gate results"
-            jq -r 'to_entries[] | "- \(.key): \(.value.result)"' <<<"${results}"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          if [[ -n "${failed}" ]]; then
-            echo "::error::Merge gate failed"
-            echo "${failed}"
-            exit 1
-          fi
-
-          echo "Merge gate passed."
+      - uses: octopusden/octopus-base/.github/actions/merge-gate@9f693dc5c38c56a13ab7a81b0d7d3a60a1382c75
+        with:
+          needs: ${{ toJson(needs) }}
