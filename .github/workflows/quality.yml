@@ -15,9 +15,9 @@ jobs:
     uses: octopusden/octopus-base/.github/workflows/common-java-gradle-quality-gates.yml@v2.3.0
     with:
       java-version: "21"
+      # qualityCoverage from convention plugin only runs tests when coverage.enabled=false
+      # (ORMS manages Kover manually with custom thresholds), so call kover tasks explicitly.
       coverage-command: >-
-        ./gradlew qualityCoverage
+        ./gradlew test koverXmlReport koverVerify
         -x :release-management-service:test
-        -x koverVerify
-        -x koverCachedVerify
         --no-daemon --stacktrace

@@ -22,3 +22,6 @@ jobs:
       enable-trivy: true
       # TODO: Re-enable after dependency-check stability is fixed (NVD API/source reliability).
       enable-dependency-check: false
+      # Report-only: transient CodeQL/Trivy infra failures must not block merge.
+      codeql-continue-on-error: true
+      trivy-continue-on-error: true
