@@ -1,5 +1,14 @@
 # Quality Gates
 
+Quality gates in this repo follow the unified octopusden standard. The shared
+contract (workflows, convention plugin, ruleset) lives in
+[octopusden/octopus-base](https://github.com/octopusden/octopus-base) — see
+[`docs/Octopus JVM Style Guidelines.md`](https://github.com/octopusden/octopus-base/blob/main/docs/Octopus%20JVM%20Style%20Guidelines.md)
+for the source of truth.
+
+Local additions below document ORMS-specific configuration (coverage
+thresholds, FT exclusions, overrides) layered on top of the shared standard.
+
 ## Local commands
 
 Full local gate (requires Docker daemon for `qualityCoverage`/`qualityCheck`):
