@@ -23,8 +23,13 @@ Full local gate (requires Docker daemon for `qualityCoverage`/`qualityCheck`):
 `quality/tests-coverage` job command in CI:
 
 ```bash
-./gradlew qualityCoverage -x :release-management-service:test -x koverVerify -x koverCachedVerify
+./gradlew qualityCoverage -x :release-management-service:test --no-daemon --stacktrace
 ```
+
+The convention plugin wires `qualityCoverage` → `koverXmlReport` + `koverVerify`
+automatically when `coverage.enabled = true` in the `octopusQuality` block
+(set in root `build.gradle.kts`). The only exclusion is the heavy Spring Boot
+integration test `:release-management-service:test`.
 
 Style guide for enforced rules:
 - `docs/STYLE_GUIDELINES.md`
