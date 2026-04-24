@@ -48,10 +48,25 @@ Technical debt register for code references (`TD-xxx`):
 
 ## CI workflows
 
-- `.github/workflows/quality.yml`
-  - `quality/static` (required)
-  - `quality/tests-coverage` (required, currently runs `qualityCoverage` with exclusions from CI workflow)
-- `.github/workflows/security.yml`
-  - `security/dependency-check` (report-only, temporarily disabled via `if: ${{ false }}`)
-  - `security/codeql` (report-only)
-  - `security/trivy` (report-only)
+PR merge is gated by the **`gate/merge`** check published by
+`.github/workflows/merge-gate.yml`. This workflow fans out to three reusable
+workflows from `octopusden/octopus-base@v2.3.1` and aggregates their results
+via the shared `merge-gate` composite action.
+
+- `.github/workflows/merge-gate.yml` — **PR-time entry point** (triggers on `pull_request`)
+  - Calls `build.yml` → `common-java-gradle-build.yml` (compile + unit tests)
+  - Calls `quality.yml` → `common-java-gradle-quality-gates.yml`
+    - `quality/wrapper-validation`
+    - `quality/static` (detekt + ktlint, blocking with baselines)
+    - `quality/tests-coverage` (Kover, blocking)
+  - Calls `security.yml` → `common-java-gradle-security-reports.yml`
+    - `security/codeql` (blocking — findings addressed via GitHub Code Scanning)
+    - `security/trivy` (blocking)
+    - `security/dependency-check` (currently disabled via `enable-dependency-check: false`)
+  - `gate/merge` job — fails unless every dependency reports `success`
+
+- `.github/workflows/quality.yml` — also runs on `push: [main]` and `workflow_dispatch`
+- `.github/workflows/security.yml` — also runs on `push: [main]`, nightly `cron`, and `workflow_dispatch`
+
+Branch protection on `main` requires the `gate/merge` check context (applied
+via the `jvm-strict` ruleset from `octopusden/octopus-base`).
