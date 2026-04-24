@@ -15,6 +15,13 @@ objects:
       containers:
         - name: mockserver
           image: ${DOCKER_REGISTRY}/mockserver/mockserver:mockserver-${MOCK_SERVER_VERSION}
+          resources:
+            requests:
+              cpu: 5m
+              memory: 200Mi
+            limits:
+              cpu: 50m
+              memory: 300Mi
           ports:
             - containerPort: 1080
               protocol: TCP

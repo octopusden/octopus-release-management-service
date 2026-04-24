@@ -22,6 +22,13 @@ objects:
       containers:
         - name: teamcity${TEAMCITY_ID}
           image: ${DOCKER_REGISTRY}/jetbrains/teamcity-server:${TEAMCITY_IMAGE_TAG}
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1.5Gi
+            limits:
+              cpu: 2000m
+              memory: 2Gi
           ports:
             - containerPort: 8111
               protocol: TCP

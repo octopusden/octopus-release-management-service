@@ -43,6 +43,13 @@ objects:
       containers:
         - name: tc${TEAMCITY_ID}-agent
           image: ${DOCKER_REGISTRY}/jetbrains/teamcity-agent:${TEAMCITY_IMAGE_TAG}-linux-sudo
+          resources:
+            requests:
+              cpu: 5m
+              memory: 400Mi
+            limits:
+              cpu: 50m
+              memory: 500Mi
           volumeMounts:
             - name: build-agent-properties-updated
               mountPath: /data/teamcity_agent/conf
