@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Asia/Nicosia"
+    open-pull-requests-limit: 3
+    allow:
+      - dependency-name: "org.octopusden*"
+        dependency-type: "direct"
+    groups:
+      octopus-external-systems-clients:
+        patterns:
+          - "org.octopusden.octopus.octopus-external-systems-clients:*"
+      octopus-infrastructure:
+        patterns:
+          - "org.octopusden.octopus.infrastructure:*"
+      octopus-plugins:
+        patterns:
+          - "org.octopusden.octopus.oc-template"
+          - "org.octopusden.octopus.oc-template:*"
+    labels:
+      - "dependencies"
+      - "build"
