@@ -137,18 +137,6 @@ subprojects {
     // detekt + ktlint are configured by octopus-quality convention plugin
     apply(plugin = "signing")
 
-    // Workaround: octopus-quality v2.3.1 sets ktlint baseline in subproject.afterEvaluate{},
-    // which is too late for ktlint-gradle 14.0.1 to pick up. Apply baseline + disable
-    // .kts script checks during configuration phase via plugins.withId{} callback.
-    plugins.withId("org.jlleitschuh.gradle.ktlint") {
-        extensions.configure(org.jlleitschuh.gradle.ktlint.KtlintExtension::class.java) {
-            val baselineFile = file("ktlint-baseline.xml")
-            if (baselineFile.exists()) {
-                baseline.set(baselineFile)
-            }
-        }
-    }
-
     repositories {
         mavenCentral()
         maven { setUrl("https://maven.artifacts.atlassian.com/") }
