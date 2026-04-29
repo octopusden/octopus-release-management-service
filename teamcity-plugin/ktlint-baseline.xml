@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <baseline version="1.0">
+    <file name="build.gradle.kts">
+        <error line="12" column="22" source="standard:multiline-expression-wrapping" />
+        <error line="14" column="26" source="standard:chain-method-continuation" />
+        <error line="14" column="110" source="standard:chain-method-continuation" />
+        <error line="14" column="116" source="standard:chain-method-continuation" />
+        <error line="14" column="123" source="standard:trailing-comma-on-call-site" />
+    </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/teamcity/plugin/ReleaseManagementBuildTriggerService.kt">
         <error line="25" column="53" source="standard:parameter-list-wrapping" />
         <error line="25" column="53" source="standard:class-signature" />
