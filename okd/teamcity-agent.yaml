@@ -24,7 +24,7 @@ objects:
         runAsUser: 0
       initContainers:
         - name: update-buildagent-properties
-          image: public.ecr.aws/docker/library/busybox:1.37
+          image: ${DOCKER_REGISTRY}/busybox:1.37
           env:
             - name: TEAMCITY_SERVER_HOST
               value: ${TEAMCITY_SERVER_HOST}
