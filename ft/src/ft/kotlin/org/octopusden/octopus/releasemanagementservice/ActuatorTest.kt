@@ -6,8 +6,9 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.Service
 import org.octopusden.octopus.releasemanagementservice.client.impl.ClassicReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManagementServiceClientParametersProvider
 
-class ActuatorTest : BaseActuatorTest(), BaseReleaseManagementServiceFuncTest {
-
+class ActuatorTest :
+    BaseActuatorTest(),
+    BaseReleaseManagementServiceFuncTest {
     override fun getObjectMapper(): ObjectMapper = mapper
 
     override fun getServiceInfo(): ServiceInfoDTO = client.getServiceInfo()

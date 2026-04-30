@@ -11,10 +11,11 @@ class SupportControllerTest : BaseSupportControllerTest() {
 
     override fun getComponent(component: String) = TestUtil.client.getComponent(component)
 
-    override fun getNotExistedComponentErrorResponse(component: String) = try {
-        TestUtil.client.getComponent(component)
-        ErrorResponse(ReleaseManagementServiceErrorCode.OTHER, "Failure expected")
-    } catch (e: NotFoundException) {
-        ErrorResponse(ReleaseManagementServiceErrorCode.NOT_FOUND, e.message!!)
-    }
+    override fun getNotExistedComponentErrorResponse(component: String) =
+        try {
+            TestUtil.client.getComponent(component)
+            ErrorResponse(ReleaseManagementServiceErrorCode.OTHER, "Failure expected")
+        } catch (e: NotFoundException) {
+            ErrorResponse(ReleaseManagementServiceErrorCode.NOT_FOUND, e.message!!)
+        }
 }
