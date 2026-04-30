@@ -6,15 +6,12 @@
         <error line="21" column="46" source="standard:class-signature" />
         <error line="21" column="72" source="standard:class-signature" />
         <error line="22" column="1" source="standard:no-empty-first-line-in-class-body" />
-        <error line="23" column="26" source="standard:multiline-expression-wrapping" />
-        <error line="24" column="17" source="standard:multiline-expression-wrapping" />
         <error line="24" column="17" source="standard:wrapping" />
         <error line="25" column="30" source="standard:chain-method-continuation" />
         <error line="27" column="25" source="standard:trailing-comma-on-call-site" />
         <error line="28" column="9" source="standard:wrapping" />
         <error line="37" column="37" source="standard:wrapping" />
         <error line="37" column="41" source="standard:wrapping" />
-        <error line="37" column="42" source="standard:multiline-expression-wrapping" />
         <error line="40" column="5" source="standard:wrapping" />
         <error line="42" column="28" source="standard:function-signature" />
         <error line="42" column="47" source="standard:function-signature" />

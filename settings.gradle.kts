@@ -15,6 +15,7 @@ pluginManagement {
         id("org.jlleitschuh.gradle.ktlint") version (extra["ktlint-gradle.version"] as String)
         id("org.jetbrains.kotlinx.kover") version (extra["kover.version"] as String)
         id("org.owasp.dependencycheck") version (extra["owasp-dependency-check.version"] as String)
+        id("org.octopusden.octopus-quality") version (extra["octopus-quality.version"] as String)
     }
     repositories {
         gradlePluginPortal()

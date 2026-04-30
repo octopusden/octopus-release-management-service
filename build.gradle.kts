@@ -1,11 +1,7 @@
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import kotlinx.kover.gradle.plugin.dsl.AggregationType
 import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.net.InetAddress
 import java.util.zip.CRC32
 
@@ -13,12 +9,13 @@ plugins {
     java
     idea
     id("io.spring.dependency-management")
-    id("org.jetbrains.kotlin.jvm")
+    id("org.jetbrains.kotlin.jvm") apply false
     id("io.github.gradle-nexus.publish-plugin")
     id("org.jetbrains.kotlinx.kover")
     id("org.owasp.dependencycheck")
     id("io.gitlab.arturbosch.detekt") apply false
     id("org.jlleitschuh.gradle.ktlint") apply false
+    id("org.octopusden.octopus-quality")
     signing
 }
 
@@ -95,32 +92,26 @@ kover {
     }
 }
 
+octopusQuality {
+    // ORMS: blocking mode (already established)
+    kotlin {
+        failOnViolation.set(true)
+    }
+    coverage {
+        // Enabled so the convention plugin wires qualityCoverage → kover tasks.
+        // Kover itself is configured manually above (custom thresholds + branch coverage);
+        // plugin does not override consumer kover config, only aggregates tasks.
+        enabled.set(true)
+    }
+    excludeProjects("test-common", "ft")
+    excludeTasks(":ft:test")
+}
+
 dependencyCheck {
     failBuildOnCVSS = 11.0F
     suppressionFile = "$rootDir/config/owasp/suppressions.xml"
     formats = listOf("HTML", "JSON", "SARIF")
     outputDirectory.set(layout.buildDirectory.dir("reports/dependency-check"))
-}
-
-tasks.register("qualityStatic") {
-    group = "verification"
-    description = "Runs static analysis checks for all modules."
-    dependsOn(subprojects.map { "${it.path}:detekt" })
-    dependsOn(subprojects.map { "${it.path}:ktlintCheck" })
-}
-
-tasks.register("qualityCoverage") {
-    group = "verification"
-    description = "Runs tests, generates merged Kover XML report and verifies coverage thresholds."
-    dependsOn(subprojects.map { "${it.path}:test" })
-    dependsOn(tasks.matching { it.name == "koverMergedXmlReport" || it.name == "koverXmlReport" })
-    dependsOn(tasks.matching { it.name == "koverMergedVerify" || it.name == "koverVerify" })
-}
-
-tasks.register("qualityCheck") {
-    group = "verification"
-    description = "Runs all mandatory quality gates."
-    dependsOn("qualityStatic", "qualityCoverage")
 }
 
 tasks.register("securityReport") {
@@ -143,6 +134,7 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlinx.kover")
     apply(plugin = "io.gitlab.arturbosch.detekt")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    // detekt + ktlint are configured by octopus-quality convention plugin
     apply(plugin = "signing")
 
     repositories {
@@ -170,46 +162,8 @@ subprojects {
         }
     }
 
-    extensions.configure<DetektExtension> {
-        buildUponDefaultConfig = true
-        allRules = false
-        config.setFrom(rootProject.file("config/detekt/detekt.yml"))
-        baseline = file("$projectDir/detekt-baseline.xml")
-        ignoreFailures = false
-    }
-
-    tasks.withType<Detekt>().configureEach {
-        reports {
-            xml.required.set(true)
-            html.required.set(true)
-            sarif.required.set(true)
-            txt.required.set(false)
-        }
-    }
-
-    extensions.configure<KtlintExtension> {
-        ignoreFailures.set(false)
-        outputToConsole.set(true)
-        reporters {
-            reporter(ReporterType.PLAIN)
-            reporter(ReporterType.CHECKSTYLE)
-        }
-        baseline.set(file("$projectDir/ktlint-baseline.xml"))
-        filter {
-            exclude("**/generated/**")
-            exclude("**/build/**")
-            include("**/src/**/*.kt")
-        }
-    }
-
-    tasks.matching {
-        it.name == "runKtlintCheckOverKotlinScripts" ||
-                it.name == "ktlintKotlinScriptCheck" ||
-                it.name == "runKtlintFormatOverKotlinScripts" ||
-                it.name == "ktlintKotlinScriptFormat"
-    }.configureEach {
-        enabled = false
-    }
+    // detekt + ktlint configuration is provided by octopus-quality convention plugin
+    // Local overrides: detekt-baseline.xml and ktlint-baseline.xml per module
 
     tasks.withType<Test> {
         useJUnitPlatform()
