@@ -99,7 +99,7 @@ octopusQuality {
     }
     coverage {
         // Enabled so the convention plugin wires qualityCoverage → kover tasks.
-        // Kover itself is configured manually below (custom thresholds + branch coverage);
+        // Kover itself is configured manually above (custom thresholds + branch coverage);
         // plugin does not override consumer kover config, only aggregates tasks.
         enabled.set(true)
     }

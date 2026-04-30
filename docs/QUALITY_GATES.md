@@ -50,7 +50,7 @@ Technical debt register for code references (`TD-xxx`):
 
 PR merge is gated by the **`gate/merge`** check published by
 `.github/workflows/merge-gate.yml`. This workflow fans out to three reusable
-workflows from `octopusden/octopus-base@v2.3.1` and aggregates their results
+workflows from `octopusden/octopus-base@v2.3.3` and aggregates their results
 via the shared `merge-gate` composite action.
 
 - `.github/workflows/merge-gate.yml` — **PR-time entry point** (triggers on `pull_request`)
