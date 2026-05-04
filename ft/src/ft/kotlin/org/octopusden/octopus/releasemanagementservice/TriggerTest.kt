@@ -74,7 +74,7 @@ class TriggerTest {
                 quietPeriod = dynamicQuietPeriod.toString(),
             )
         Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
-        with(readBuilds(buildType.id)) {
+        with(readBuildsWithRetry(buildType.id)) {
             Assertions.assertTrue(
                 statusCode() / 100 == 2,
                 "Unable to get builds of build type '${buildType.id}':\n${body()}",
@@ -96,6 +96,10 @@ class TriggerTest {
         var lastBody = ""
         while (System.currentTimeMillis() < deadline) {
             val response = readBuilds(buildTypeId)
+            if (response.statusCode() / 100 == 5) {
+                Thread.sleep(BUILDS_POLL_INTERVAL)
+                continue
+            }
             Assertions.assertTrue(
                 response.statusCode() / 100 == 2,
                 "Unable to get builds of build type '$buildTypeId': status=${response.statusCode()}\n${response.body()}",
@@ -143,6 +147,19 @@ class TriggerTest {
                     ),
             ),
         )
+
+    private fun readBuildsWithRetry(buildTypeId: String): HttpResponse<String> {
+        for (attempt in 0 until RETRY_ATTEMPTS) {
+            val response = readBuilds(buildTypeId)
+            if (response.statusCode() / 100 != 5) {
+                return response
+            }
+            if (attempt < RETRY_ATTEMPTS - 1) {
+                Thread.sleep(RETRY_DELAYS[attempt])
+            }
+        }
+        return readBuilds(buildTypeId)
+    }
 
     private fun readBuilds(buildTypeId: String): HttpResponse<String> =
         httpClient.send(
