@@ -16,7 +16,7 @@ jobs:
     with:
       java-version: "21"
       # ORMS excludes :release-management-service:test from quality gate (heavy Spring Boot
-       # integration test); everything else is standard qualityCoverage from convention plugin.
+      # integration test); everything else is standard qualityCoverage from convention plugin.
       coverage-command: >-
         ./gradlew qualityCoverage
         -x :release-management-service:test

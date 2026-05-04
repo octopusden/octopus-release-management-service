@@ -104,7 +104,6 @@ octopusQuality {
         enabled.set(true)
     }
     excludeProjects("test-common", "ft")
-    excludeTasks(":ft:test")
 }
 
 dependencyCheck {
