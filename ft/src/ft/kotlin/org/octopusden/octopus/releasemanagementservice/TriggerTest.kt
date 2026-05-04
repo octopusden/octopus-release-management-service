@@ -1,9 +1,11 @@
 package org.octopusden.octopus.releasemanagementservice
 
+import java.io.IOException
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -29,18 +31,8 @@ class TriggerTest {
                   status: RELEASE
             """.trimIndent()
         )
-        Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
         // TD-002: switch to TeamcityClient builds API once supported (see docs/TECH_DEBT.md).
-        with(readBuilds(buildType.id)) {
-            Assertions.assertTrue(
-                statusCode() / 100 == 2,
-                "Unable to get builds of build type '${buildType.id}':\n${body()}"
-            )
-            Assertions.assertTrue(
-                body().contains("\"count\":1,"),
-                "Number of builds of build type '${buildType.id}' is not equals to 1:\n${body()}"
-            )
-        }
+        pollBuildsUntilCount(buildType.id, expectedCount = 1)
     }
 
     @Test
@@ -53,18 +45,8 @@ class TriggerTest {
                   inReleaseBranch: true
             """.trimIndent()
         )
-        Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
         // TD-002: switch to TeamcityClient builds API once supported (see docs/TECH_DEBT.md).
-        with(readBuilds(buildType.id)) {
-            Assertions.assertTrue(
-                statusCode() / 100 == 2,
-                "Unable to get builds of build type '${buildType.id}':\n${body()}"
-            )
-            Assertions.assertTrue(
-                body().contains("\"count\":1,"),
-                "Number of builds of build type '${buildType.id}' is not equals to 1:\n${body()}"
-            )
-        }
+        pollBuildsUntilCount(buildType.id, expectedCount = 1)
     }
 
     @Test
@@ -92,17 +74,27 @@ class TriggerTest {
                 "Expected 0 builds during quiet period, but got:\n${body()}"
             )
         }
-        Thread.sleep(DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL)
-        with(readBuilds(buildType.id)) {
+        pollBuildsUntilCount(buildType.id, expectedCount = 1, failureMessage = "Expected 1 build after quiet period elapsed")
+    }
+
+    private fun pollBuildsUntilCount(buildTypeId: String, expectedCount: Int, failureMessage: String? = null) {
+        val deadline = System.currentTimeMillis() + BUILDS_POLL_TIMEOUT
+        var lastBody = ""
+        while (System.currentTimeMillis() < deadline) {
+            val response = readBuilds(buildTypeId)
             Assertions.assertTrue(
-                statusCode() / 100 == 2,
-                "Unable to get builds of build type '${buildType.id}':\n${body()}"
+                response.statusCode() / 100 == 2,
+                "Unable to get builds of build type '$buildTypeId': status=${response.statusCode()}\n${response.body()}"
             )
-            Assertions.assertTrue(
-                body().contains("\"count\":1,"),
-                "Expected 1 build after quiet period elapsed, but got:\n${body()}"
-            )
+            lastBody = response.body()
+            if (lastBody.contains("\"count\":$expectedCount,")) {
+                return
+            }
+            Thread.sleep(BUILDS_POLL_INTERVAL)
         }
+        Assertions.fail<Unit>(
+            "${failureMessage ?: "Number of builds of build type '$buildTypeId' is not equals to $expectedCount"}:\n$lastBody"
+        )
     }
 
     private fun createBuildType(name: String, triggerSelector: String, quietPeriod: String = "0"): TeamcityBuildType {
@@ -153,32 +145,96 @@ class TriggerTest {
         val teamcityApiUrl = "$teamcityUrl/app/rest/2018.1"
         const val DEFAULT_TEAMCITY_TRIGGER_POLLING_INTERVAL = 60000L
         const val TEAMCITY_AUTHORIZATION = "Basic YWRtaW46YWRtaW4="
+        private const val READINESS_POLL_INTERVAL = 5000L
+        private const val READINESS_TIMEOUT = 180000L
+        private const val BUILDS_POLL_INTERVAL = 5000L
+        private const val BUILDS_POLL_TIMEOUT = 180000L
+        private const val RETRY_ATTEMPTS = 5
+        private val RETRY_DELAYS = longArrayOf(1000, 2000, 4000, 8000, 16000)
 
         private val teamcityClient = TeamcityClassicClient(object : ClientParametersProvider {
             override fun getApiUrl() = teamcityUrl
             override fun getAuth() = StandardBasicCredCredentialProvider("admin", "admin")
         })
 
-        private val httpClient = HttpClient.newHttpClient()
+        private val httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build()
+
+        private fun waitForTeamcityReady() {
+            val deadline = System.currentTimeMillis() + READINESS_TIMEOUT
+            val request = HttpRequest.newBuilder()
+                .uri(URI("$teamcityUrl/app/rest/server/version"))
+                .header("Origin", teamcityUrl)
+                .header("Authorization", TEAMCITY_AUTHORIZATION)
+                .header("Accept", "text/plain")
+                .timeout(Duration.ofSeconds(30))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build()
+            while (System.currentTimeMillis() < deadline) {
+                try {
+                    val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+                    if (response.statusCode() / 100 == 2) {
+                        return
+                    }
+                } catch (_: IOException) {
+                }
+                Thread.sleep(READINESS_POLL_INTERVAL)
+            }
+            throw RuntimeException(
+                "TeamCity REST API at $teamcityUrl did not become ready within ${READINESS_TIMEOUT / 1000}s"
+            )
+        }
+
+        private fun sendWithRetry(request: HttpRequest): HttpResponse<String> {
+            var lastException: Exception? = null
+            var lastResponse: HttpResponse<String>? = null
+            for (attempt in 0 until RETRY_ATTEMPTS) {
+                try {
+                    val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+                    if (response.statusCode() / 100 == 2) {
+                        return response
+                    }
+                    lastResponse = response
+                    if (response.statusCode() / 100 != 5) {
+                        return response
+                    }
+                } catch (e: IOException) {
+                    lastException = e
+                }
+                if (attempt < RETRY_ATTEMPTS - 1) {
+                    Thread.sleep(RETRY_DELAYS[attempt])
+                }
+            }
+            if (lastResponse != null) {
+                return lastResponse
+            }
+            throw RuntimeException(
+                "Request to ${request.uri()} failed after $RETRY_ATTEMPTS attempts", lastException
+            )
+        }
 
         @JvmStatic
         @BeforeAll
         fun beforeAll() {
+            waitForTeamcityReady()
             // TD-003: switch to TeamcityClient agents API once supported (see docs/TECH_DEBT.md).
             with(
-                httpClient.send(
+                sendWithRetry(
                     HttpRequest.newBuilder()
                         .uri(URI("$teamcityApiUrl/agents/name:test-agent/authorized"))
                         .header("Origin", teamcityUrl)
                         .header("Authorization", TEAMCITY_AUTHORIZATION)
                         .header("Content-Type", "text/plain")
+                        .timeout(Duration.ofSeconds(30))
                         .method("PUT", HttpRequest.BodyPublishers.ofString("true"))
                         .build(),
-                    HttpResponse.BodyHandlers.ofString(),
                 ),
             ) {
                 if (statusCode() / 100 != 2) {
-                    throw RuntimeException("Unable to authorize 'test-agent':\n${body()}")
+                    throw RuntimeException(
+                        "Unable to authorize 'test-agent': status=${statusCode()}\n${body()}"
+                    )
                 }
             }
         }

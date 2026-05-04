@@ -27,10 +27,12 @@ objects:
               protocol: TCP
           readinessProbe:
             httpGet:
-              path: /login.html
+              path: /app/rest/server/version
               port: 8111
             initialDelaySeconds: 60
             periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 30
           volumeMounts:
             - name: teamcity${TEAMCITY_ID}-data
               mountPath: /data/teamcity_server/datadir
