@@ -96,13 +96,14 @@ class TriggerTest {
         var lastBody = ""
         while (System.currentTimeMillis() < deadline) {
             val response = readBuilds(buildTypeId)
+            lastBody = "status=${response.statusCode()}\n${response.body()}"
             if (response.statusCode() / 100 == 5) {
                 Thread.sleep(BUILDS_POLL_INTERVAL)
                 continue
             }
             Assertions.assertTrue(
                 response.statusCode() / 100 == 2,
-                "Unable to get builds of build type '$buildTypeId': status=${response.statusCode()}\n${response.body()}",
+                "Unable to get builds of build type '$buildTypeId': $lastBody",
             )
             lastBody = response.body()
             if (lastBody.contains("\"count\":$expectedCount,")) {

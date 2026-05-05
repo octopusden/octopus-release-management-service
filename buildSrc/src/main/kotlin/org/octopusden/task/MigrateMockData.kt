@@ -115,7 +115,7 @@ abstract class MigrateMockData : DefaultTask() {
 
         private val defaultParams = mapOf("descending" to listOf("false"))
         private val endpointToResponseFileName = mapOf(
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to listOf("10"))to "releng/builds.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to listOf("10")) to "releng/builds.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to listOf("1")) to "releng/builds-limit.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("descending" to listOf("true")) to "releng/builds-descending.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("minors" to listOf("2.0")) to "releng/builds-2.0.json",
