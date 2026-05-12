@@ -27,7 +27,8 @@ abstract class MigrateMockData : DefaultTask() {
 
     @TaskAction
     fun startMockServer() {
-        mockServerClient.reset()
+        waitForMockServerReady()
+        resetWithRetry()
         endpointToResponseFileName.forEach {
             generateMockserverData(it.key.first, it.key.second, testDataDir.get() + File.separator + it.value, HttpStatusCode.OK_200.code())
         }
@@ -40,6 +41,43 @@ abstract class MigrateMockData : DefaultTask() {
             testDataDir.get() + File.separator + "jira/create-issue.json",
             HttpStatusCode.CREATED_201.code(),
             "POST"
+        )
+    }
+
+    private fun waitForMockServerReady() {
+        val deadline = System.currentTimeMillis() + READINESS_TIMEOUT
+        while (System.currentTimeMillis() < deadline) {
+            try {
+                if (mockServerClient.hasStarted()) {
+                    logger.lifecycle("MockServer at {}:{} is ready", host.get(), port.get())
+                    return
+                }
+            } catch (e: Exception) {
+                logger.debug("MockServer not ready yet: {}", e.message)
+            }
+            Thread.sleep(READINESS_POLL_INTERVAL)
+        }
+        throw RuntimeException(
+            "MockServer at ${host.get()}:${port.get()} did not become ready within ${READINESS_TIMEOUT / 1000}s"
+        )
+    }
+
+    private fun resetWithRetry() {
+        var lastException: Exception? = null
+        for (attempt in 1..RETRY_ATTEMPTS) {
+            try {
+                mockServerClient.reset()
+                return
+            } catch (e: Exception) {
+                lastException = e
+                logger.warn("MockServer reset attempt $attempt/$RETRY_ATTEMPTS failed: {}", e.message)
+                if (attempt < RETRY_ATTEMPTS) {
+                    Thread.sleep(RETRY_DELAYS[attempt - 1])
+                }
+            }
+        }
+        throw RuntimeException(
+            "MockServer reset at ${host.get()}:${port.get()} failed after $RETRY_ATTEMPTS attempts", lastException
         )
     }
 
@@ -70,9 +108,14 @@ abstract class MigrateMockData : DefaultTask() {
     }
 
     companion object {
+        private const val READINESS_POLL_INTERVAL = 5000L
+        private const val READINESS_TIMEOUT = 120000L
+        private const val RETRY_ATTEMPTS = 5
+        private val RETRY_DELAYS = longArrayOf(1000, 2000, 4000, 8000, 16000)
+
         private val defaultParams = mapOf("descending" to listOf("false"))
         private val endpointToResponseFileName = mapOf(
-            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to listOf("10"))to "releng/builds.json",
+            "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to listOf("10")) to "releng/builds.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("limit" to listOf("1")) to "releng/builds-limit.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("descending" to listOf("true")) to "releng/builds-descending.json",
             "/rest/release-engineering/3/component/ReleaseManagementService/builds" to defaultParams + mapOf("minors" to listOf("2.0")) to "releng/builds-2.0.json",
