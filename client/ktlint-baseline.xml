@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <baseline version="1.0">
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/DateToISOExpander.kt">
-        <error line="23" column="33" source="standard:multiline-expression-wrapping" />
         <error line="23" column="50" source="standard:chain-method-continuation" />
     </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceErrorDecoder.kt">
@@ -17,7 +16,6 @@
         <error line="20" column="71" source="standard:function-expression-body" />
         <error line="22" column="16" source="standard:chain-method-continuation" />
         <error line="26" column="28" source="standard:chain-method-continuation" />
-        <error line="39" column="84" source="standard:multiline-expression-wrapping" />
         <error line="41" column="73" source="standard:trailing-comma-on-call-site" />
     </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/ReleaseManagementServiceRetry.kt">

@@ -6,26 +6,23 @@ import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManage
 
 class TestUtil private constructor() {
     companion object {
-        private val hostReleaseManagement =
-            System.getProperty("test.release-management-host")
-                ?: throw Exception("System property 'test.release-management-host' must be defined")
+        private val hostReleaseManagement = System.getProperty("test.release-management-host")
+            ?: throw Exception("System property 'test.release-management-host' must be defined")
 
         @JvmStatic
         val mapper = jacksonObjectMapper()
 
         @JvmStatic
         val client =
-            ClassicReleaseManagementServiceClient(
-                object : ReleaseManagementServiceClientParametersProvider {
-                    override fun getApiUrl() = "http://$hostReleaseManagement"
+            ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
+                override fun getApiUrl() = "http://$hostReleaseManagement"
 
-                    override fun getTimeRetryInMillis() = 180000
+                override fun getTimeRetryInMillis() = 180000
 
-                    override fun getConnectTimeoutInMillis() = 30000
+                override fun getConnectTimeoutInMillis() = 30000
 
-                    override fun getReadTimeoutInMillis() = 30000
-                },
-            )
+                override fun getReadTimeoutInMillis() = 30000
+            })
 
         @JvmStatic
         fun executeAutomation(

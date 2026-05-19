@@ -16,12 +16,11 @@ class AutomationTest : BaseReleaseManagementServiceFuncTest {
     @Test
     fun testDependenciesStatus() {
         val expected = "ReleaseManagementService:1.0.1 BUILD [\n    dependency1:0.1 RC\n    dependency2:0.2 RELEASE\n]"
-        val outFile =
-            File("")
-                .resolve("build")
-                .resolve("automation-test")
-                .resolve("testDependenciesStatus.txt")
-                .also { it.parentFile.mkdirs() }
+        val outFile = File("")
+            .resolve("build")
+            .resolve("automation-test")
+            .resolve("testDependenciesStatus.txt")
+            .also { it.parentFile.mkdirs() }
         TestUtil.executeAutomation(
             DependenciesStatus.COMMAND,
             "${DependenciesStatus.COMPONENT_NAME}=ReleaseManagementService",
@@ -33,22 +32,17 @@ class AutomationTest : BaseReleaseManagementServiceFuncTest {
 
     @Test
     fun testMandatoryUpdate() {
-        val outFile =
-            File("")
-                .resolve("build")
-                .resolve("automation-test")
-                .resolve("testMandatoryUpdate.json")
-                .also { it.parentFile.mkdirs() }
-        val expected =
-            getObjectMapper()
-                .registerKotlinModule()
-                .enable(SerializationFeature.INDENT_OUTPUT)
-                .writeValueAsString(
-                    loadObject(
-                        "../test-data/releng/create-mandatory-update-3.json",
-                        object : TypeReference<MandatoryUpdateResponseDTO>() {},
-                    ),
-                )
+        val outFile = File("")
+            .resolve("build")
+            .resolve("automation-test")
+            .resolve("testMandatoryUpdate.json")
+            .also { it.parentFile.mkdirs() }
+        val expected = getObjectMapper()
+            .registerKotlinModule()
+            .enable(SerializationFeature.INDENT_OUTPUT)
+            .writeValueAsString(
+                loadObject("../test-data/releng/create-mandatory-update-3.json", object : TypeReference<MandatoryUpdateResponseDTO>() {}),
+            )
         TestUtil.executeAutomation(
             MandatoryUpdate.COMMAND,
             "${MandatoryUpdate.COMPONENT}=dependency-component-first",
