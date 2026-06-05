@@ -1,5 +1,6 @@
 package org.octopusden.octopus.releasemanagementservice
 
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ReleaseManagementServiceErrorCode
@@ -19,6 +20,9 @@ class BuildControllerTest :
         component: String,
         version: String,
     ) = TestUtil.client.getBuild(component, version)
+
+    override fun searchBuildsByDependencies(request: BuildDependencySearchRequest) =
+        TestUtil.client.searchBuildsByDependencies(request)
 
     override fun getNotExistedBuildErrorResponse(
         component: String,

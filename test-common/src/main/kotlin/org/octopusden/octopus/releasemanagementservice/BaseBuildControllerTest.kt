@@ -7,6 +7,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchResult
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import java.util.stream.Stream
@@ -16,6 +18,7 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
     abstract fun getBuilds(component: String, params: Map<String, Any>): Collection<ShortBuildDTO>
     abstract fun getBuild(component: String, version: String): BuildDTO
     abstract fun getNotExistedBuildErrorResponse(component: String, version: String): ErrorResponse
+    abstract fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult>
 
     @ParameterizedTest
     @MethodSource("builds")
@@ -37,6 +40,19 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
             "../test-data/releng/build-not-exist-error.json",
             object : TypeReference<ErrorResponse>() {})
         Assertions.assertEquals(expected, errorResponse)
+    }
+
+    @Test
+    fun searchBuildsByDependenciesTest() {
+        val request = loadObject(
+            "../test-data/releng/search-builds-by-dependencies-request.json",
+            object : TypeReference<BuildDependencySearchRequest>() {}
+        )
+        val expected = loadObject(
+            "../test-data/releng/search-builds-by-dependencies-response.json",
+            object : TypeReference<Collection<BuildDependencySearchResult>>() {}
+        )
+        Assertions.assertEquals(expected, searchBuildsByDependencies(request))
     }
 
     private fun builds(): Stream<Arguments> = Stream.of(

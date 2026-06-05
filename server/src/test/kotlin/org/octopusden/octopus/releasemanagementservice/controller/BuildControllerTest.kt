@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.octopusden.octopus.releasemanagementservice.BaseBuildControllerTest
 import org.octopusden.octopus.releasemanagementservice.ReleaseManagementServiceApplication
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchResult
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import org.springframework.beans.factory.annotation.Autowired
@@ -64,6 +66,15 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
             emptyMap(),
             component,
             version
+        )
+    }
+    override fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult> {
+        return post(
+            code = HttpStatus.OK.value(),
+            typeReference = object : TypeReference<Collection<BuildDependencySearchResult>>() {},
+            path = "/rest/api/1/builds/search-by-dependencies",
+            params = emptyMap(),
+            body = request
         )
     }
 }
