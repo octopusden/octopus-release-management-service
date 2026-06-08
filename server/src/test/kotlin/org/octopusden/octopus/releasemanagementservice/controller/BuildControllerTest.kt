@@ -68,13 +68,13 @@ class BuildControllerTest : BaseBuildControllerTest(), BaseControllerTest {
             version
         )
     }
-    override fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult> {
-        return post(
+
+    override fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult> =
+        post(
             code = HttpStatus.OK.value(),
             typeReference = object : TypeReference<Collection<BuildDependencySearchResult>>() {},
             path = "/rest/api/1/builds/search-by-dependencies",
             params = emptyMap(),
-            body = request
+            body = request,
         )
-    }
 }

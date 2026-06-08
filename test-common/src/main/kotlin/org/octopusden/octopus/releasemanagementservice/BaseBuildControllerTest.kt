@@ -18,6 +18,7 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
     abstract fun getBuilds(component: String, params: Map<String, Any>): Collection<ShortBuildDTO>
     abstract fun getBuild(component: String, version: String): BuildDTO
     abstract fun getNotExistedBuildErrorResponse(component: String, version: String): ErrorResponse
+
     abstract fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult>
 
     @ParameterizedTest
@@ -46,11 +47,11 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
     fun searchBuildsByDependenciesTest() {
         val request = loadObject(
             "../test-data/releng/search-builds-by-dependencies-request.json",
-            object : TypeReference<BuildDependencySearchRequest>() {}
+            object : TypeReference<BuildDependencySearchRequest>() {},
         )
         val expected = loadObject(
             "../test-data/releng/search-builds-by-dependencies-response.json",
-            object : TypeReference<Collection<BuildDependencySearchResult>>() {}
+            object : TypeReference<Collection<BuildDependencySearchResult>>() {},
         )
         Assertions.assertEquals(expected, searchBuildsByDependencies(request))
     }
