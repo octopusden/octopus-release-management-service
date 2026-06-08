@@ -1,0 +1,27 @@
+{
+  "component": "ReleaseManagementService",
+  "versionRange": {
+    "from": "1.0.0",
+    "to": "2.0.0"
+  },
+  "statuses": ["RC", "RELEASE"],
+  "descending": true,
+  "limit": 10,
+  "dependencies": [
+    {
+      "component": "dependency-component-first",
+      "versionRange": {
+        "from": "1.0.0",
+        "to": "2.0.0"
+      }
+    },
+    {
+      "component": "dependency-component-second",
+      "versionRange": {
+        "from": "2.0.0",
+        "to": "3.0.0"
+      }
+    }
+  ],
+  "requireAllDependencies": true
+}

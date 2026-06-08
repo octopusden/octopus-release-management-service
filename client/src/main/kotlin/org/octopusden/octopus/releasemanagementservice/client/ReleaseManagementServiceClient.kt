@@ -5,7 +5,9 @@ import feign.Param
 import feign.QueryMap
 import feign.RequestLine
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchResult
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.IssueReleasesDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
@@ -28,6 +30,10 @@ interface ReleaseManagementServiceClient {
         @Param("component") component: String,
         @Param("version") version: String,
     ): BuildDTO
+
+    @RequestLine("POST /rest/api/1/builds/search-by-dependencies")
+    @Headers("Content-Type: application/json")
+    fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult>
 
     @RequestLine("POST /rest/api/1/utils/mandatory-update?dryRun={dryRun}")
     @Headers("Content-Type: application/json")

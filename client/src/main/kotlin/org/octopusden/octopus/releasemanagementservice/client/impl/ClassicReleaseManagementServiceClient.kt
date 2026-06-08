@@ -14,7 +14,9 @@ import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementS
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceErrorDecoder
 import org.octopusden.octopus.releasemanagementservice.client.ReleaseManagementServiceRetry
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchResult
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.IssueReleasesDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
@@ -50,6 +52,9 @@ class ClassicReleaseManagementServiceClient(
         component: String,
         version: String,
     ): BuildDTO = client.getBuild(component, version)
+
+    override fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult> =
+        client.searchBuildsByDependencies(request)
 
     override fun getComponents(): Collection<ComponentDTO> = client.getComponents()
 

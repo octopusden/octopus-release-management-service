@@ -47,6 +47,13 @@ abstract class MigrateMockData : DefaultTask() {
             HttpStatusCode.CREATED_201.code(),
             "POST",
         )
+        generateMockserverData(
+            "/rest/release-engineering/3/builds/search-by-dependencies",
+            emptyMap(),
+            testDataDir.get() + File.separator + "releng/search-builds-by-dependencies-response.json",
+            HttpStatusCode.OK_200.code(),
+            "POST",
+        )
     }
 
     private fun generateMockserverData(

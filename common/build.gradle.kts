@@ -61,6 +61,7 @@ dependencyManagement {
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations")
+    implementation("jakarta.validation:jakarta.validation-api:${properties["jakarta-validation.version"]}")
 
     api("io.github.openfeign:feign-httpclient")
     api("io.github.openfeign:feign-jackson")

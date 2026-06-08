@@ -13,7 +13,9 @@ import feign.slf4j.Slf4jLogger
 import org.apache.http.impl.client.HttpClientBuilder
 import java.util.concurrent.TimeUnit
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchResult
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateRelengFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
@@ -43,6 +45,9 @@ class ClassicLegacyRelengClient(url: String, objectMapper: ObjectMapper) : Legac
         client.getBuilds(component, filter)
 
     override fun getBuild(component: String, version: String): BuildDTO = client.getBuild(component, version)
+
+    override fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult> =
+        client.searchBuildsByDependencies(request)
 
     override fun getComponents(): Collection<ComponentDTO> = client.getComponents()
 

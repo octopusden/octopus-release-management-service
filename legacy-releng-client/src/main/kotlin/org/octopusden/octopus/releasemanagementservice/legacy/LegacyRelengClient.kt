@@ -4,7 +4,9 @@ import feign.Param
 import feign.QueryMap
 import feign.RequestLine
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchResult
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ComponentDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.IssueReleasesDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateRelengFilterDTO
@@ -22,6 +24,9 @@ interface LegacyRelengClient {
         @Param("component") component: String,
         @Param("version") version: String,
     ): BuildDTO
+
+    @RequestLine("POST rest/release-engineering/3/builds/search-by-dependencies")
+    fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult>
 
     @RequestLine("GET rest/release-engineering/3/component-management")
     fun getComponents(): Collection<ComponentDTO>
