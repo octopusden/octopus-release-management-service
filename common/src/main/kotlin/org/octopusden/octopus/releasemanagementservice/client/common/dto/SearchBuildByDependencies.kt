@@ -13,6 +13,7 @@ data class BuildDependencySearchRequest(
     val descending: Boolean = false,
     @field:Positive
     val limit: Int? = null,
+    @field:Valid
     val dependencies: Set<DependencySearchCriteria> = emptySet(),
     val requireAllDependencies: Boolean = false,
 )
@@ -26,7 +27,9 @@ data class BuildDependencySearchResult(
 )
 
 data class DependencySearchCriteria(
+    @field:NotBlank
     val component: String,
+    @field:Valid
     val versionRange: VersionRange
 )
 
