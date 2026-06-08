@@ -3,8 +3,8 @@ package org.octopusden.octopus.releasemanagementservice.controller
 import jakarta.validation.Valid
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
-import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchResult
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildFilterDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import org.octopusden.octopus.releasemanagementservice.service.BuildService
 import org.slf4j.LoggerFactory
@@ -33,7 +33,9 @@ class BuildController(private val buildService: BuildService) {
     }
 
     @PostMapping("/search-by-dependencies")
-    fun searchByDependencies(@Valid @RequestBody request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult> {
+    fun searchByDependencies(
+        @Valid @RequestBody request: BuildDependencySearchRequest,
+    ): Collection<BuildDependencySearchResult> {
         log.info("Search builds by dependencies request: '{}'", request)
         return buildService.searchBuildsByDependencies(request)
     }

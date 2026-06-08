@@ -52,7 +52,7 @@ abstract class MigrateMockData : DefaultTask() {
             emptyMap(),
             testDataDir.get() + File.separator + "releng/search-builds-by-dependencies-response.json",
             HttpStatusCode.OK_200.code(),
-            "POST"
+            "POST",
         )
     }
 

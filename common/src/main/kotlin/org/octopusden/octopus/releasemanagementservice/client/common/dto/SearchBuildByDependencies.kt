@@ -23,19 +23,19 @@ data class BuildDependencySearchResult(
     val version: String,
     val status: BuildStatus,
     val dependencies: Collection<ShortBuildDTO>,
-    val hotfix: Boolean
+    val hotfix: Boolean,
 )
 
 data class DependencySearchCriteria(
     @field:NotBlank
     val component: String,
     @field:Valid
-    val versionRange: VersionRange
+    val versionRange: VersionRange,
 )
 
 data class VersionRange(
     @field:NotBlank
     val from: String,
     @field:NotBlank
-    val to: String
+    val to: String,
 )

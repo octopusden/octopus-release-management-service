@@ -9,5 +9,6 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBu
 interface BuildService {
     fun getBuilds(component: String, filter: BuildFilterDTO): Collection<ShortBuildDTO>
     fun getBuild(component: String, version: String): BuildDTO
+
     fun searchBuildsByDependencies(request: BuildDependencySearchRequest): Collection<BuildDependencySearchResult>
 }

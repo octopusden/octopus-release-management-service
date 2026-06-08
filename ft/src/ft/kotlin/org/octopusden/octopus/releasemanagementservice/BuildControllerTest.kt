@@ -21,8 +21,7 @@ class BuildControllerTest :
         version: String,
     ) = TestUtil.client.getBuild(component, version)
 
-    override fun searchBuildsByDependencies(request: BuildDependencySearchRequest) =
-        TestUtil.client.searchBuildsByDependencies(request)
+    override fun searchBuildsByDependencies(request: BuildDependencySearchRequest) = TestUtil.client.searchBuildsByDependencies(request)
 
     override fun getNotExistedBuildErrorResponse(
         component: String,

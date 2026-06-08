@@ -46,7 +46,7 @@ class ExceptionInfoHandler {
             }
         return ErrorResponse(
             ReleaseManagementServiceErrorCode.getErrorCode(exception),
-            message.ifBlank { "Validation failed" }
+            message.ifBlank { "Validation failed" },
         )
     }
 
