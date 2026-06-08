@@ -13,6 +13,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
@@ -35,6 +36,10 @@ class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     fun handleArgumentsNotCompatible(exception: ReleaseManagementServiceException): ErrorResponse = getErrorResponse(exception)
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleMethodArgumentNotValid(exception: MethodArgumentNotValidException): ErrorResponse = getErrorResponse(exception)
 
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

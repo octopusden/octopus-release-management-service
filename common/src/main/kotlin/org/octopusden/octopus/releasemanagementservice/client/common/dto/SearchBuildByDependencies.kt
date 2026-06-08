@@ -1,13 +1,20 @@
 package org.octopusden.octopus.releasemanagementservice.client.common.dto
 
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Positive
+
 data class BuildDependencySearchRequest(
+    @field:NotBlank
     val component: String,
+    @field:Valid
     val versionRange: VersionRange,
     val statuses: Set<BuildStatus> = emptySet(),
-    val descending: Boolean = true,
-    val limit: Int,
+    val descending: Boolean = false,
+    @field:Positive
+    val limit: Int? = null,
     val dependencies: Set<DependencySearchCriteria> = emptySet(),
-    val requireAllDependencies: Boolean = false
+    val requireAllDependencies: Boolean = false,
 )
 
 data class BuildDependencySearchResult(
@@ -24,6 +31,8 @@ data class DependencySearchCriteria(
 )
 
 data class VersionRange(
+    @field:NotBlank
     val from: String,
+    @field:NotBlank
     val to: String
 )
