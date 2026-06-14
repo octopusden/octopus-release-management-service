@@ -25,12 +25,24 @@ objects:
           ports:
             - containerPort: 8111
               protocol: TCP
+          env:
+            - name: TEAMCITY_SERVER_MEM_OPTS
+              value: "-Xms512m -Xmx2g"
+          resources:
+            requests:
+              cpu: 300m
+              memory: 1536Mi
+            limits:
+              cpu: 2500m
+              memory: 4Gi
           readinessProbe:
             httpGet:
-              path: /login.html
+              path: /app/rest/server/version
               port: 8111
             initialDelaySeconds: 60
             periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 30
           volumeMounts:
             - name: teamcity${TEAMCITY_ID}-data
               mountPath: /data/teamcity_server/datadir

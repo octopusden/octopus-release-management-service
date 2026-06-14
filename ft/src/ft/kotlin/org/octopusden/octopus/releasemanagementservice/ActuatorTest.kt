@@ -6,15 +6,17 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.Service
 import org.octopusden.octopus.releasemanagementservice.client.impl.ClassicReleaseManagementServiceClient
 import org.octopusden.octopus.releasemanagementservice.client.impl.ReleaseManagementServiceClientParametersProvider
 
-class ActuatorTest : BaseActuatorTest(), BaseReleaseManagementServiceFuncTest {
-
+class ActuatorTest :
+    BaseActuatorTest(),
+    BaseReleaseManagementServiceFuncTest {
     override fun getObjectMapper(): ObjectMapper = mapper
 
     override fun getServiceInfo(): ServiceInfoDTO = client.getServiceInfo()
 
     companion object {
-        private val hostReleaseManagement = System.getProperty("test.release-management-host")
-            ?: throw Exception("System property 'test.release-management-host' must be defined")
+        private val hostReleaseManagement =
+            System.getProperty("test.release-management-host")
+                ?: throw Exception("System property 'test.release-management-host' must be defined")
 
         @JvmStatic
         private val mapper = jacksonObjectMapper()

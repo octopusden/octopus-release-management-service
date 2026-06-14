@@ -13,12 +13,13 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestControllerAdvice
 
-@ControllerAdvice
+@RestControllerAdvice
 class ExceptionInfoHandler {
 
     @ExceptionHandler(NotFoundException::class)
@@ -35,6 +36,19 @@ class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     fun handleArgumentsNotCompatible(exception: ReleaseManagementServiceException): ErrorResponse = getErrorResponse(exception)
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun handleMethodArgumentNotValid(exception: MethodArgumentNotValidException): ErrorResponse {
+        val message = exception.bindingResult.fieldErrors
+            .joinToString("; ") { fieldError ->
+                "${fieldError.field}: ${fieldError.defaultMessage}"
+            }
+        return ErrorResponse(
+            ReleaseManagementServiceErrorCode.getErrorCode(exception),
+            message.ifBlank { "Validation failed" },
+        )
+    }
 
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

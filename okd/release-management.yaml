@@ -25,6 +25,13 @@ objects:
           ports:
             - containerPort: 8080
               protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 400Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
