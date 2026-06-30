@@ -83,7 +83,7 @@ class UtilityServiceImpl(
             description = description,
             assignee = assignee,
             dueDate = dto.dueDate,
-            extraFields = extraFields
+            extraFields = extraFields,
         )
     }
 
@@ -116,7 +116,7 @@ class UtilityServiceImpl(
                 description = ISSUE_DESCRIPTION_TEMPLATE.format(componentId, versions, component, version),
                 assignee = assignee,
                 dueDate = dto.dueDate,
-                extraFields = extraFields
+                extraFields = extraFields,
             )
         }
     }

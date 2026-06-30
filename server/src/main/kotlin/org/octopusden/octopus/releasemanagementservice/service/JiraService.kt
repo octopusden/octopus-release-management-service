@@ -13,7 +13,7 @@ interface JiraService {
         description: String,
         assignee: String,
         dueDate: Date?,
-        extraFields: Map<String, Any>
+        extraFields: Map<String, Any>,
     ): String
 
     fun findIssues(jql: String): List<Issue>

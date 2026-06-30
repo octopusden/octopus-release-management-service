@@ -48,7 +48,7 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
         description: String,
         assignee: String,
         dueDate: Date?,
-        extraFields: Map<String, Any>
+        extraFields: Map<String, Any>,
     ): String {
         val builder = IssueInputBuilder()
             .setProjectKey(projectKey)

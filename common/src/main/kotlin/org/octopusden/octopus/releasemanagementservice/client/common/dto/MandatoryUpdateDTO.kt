@@ -11,5 +11,5 @@ data class MandatoryUpdateDTO(
     val dueDate: Date? = null,
     val notice: String = "",
     val customer: String,
-    val filter: MandatoryUpdateFilterDTO
+    val filter: MandatoryUpdateFilterDTO,
 )
