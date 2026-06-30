@@ -8,6 +8,7 @@ interface JiraService {
     fun createIssue(
         projectKey: String,
         issueTypeName: String,
+        issuePriorityName: String?,
         summary: String,
         description: String,
         assignee: String,

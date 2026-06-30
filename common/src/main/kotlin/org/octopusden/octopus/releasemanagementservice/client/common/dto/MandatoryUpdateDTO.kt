@@ -7,6 +7,7 @@ data class MandatoryUpdateDTO(
     val version: String,
     val projectKey: String,
     val epicName: String,
+    val issuePriority: String? = null,
     val dueDate: Date? = null,
     val notice: String = "",
     val customer: String,
