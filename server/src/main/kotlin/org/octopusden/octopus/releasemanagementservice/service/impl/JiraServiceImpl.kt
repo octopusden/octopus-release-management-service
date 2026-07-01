@@ -3,6 +3,7 @@ package org.octopusden.octopus.releasemanagementservice.service.impl
 import com.atlassian.jira.rest.client.api.domain.IssueType
 import com.atlassian.jira.rest.client.api.domain.Field
 import com.atlassian.jira.rest.client.api.domain.Issue
+import com.atlassian.jira.rest.client.api.domain.Priority
 import com.atlassian.jira.rest.client.api.domain.input.ComplexIssueInputFieldValue
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory
@@ -42,20 +43,24 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
     override fun createIssue(
         projectKey: String,
         issueTypeName: String,
+        issuePriorityName: String?,
         summary: String,
         description: String,
         assignee: String,
         dueDate: Date?,
-        extraFields: Map<String, Any>
+        extraFields: Map<String, Any>,
     ): String {
         val builder = IssueInputBuilder()
             .setProjectKey(projectKey)
-            .setIssueType(getIssueType(issueTypeName))
+            .setIssueType(getIssueType(issueTypeName.trim()))
             .setSummary(summary)
             .setDescription(description)
             .setAssigneeName(assignee)
         if (dueDate != null) {
             builder.setDueDate(DateTime(dueDate))
+        }
+        if (!issuePriorityName.isNullOrBlank()) {
+            builder.setPriority(getPriority(issuePriorityName.trim()))
         }
         extraFields.forEach { (fieldName, value) ->
             val fieldId = getField(fieldName).id
@@ -75,12 +80,17 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
 
     private fun getIssueType(name: String): IssueType {
         return client.metadataClient.issueTypes.claim().find { it.name == name }
-            ?: throw NotFoundException("Issues type '$name' is not found!")
+            ?: throw NotFoundException("Issue type '$name' is not found!")
     }
 
     private fun getField(name: String): Field {
         return client.metadataClient.fields.claim().find { it.name == name }
             ?: throw NotFoundException("Field '$name' is not found!")
+    }
+
+    private fun getPriority(name: String): Priority {
+        return client.metadataClient.priorities.claim().find { it.name == name }
+            ?: throw NotFoundException("Priority '$name' is not found!")
     }
 
     companion object {
