@@ -52,7 +52,7 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
     ): String {
         val builder = IssueInputBuilder()
             .setProjectKey(projectKey)
-            .setIssueType(getIssueType(issueTypeName))
+            .setIssueType(getIssueType(issueTypeName.trim()))
             .setSummary(summary)
             .setDescription(description)
             .setAssigneeName(assignee)
