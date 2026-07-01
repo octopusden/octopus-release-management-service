@@ -60,7 +60,7 @@ class JiraServiceImpl(jiraClientProperties: JiraClientProperties): JiraService {
             builder.setDueDate(DateTime(dueDate))
         }
         if (!issuePriorityName.isNullOrBlank()) {
-            builder.setPriority(getPriority(issuePriorityName))
+            builder.setPriority(getPriority(issuePriorityName.trim()))
         }
         extraFields.forEach { (fieldName, value) ->
             val fieldId = getField(fieldName).id
