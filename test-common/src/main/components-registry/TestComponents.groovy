@@ -33,6 +33,9 @@
         majorVersionFormat = '$major.$minor'
         releaseVersionFormat = '$major.$minor.$service'
         displayName = 'Main component second'
+        component {
+            versionPrefix = 'second'
+        }
     }
     distribution {
         external = true
@@ -54,6 +57,9 @@
         majorVersionFormat = '$major.$minor'
         releaseVersionFormat = '$major.$minor.$service'
         displayName = 'Main component third'
+        component {
+            versionPrefix = 'third'
+        }
     }
     distribution {
         external = true
@@ -75,6 +81,9 @@
         majorVersionFormat = '$major.$minor'
         releaseVersionFormat = '$major.$minor.$service'
         displayName = 'Main component solution'
+        component {
+            versionPrefix = 'solution'
+        }
     }
     distribution {
         external = true
@@ -96,6 +105,9 @@
         majorVersionFormat = '$major.$minor'
         releaseVersionFormat = '$major.$minor.$service'
         displayName = 'Main component not external'
+        component {
+            versionPrefix = 'not-external'
+        }
     }
     distribution {
         external = false
