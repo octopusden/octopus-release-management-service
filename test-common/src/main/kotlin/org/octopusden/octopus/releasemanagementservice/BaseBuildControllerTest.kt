@@ -34,6 +34,12 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
         Assertions.assertEquals(expected, getBuild("ReleaseManagementService", version))
     }
 
+    @ParameterizedTest
+    @MethodSource("buildLimitations")
+    fun getBuildLimitationsTest(version: String, expectedLimitations: String?) {
+        Assertions.assertEquals(expectedLimitations, getBuild("ReleaseManagementService", version).limitations)
+    }
+
     @Test
     fun getNotExistedBuildTest() {
         val errorResponse = getNotExistedBuildErrorResponse("ReleaseManagementService", "1.0.3")
@@ -132,6 +138,17 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
                 "../test-data/releng/builds-with-max-age-filter-3.json",
                 object : TypeReference<Collection<ShortBuildDTO>>() {})
         )
+    )
+
+    private fun buildLimitations(): Stream<Arguments> = Stream.of(
+        // limitations are provided by releng and have to survive the whole chain down to the client
+        Arguments.of(
+            "1.0.1",
+            "Upgrade from 1.0.0 is not supported, reinstall required.\nSee TEST-1 for details."
+        ),
+        // builds without limitations in the releng response must expose null, not a failure
+        Arguments.of("2.0.1", null),
+        Arguments.of("1.0.2", null)
     )
 
     protected fun build(): Stream<Arguments> = Stream.of(
