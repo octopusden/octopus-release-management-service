@@ -129,6 +129,18 @@ abstract class MigrateMockData : DefaultTask() {
                     ) to
                     "releng/builds_1.0.2-hotfix.json",
                 "/rest/release-engineering/3/component/ReleaseManagementService/builds" to
+                    defaultParams + mapOf("javaVersions" to listOf("17")) to
+                    "releng/builds-java-17.json",
+                "/rest/release-engineering/3/component/ReleaseManagementService/builds" to
+                    defaultParams + mapOf("javaVersionPresent" to listOf("true")) to
+                    "releng/builds-java-recorded.json",
+                "/rest/release-engineering/3/component/ReleaseManagementService/builds" to
+                    defaultParams + mapOf("javaVersionPresent" to listOf("false")) to
+                    "releng/builds-java-not-recorded.json",
+                "/rest/release-engineering/3/component/ReleaseManagementService/builds" to
+                    defaultParams + mapOf("mavenVersions" to listOf("3.9")) to
+                    "releng/builds-java-17.json",
+                "/rest/release-engineering/3/component/ReleaseManagementService/builds" to
                     defaultParams + mapOf("branchNames" to listOf("release-1.0", "release-1.1")) to
                     "releng/builds-with-branch-filter-2.json",
                 "/rest/release-engineering/3/component/ReleaseManagementService/builds" to

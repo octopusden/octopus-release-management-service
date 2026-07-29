@@ -34,6 +34,22 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
         Assertions.assertEquals(expected, getBuild("ReleaseManagementService", version))
     }
 
+    @ParameterizedTest
+    @MethodSource("buildToolVersions")
+    fun getBuildToolVersionsTest(version: String, expectedJavaVersion: String?, expectedMavenVersion: String?) {
+        val build = getBuild("ReleaseManagementService", version)
+        Assertions.assertEquals(expectedJavaVersion, build.javaVersion)
+        Assertions.assertEquals(expectedMavenVersion, build.mavenVersion)
+    }
+
+    @ParameterizedTest
+    @MethodSource("buildToolVersions")
+    fun getBuildsToolVersionsTest(version: String, expectedJavaVersion: String?, expectedMavenVersion: String?) {
+        val build = getBuilds("ReleaseManagementService", mapOf("versions" to listOf(version))).single()
+        Assertions.assertEquals(expectedJavaVersion, build.javaVersion)
+        Assertions.assertEquals(expectedMavenVersion, build.mavenVersion)
+    }
+
     @Test
     fun getNotExistedBuildTest() {
         val errorResponse = getNotExistedBuildErrorResponse("ReleaseManagementService", "1.0.3")
@@ -131,7 +147,33 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
             loadObject(
                 "../test-data/releng/builds-with-max-age-filter-3.json",
                 object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("javaVersions" to listOf("17")),
+            loadObject("../test-data/releng/builds-java-17.json", object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("mavenVersions" to listOf("3.9")),
+            loadObject("../test-data/releng/builds-java-17.json", object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("javaVersionPresent" to true),
+            loadObject(
+                "../test-data/releng/builds-java-recorded.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
+        ),
+        Arguments.of(
+            mapOf("javaVersionPresent" to false),
+            loadObject(
+                "../test-data/releng/builds-java-not-recorded.json",
+                object : TypeReference<Collection<ShortBuildDTO>>() {})
         )
+    )
+
+    private fun buildToolVersions(): Stream<Arguments> = Stream.of(
+        Arguments.of("1.0.1", "17", "3.9"),
+        Arguments.of("2.0.1", "1.8", null),
+        Arguments.of("1.0.2", null, null)
     )
 
     protected fun build(): Stream<Arguments> = Stream.of(

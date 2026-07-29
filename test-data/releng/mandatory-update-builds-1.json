@@ -21,7 +21,9 @@
       "BUILD": "2025-04-04T13:12:17.000+00:00",
       "RC": "2025-04-04T19:56:43.000+00:00",
       "RELEASE": "2025-04-04T20:03:30.000+00:00"
-    }
+    },
+    "javaVersion": "17",
+    "mavenVersion": "3.9"
   },
   {
     "component": "main-component-first",
