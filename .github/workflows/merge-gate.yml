@@ -24,6 +24,6 @@ jobs:
     needs: [build, quality, security]
     runs-on: ubuntu-latest
     steps:
-      - uses: octopusden/octopus-base/.github/actions/merge-gate@v2.5.2
+      - uses: octopusden/octopus-base/.github/actions/merge-gate@v2.6.1
         with:
           needs: ${{ toJson(needs) }}

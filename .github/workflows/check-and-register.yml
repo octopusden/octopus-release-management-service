@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    uses: octopusden/octopus-base/.github/workflows/common-check-and-register-release.yml@v2.5.2
+    uses: octopusden/octopus-base/.github/workflows/common-check-and-register-release.yml@v2.6.1
     if:  "${{ github.event.workflow_run.conclusion == 'success' }}"
     with:
       # Gate registration on a module that is actually published to Central. The server jar is

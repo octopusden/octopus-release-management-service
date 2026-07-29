@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@v2.5.2
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@v2.6.1
     with:
       flow-type: hybrid
       java-version: '21'
@@ -14,4 +14,13 @@ jobs:
       build-version: ${{ github.event.client_payload.project_version }}
       docker-image: release-management-service
       skip-extra-tasks: ft
+      # Exempt from the Maven Central publication guard. Everything else this repository
+      # publishes is a thin library jar, so the guard's defaults apply unchanged.
+      #   automation — the TeamCity metarunner resolves it from a Maven repository as
+      #     ${group}:${name}:${version}:jar:all (automation/metarunners/
+      #     OctopusReleaseManagementAutomation.xml), so the shadow jar must stay published.
+      #   release-management-teamcity-plugin — an 8.5 MB TeamCity plugin bundle, above the
+      #     8 MB default. Its users install it into TeamCity from outside this GitHub
+      #     organisation, so it is exempted rather than dropped.
+      fat-jar-publication-allowlist: automation,release-management-teamcity-plugin
     secrets: inherit
