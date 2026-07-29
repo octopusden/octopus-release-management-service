@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchResult
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildParameters
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import java.util.stream.Stream
@@ -35,19 +36,16 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("buildToolVersions")
-    fun getBuildToolVersionsTest(version: String, expectedJavaVersion: String?, expectedMavenVersion: String?) {
-        val build = getBuild("ReleaseManagementService", version)
-        Assertions.assertEquals(expectedJavaVersion, build.javaVersion)
-        Assertions.assertEquals(expectedMavenVersion, build.mavenVersion)
+    @MethodSource("buildParameters")
+    fun getBuildParametersTest(version: String, expected: BuildParameters) {
+        Assertions.assertEquals(expected, getBuild("ReleaseManagementService", version).buildParameters)
     }
 
     @ParameterizedTest
-    @MethodSource("buildToolVersions")
-    fun getBuildsToolVersionsTest(version: String, expectedJavaVersion: String?, expectedMavenVersion: String?) {
+    @MethodSource("buildParameters")
+    fun getBuildsParametersTest(version: String, expected: BuildParameters) {
         val build = getBuilds("ReleaseManagementService", mapOf("versions" to listOf(version))).single()
-        Assertions.assertEquals(expectedJavaVersion, build.javaVersion)
-        Assertions.assertEquals(expectedMavenVersion, build.mavenVersion)
+        Assertions.assertEquals(expected, build.buildParameters)
     }
 
     @Test
@@ -170,10 +168,10 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
         )
     )
 
-    private fun buildToolVersions(): Stream<Arguments> = Stream.of(
-        Arguments.of("1.0.1", "17", "3.9"),
-        Arguments.of("2.0.1", "1.8", null),
-        Arguments.of("1.0.2", null, null)
+    private fun buildParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of("1.0.1", BuildParameters(javaVersion = "17", mavenVersion = "3.9")),
+        Arguments.of("2.0.1", BuildParameters(javaVersion = "1.8")),
+        Arguments.of("1.0.2", BuildParameters())
     )
 
     protected fun build(): Stream<Arguments> = Stream.of(

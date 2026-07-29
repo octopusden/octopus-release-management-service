@@ -15,5 +15,7 @@
     "RC": "2024-07-04T19:56:43.000+00:00",
     "RELEASE": "2024-07-04T20:03:30.000+00:00"
   },
-  "javaVersion": "1.8"
+  "buildParameters": {
+    "javaVersion": "1.8"
+  }
 }

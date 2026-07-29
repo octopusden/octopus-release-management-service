@@ -135,8 +135,7 @@ class UtilityServiceImpl(
             version = version,
             status = status,
             hotfix = hotfix,
-            javaVersion = javaVersion,
-            mavenVersion = mavenVersion
+            buildParameters = buildParameters
         )
 
     companion object {
