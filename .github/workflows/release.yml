@@ -20,7 +20,12 @@ jobs:
       #     ${group}:${name}:${version}:jar:all (automation/metarunners/
       #     OctopusReleaseManagementAutomation.xml), so the shadow jar must stay published.
       #   release-management-teamcity-plugin — an 8.5 MB TeamCity plugin bundle, above the
-      #     8 MB default. Its users install it into TeamCity from outside this GitHub
-      #     organisation, so it is exempted rather than dropped.
+      #     8 MB default. Exempted to keep this change behaviour-preserving, NOT because a
+      #     consumer is known: nothing in this organisation resolves it from a Maven
+      #     repository (the only in-repo user, ft's deployTeamcity2022Plugin, takes it from
+      #     the project's `distributions` configuration), and the GitHub releases carry no
+      #     assets. Whether Maven Central is still a needed install channel for TeamCity
+      #     admins is an open question in the PR — if it is not, dropping this publication
+      #     saves a further 60 files and 8.5 MB per release.
       fat-jar-publication-allowlist: automation,release-management-teamcity-plugin
     secrets: inherit
