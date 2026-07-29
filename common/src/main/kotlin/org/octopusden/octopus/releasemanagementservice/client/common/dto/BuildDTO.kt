@@ -10,5 +10,6 @@ data class BuildDTO(
     val dependencies: Collection<ShortBuildDTO>,
     val commits: Collection<CommitDTO>,
     val statusHistory: Map<BuildStatus, Date>,
-    val hotfix: Boolean
+    val hotfix: Boolean,
+    val limitations: String? = null,
 )
