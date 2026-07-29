@@ -135,7 +135,7 @@ class UtilityServiceImpl(
             version = version,
             status = status,
             hotfix = hotfix,
-            buildParameters = buildParameters
+            buildParameters = buildParameters,
         )
 
     companion object {
@@ -145,7 +145,7 @@ class UtilityServiceImpl(
         private const val ISSUE_SUMMARY_TEMPLATE = "%s. %s: Bump Dependencies on %s to %s or a later version."
         private const val ISSUE_DESCRIPTION_TEMPLATE =
             "Component %s has the following versions eligible for mandatory update:\n%s\n\n" +
-                    "Those versions are to be updated: please bump dependencies on %s to %s or a later version."
+                "Those versions are to be updated: please bump dependencies on %s to %s or a later version."
 
         private const val CRN_REQUIRED_FIELD_VALUE = "No"
 

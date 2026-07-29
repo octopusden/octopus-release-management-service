@@ -7,9 +7,10 @@ import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 interface BaseReleaseManagementServiceTest {
-
     fun getObjectMapper(): ObjectMapper
 
-    fun <T> loadObject(file: String, typeReference: TypeReference<T>): T =
-        getObjectMapper().readValue(File(file), typeReference)
+    fun <T> loadObject(
+        file: String,
+        typeReference: TypeReference<T>,
+    ): T = getObjectMapper().readValue(File(file), typeReference)
 }

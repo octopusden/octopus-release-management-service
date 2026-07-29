@@ -5,5 +5,5 @@ data class ShortBuildDTO(
     val version: String,
     val status: BuildStatus,
     val hotfix: Boolean,
-    val buildParameters: BuildParameters = BuildParameters()
+    val buildParameters: BuildParameters,
 )
