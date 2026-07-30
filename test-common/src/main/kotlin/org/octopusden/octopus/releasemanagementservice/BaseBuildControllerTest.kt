@@ -239,7 +239,7 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
             // builds without limitations in the releng response must expose null, not a failure
             Arguments.of("2.0.1", null),
             Arguments.of("1.0.2", null),
-    )
+        )
 
     protected fun build(): Stream<Arguments> =
         Stream.of(
