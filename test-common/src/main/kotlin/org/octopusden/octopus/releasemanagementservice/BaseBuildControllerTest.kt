@@ -14,6 +14,9 @@ import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorRe
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import java.util.stream.Stream
 
+// A shared test base grows a function per scenario it covers, so the usual ceiling on
+// class size does not carry its normal meaning here.
+@Suppress("TooManyFunctions")
 abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
     abstract fun getBuilds(
         component: String,
@@ -49,6 +52,15 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
         expected: BuildDTO,
     ) {
         Assertions.assertEquals(expected, getBuild("ReleaseManagementService", version))
+    }
+
+    @ParameterizedTest
+    @MethodSource("buildLimitations")
+    fun getBuildLimitationsTest(
+        version: String,
+        expectedLimitations: String?,
+    ) {
+        Assertions.assertEquals(expectedLimitations, getBuild("ReleaseManagementService", version).limitations)
     }
 
     @ParameterizedTest
@@ -214,6 +226,20 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
             Arguments.of("2.0.1", BuildParameters(javaVersion = "1.8")),
             Arguments.of("1.0.2", BuildParameters()),
         )
+
+    // Referenced by name from @MethodSource, which static analysis cannot follow;
+    // protected, like `build()` below, so it is not read as dead code.
+    protected fun buildLimitations(): Stream<Arguments> =
+        Stream.of(
+            // limitations are provided by releng and have to survive the whole chain down to the client
+            Arguments.of(
+                "1.0.1",
+                "Upgrade from 1.0.0 is not supported, reinstall required.\nSee TEST-1 for details.",
+            ),
+            // builds without limitations in the releng response must expose null, not a failure
+            Arguments.of("2.0.1", null),
+            Arguments.of("1.0.2", null),
+    )
 
     protected fun build(): Stream<Arguments> =
         Stream.of(

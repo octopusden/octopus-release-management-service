@@ -33,5 +33,6 @@
   "buildParameters": {
     "javaVersion": "17",
     "mavenVersion": "3.9"
-  }
+  },
+  "limitations": "Upgrade from 1.0.0 is not supported, reinstall required.\nSee TEST-1 for details."
 }

@@ -11,5 +11,6 @@ data class BuildDTO(
     val commits: Collection<CommitDTO>,
     val statusHistory: Map<BuildStatus, Date>,
     val hotfix: Boolean,
+    val limitations: String? = null,
     val buildParameters: BuildParameters = BuildParameters(),
 )
