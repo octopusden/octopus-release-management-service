@@ -4,7 +4,11 @@
     {
       "component": "main-component-first",
       "version": "1.0.5",
-      "status": "RELEASE"
+      "status": "RELEASE",
+      "buildParameters": {
+        "javaVersion": "17",
+        "mavenVersion": "3.9"
+      }
     },
     {
       "component": "main-component-first",

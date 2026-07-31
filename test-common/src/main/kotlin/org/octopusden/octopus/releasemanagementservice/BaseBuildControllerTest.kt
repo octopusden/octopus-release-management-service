@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchRequest
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildDependencySearchResult
+import org.octopusden.octopus.releasemanagementservice.client.common.dto.BuildParameters
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ErrorResponse
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.ShortBuildDTO
 import java.util.stream.Stream
@@ -60,6 +61,25 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
         expectedLimitations: String?,
     ) {
         Assertions.assertEquals(expectedLimitations, getBuild("ReleaseManagementService", version).limitations)
+    }
+
+    @ParameterizedTest
+    @MethodSource("buildParameters")
+    fun getBuildParametersTest(
+        version: String,
+        expected: BuildParameters,
+    ) {
+        Assertions.assertEquals(expected, getBuild("ReleaseManagementService", version).buildParameters)
+    }
+
+    @ParameterizedTest
+    @MethodSource("buildParameters")
+    fun getBuildsParametersTest(
+        version: String,
+        expected: BuildParameters,
+    ) {
+        val build = getBuilds("ReleaseManagementService", mapOf("versions" to listOf(version))).single()
+        Assertions.assertEquals(expected, build.buildParameters)
     }
 
     @Test
@@ -176,6 +196,35 @@ abstract class BaseBuildControllerTest : BaseReleaseManagementServiceTest {
                     object : TypeReference<Collection<ShortBuildDTO>>() {},
                 ),
             ),
+            Arguments.of(
+                mapOf("javaVersions" to listOf("17")),
+                loadObject("../test-data/releng/builds-java-17.json", object : TypeReference<Collection<ShortBuildDTO>>() {}),
+            ),
+            Arguments.of(
+                mapOf("mavenVersions" to listOf("3.9")),
+                loadObject("../test-data/releng/builds-java-17.json", object : TypeReference<Collection<ShortBuildDTO>>() {}),
+            ),
+            Arguments.of(
+                mapOf("javaVersionPresent" to true),
+                loadObject(
+                    "../test-data/releng/builds-java-recorded.json",
+                    object : TypeReference<Collection<ShortBuildDTO>>() {},
+                ),
+            ),
+            Arguments.of(
+                mapOf("javaVersionPresent" to false),
+                loadObject(
+                    "../test-data/releng/builds-java-not-recorded.json",
+                    object : TypeReference<Collection<ShortBuildDTO>>() {},
+                ),
+            ),
+        )
+
+    private fun buildParameters(): Stream<Arguments> =
+        Stream.of(
+            Arguments.of("1.0.1", BuildParameters(javaVersion = "17", mavenVersion = "3.9")),
+            Arguments.of("2.0.1", BuildParameters(javaVersion = "1.8")),
+            Arguments.of("1.0.2", BuildParameters()),
         )
 
     // Referenced by name from @MethodSource, which static analysis cannot follow;

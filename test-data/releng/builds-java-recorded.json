@@ -1,0 +1,4 @@
+[
+  {"component":"ReleaseManagementService","version":"1.0.1","status":"BUILD","buildParameters":{"javaVersion":"17","mavenVersion":"3.9"}},
+  {"component":"ReleaseManagementService","version":"2.0.1","status":"RELEASE","buildParameters":{"javaVersion":"1.8"}}
+]

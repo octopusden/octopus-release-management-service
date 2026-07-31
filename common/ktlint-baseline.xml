@@ -38,9 +38,6 @@
         <error line="5" column="27" source="standard:class-signature" />
         <error line="5" column="43" source="standard:class-signature" />
     </file>
-    <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/common/dto/ShortBuildDTO.kt">
-        <error line="7" column="24" source="standard:trailing-comma-on-declaration-site" />
-    </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/client/common/exception/AlreadyExistsException.kt">
         <error line="3" column="30" source="standard:class-signature" />
         <error line="3" column="45" source="standard:class-signature" />
