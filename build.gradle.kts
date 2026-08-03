@@ -93,6 +93,34 @@ kover {
 }
 
 octopusQuality {
+    // Regression guard on what this repository publishes to Maven Central, from octopus-base
+    // v2.7.0. No hand-rolled guard existed here before this change — nothing is being deleted,
+    // this is a straight addition.
+    //
+    // This is deliberately INDEPENDENT of release.yml's fat-jar-publication-allowlist
+    // (`automation,release-management-teamcity-plugin`): that exemption stops the release-time
+    // SIZE guard from inspecting either artifactId at all, so a second oversized artifact added
+    // to either publication would pass that guard unnoticed. The signatures declared below are
+    // the only thing left watching those two — which is why the two mechanisms are
+    // complementary, not redundant.
+    publication {
+        enforceCentralPublications.set(true)
+        centralPublications.set(
+            setOf(
+                ":automation|maven|org.octopusden.octopus.automation.release-management:automation|" +
+                    "[jar, jar:all, jar:javadoc, jar:sources, zip:metarunners]",
+                ":client|maven|org.octopusden.octopus.release-management-service:client|" +
+                    "[jar, jar:javadoc, jar:sources]",
+                ":common|maven|org.octopusden.octopus.release-management-service:common|" +
+                    "[jar, jar:javadoc, jar:sources]",
+                ":legacy-releng-client|maven|org.octopusden.octopus.release-management-service:legacy-releng-client|" +
+                    "[jar, jar:javadoc, jar:sources]",
+                ":release-management-teamcity-plugin|maven|" +
+                    "org.octopusden.octopus.release-management-service:release-management-teamcity-plugin|" +
+                    "[jar, jar:javadoc, jar:sources, zip]",
+            ),
+        )
+    }
     // ORMS: blocking mode (already established)
     kotlin {
         failOnViolation.set(true)
