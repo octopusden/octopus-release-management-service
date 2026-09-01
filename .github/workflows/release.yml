@@ -6,7 +6,9 @@ on:
 
 jobs:
   build:
-    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@v2.7.1
+    # TODO placeholder — replace with the octopus-base tag that carries
+    # github-packages-publications once it is released. Nothing below works before then.
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@vX.Y.Z
     with:
       flow-type: hybrid
       java-version: '21'
@@ -14,11 +16,21 @@ jobs:
       build-version: ${{ github.event.client_payload.project_version }}
       docker-image: release-management-service
       skip-extra-tasks: ft
-      # Exempt from the Maven Central publication guard. Everything else this repository
-      # publishes is a thin library jar, so the guard's defaults apply unchanged.
-      #   automation — the TeamCity metarunner resolves it from a Maven repository as
-      #     ${group}:${name}:${version}:jar:all (automation/metarunners/
-      #     OctopusReleaseManagementAutomation.xml), so the shadow jar must stay published.
+      # The automation shadow jar leaves Maven Central for GitHub Packages. It cannot simply stop
+      # being published: the OctopusReleaseManagementAutomation metarunner resolves it as
+      # ${group}:${name}:${version}:jar:all through a TeamCity Maven2 runner, and that runner is
+      # what makes the download work on both Windows and Linux agents.
+      #
+      # Consumers need a token with read:packages — that registry has no anonymous read, unlike
+      # ghcr.io. How the TeamCity agents get one is tracked separately (an Artifactory remote
+      # repository proxying maven.pkg.github.com, or a project-level Maven settings file).
+      github-packages-publications: shadow
+      # Exempt from the Maven Central publication guard.
+      #   automation — the guard inspects publishToMavenLocal, which materialises every
+      #     publication regardless of where it is bound, so it still sees the shadow jar even
+      #     though nothing sends it to Central any more. The allowlist is keyed by artifactId and
+      #     the thin and fat publications share one, so it cannot exempt just the fat jar.
+      #     Removable once the guard is taught to inspect only Sonatype-bound publications.
       #   release-management-teamcity-plugin — an 8.5 MB TeamCity plugin bundle, above the
       #     8 MB default. Exempted to keep this change behaviour-preserving, NOT because a
       #     consumer is known: nothing in this organisation resolves it from a Maven
