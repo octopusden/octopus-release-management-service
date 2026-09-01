@@ -25,12 +25,10 @@ jobs:
       # ghcr.io. How the TeamCity agents get one is tracked separately (an Artifactory remote
       # repository proxying maven.pkg.github.com, or a project-level Maven settings file).
       github-packages-publications: shadow
-      # Exempt from the Maven Central publication guard.
-      #   automation — the guard inspects publishToMavenLocal, which materialises every
-      #     publication regardless of where it is bound, so it still sees the shadow jar even
-      #     though nothing sends it to Central any more. The allowlist is keyed by artifactId and
-      #     the thin and fat publications share one, so it cannot exempt just the fat jar.
-      #     Removable once the guard is taught to inspect only Sonatype-bound publications.
+      # Exempt from the Maven Central publication guard. automation is NOT listed: the guard
+      # applies the same routing as the publish steps, so the shadow jar is not counted against
+      # Central and the thin jar stays covered — the allowlist is keyed by artifactId, so listing
+      # automation would have exempted both.
       #   release-management-teamcity-plugin — an 8.5 MB TeamCity plugin bundle, above the
       #     8 MB default. Exempted to keep this change behaviour-preserving, NOT because a
       #     consumer is known: nothing in this organisation resolves it from a Maven
@@ -39,5 +37,5 @@ jobs:
       #     assets. Whether Maven Central is still a needed install channel for TeamCity
       #     admins is an open question in the PR — if it is not, dropping this publication
       #     saves a further 60 files and 8.5 MB per release.
-      fat-jar-publication-allowlist: automation,release-management-teamcity-plugin
+      fat-jar-publication-allowlist: release-management-teamcity-plugin
     secrets: inherit
