@@ -72,9 +72,6 @@ val metarunners = artifacts.add(
     builtBy("zipMetarunners")
 }
 
-// The shadow plugin adds shadowRuntimeElements as a variant of components["java"] once
-// maven-publish is applied, which is how the 20 MB shadow jar has been reaching Maven Central
-// without anyone asking for it. Dropping the variant leaves the thin jar, sources and javadoc.
 (components["java"] as AdhocComponentWithVariants)
     .withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) { skip() }
 
@@ -107,15 +104,6 @@ publishing {
             artifact(metarunners)
             automationPom()
         }
-
-        // The shadow jar, off Central and onto GitHub Packages. It cannot simply stop being
-        // published: the OctopusReleaseManagementAutomation metarunner resolves it as
-        // ${group}:${name}:${version}:jar:all through a TeamCity Maven2 runner, and that runner is
-        // what makes the download work on both Windows and Linux agents — a GitHub release asset
-        // would not. Same coordinates as above, distinguished only by the classifier.
-        //
-        // Which publication goes where is decided by the release workflow's
-        // github-packages-publications input, not here.
         create<MavenPublication>("shadow") {
             artifact(tasks.named("shadowJar"))
             automationPom()
@@ -123,15 +111,9 @@ publishing {
     }
 
     repositories {
-        // The name is the contract the release workflow's routing keys off.
         maven {
             name = "GitHubPackages"
-            url = uri(
-                "https://maven.pkg.github.com/" +
-                    (System.getenv("GITHUB_REPOSITORY") ?: "octopusden/${rootProject.name}")
-            )
-            // Set by the workflow. GITHUB_TOKEN is not an ambient variable, and GITHUB_ACTOR is a
-            // built-in whose value varies by trigger.
+            url = uri("https://maven.pkg.github.com/octopusden/${rootProject.name}")
             credentials {
                 username = System.getenv("GITHUB_PACKAGES_USERNAME")
                 password = System.getenv("GITHUB_PACKAGES_TOKEN")

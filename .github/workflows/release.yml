@@ -16,14 +16,6 @@ jobs:
       build-version: ${{ github.event.client_payload.project_version }}
       docker-image: release-management-service
       skip-extra-tasks: ft
-      # The automation shadow jar leaves Maven Central for GitHub Packages. It cannot simply stop
-      # being published: the OctopusReleaseManagementAutomation metarunner resolves it as
-      # ${group}:${name}:${version}:jar:all through a TeamCity Maven2 runner, and that runner is
-      # what makes the download work on both Windows and Linux agents.
-      #
-      # Consumers need a token with read:packages — that registry has no anonymous read, unlike
-      # ghcr.io. How the TeamCity agents get one is tracked separately (an Artifactory remote
-      # repository proxying maven.pkg.github.com, or a project-level Maven settings file).
       github-packages-publications: shadow
       # Exempt from the Maven Central publication guard. automation is NOT listed: the guard
       # applies the same routing as the publish steps, so the shadow jar is not counted against
