@@ -16,7 +16,7 @@ jobs:
       build-version: ${{ github.event.client_payload.project_version }}
       docker-image: release-management-service
       skip-extra-tasks: ft
-      github-packages-publications: shadow
+      github-packages-publications: ":automation:shadow"
       # Exempt from the Maven Central publication guard. automation is NOT listed: the guard
       # applies the same routing as the publish steps, so the shadow jar is not counted against
       # Central and the thin jar stays covered — the allowlist is keyed by artifactId, so listing
