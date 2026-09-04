@@ -10,20 +10,15 @@ jobs:
     # github-packages-publications once it is released. Nothing below works before then.
     uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@vX.Y.Z
     permissions:
-      # A reusable workflow can only narrow the permissions its caller grants, never widen them.
-      contents: write   # tag and GitHub Release
-      packages: write   # publish to GitHub Packages
+      contents: write
+      packages: write
     with:
       flow-type: hybrid
       java-version: '21'
       commit-hash: ${{ github.event.client_payload.commit }}
       build-version: ${{ github.event.client_payload.project_version }}
-      # A run that published to Central and then failed cannot be re-dispatched — Central refuses
-      # a version it already holds — so finishing it needs a resume.
       resume-deployment-id: ${{ github.event.client_payload.resume_deployment_id }}
       docker-image: release-management-service
       skip-extra-tasks: ft
-      # Both are distributions, not dependencies: nothing compiles against them. Each publication
-      # moves as a whole, so its artifacts keep the coordinates their consumers already use.
       github-packages-publications: ":automation:maven, :release-management-teamcity-plugin:maven"
     secrets: inherit
