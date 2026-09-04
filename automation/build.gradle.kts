@@ -102,9 +102,6 @@ publishing {
     }
 
     repositories {
-        // Nothing this module publishes is consumed as a dependency: the jar is run, not compiled
-        // against, and the metarunners archive is unpacked. The release routes this publication
-        // here as a whole, so the module leaves Maven Central entirely.
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/octopusden/${rootProject.name}")
