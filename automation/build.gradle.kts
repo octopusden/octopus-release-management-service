@@ -72,45 +72,39 @@ val metarunners = artifacts.add(
     builtBy("zipMetarunners")
 }
 
-(components["java"] as AdhocComponentWithVariants)
-    .withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) { skip() }
-
-fun MavenPublication.automationPom() = pom {
-    name.set(project.name)
-    description.set(project.description)
-    url.set("https://github.com/octopusden/${rootProject.name}.git")
-    licenses {
-        license {
-            name.set("The Apache License, Version 2.0")
-            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-        }
-    }
-    scm {
-        url.set("https://github.com/octopusden/${rootProject.name}.git")
-        connection.set("scm:git://github.com/octopusden/${rootProject.name}.git")
-    }
-    developers {
-        developer {
-            id.set("octopus")
-            name.set("octopus")
-        }
-    }
-}
-
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
             artifact(metarunners)
-            automationPom()
-        }
-        create<MavenPublication>("shadow") {
-            artifact(tasks.named("shadowJar"))
-            automationPom()
+            pom {
+                name.set(project.name)
+                description.set(project.description)
+                url.set("https://github.com/octopusden/${rootProject.name}.git")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/octopusden/${rootProject.name}.git")
+                    connection.set("scm:git://github.com/octopusden/${rootProject.name}.git")
+                }
+                developers {
+                    developer {
+                        id.set("octopus")
+                        name.set("octopus")
+                    }
+                }
+            }
         }
     }
 
     repositories {
+        // Nothing this module publishes is consumed as a dependency: the jar is run, not compiled
+        // against, and the metarunners archive is unpacked. The release routes this publication
+        // here as a whole, so the module leaves Maven Central entirely.
         maven {
             name = "GitHubPackages"
             url = uri("https://maven.pkg.github.com/octopusden/${rootProject.name}")

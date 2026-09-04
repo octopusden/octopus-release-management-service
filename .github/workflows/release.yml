@@ -9,25 +9,29 @@ jobs:
     # TODO placeholder — replace with the octopus-base tag that carries
     # github-packages-publications once it is released. Nothing below works before then.
     uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@vX.Y.Z
+    permissions:
+      # A reusable workflow can only narrow the permissions its caller grants, never widen them.
+      contents: write   # tag and GitHub Release
+      packages: write   # publish to GitHub Packages
     with:
       flow-type: hybrid
       java-version: '21'
       commit-hash: ${{ github.event.client_payload.commit }}
       build-version: ${{ github.event.client_payload.project_version }}
+      # Forwarded so a run that died between the two registries can be resumed. Central refuses to
+      # re-upload a version it already holds, so a plain re-dispatch cannot finish the publication
+      # that is missing; a resumed run skips the upload and completes the rest.
+      resume-deployment-id: ${{ github.event.client_payload.resume_deployment_id }}
       docker-image: release-management-service
       skip-extra-tasks: ft
-      github-packages-publications: ":automation:shadow"
-      # Exempt from the Maven Central publication guard. automation is NOT listed: the guard
-      # applies the same routing as the publish steps, so the shadow jar is not counted against
-      # Central and the thin jar stays covered — the allowlist is keyed by artifactId, so listing
-      # automation would have exempted both.
-      #   release-management-teamcity-plugin — an 8.5 MB TeamCity plugin bundle, above the
-      #     8 MB default. Exempted to keep this change behaviour-preserving, NOT because a
-      #     consumer is known: nothing in this organisation resolves it from a Maven
-      #     repository (the only in-repo user, ft's deployTeamcity2022Plugin, takes it from
-      #     the project's `distributions` configuration), and the GitHub releases carry no
-      #     assets. Whether Maven Central is still a needed install channel for TeamCity
-      #     admins is an open question in the PR — if it is not, dropping this publication
-      #     saves a further 60 files and 8.5 MB per release.
+      # The automation module is a distribution, not a dependency: its jar is executed rather than
+      # compiled against, and its metarunners archive is unpacked. The whole publication moves, so
+      # the fat jar, the thin jar and the archive stay together and keep the coordinates their
+      # consumers already use.
+      github-packages-publications: ":automation:maven"
+      # release-management-teamcity-plugin publishes an 8.5 MB bundle, above the guard's default.
+      # Exempted to keep this change behaviour-preserving, not because a consumer is known: nothing
+      # here resolves it from a Maven repository, and the GitHub releases carry no assets. Removing
+      # it needs a decision about whether that module should publish at all.
       fat-jar-publication-allowlist: release-management-teamcity-plugin
     secrets: inherit
