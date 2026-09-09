@@ -6,26 +6,19 @@ on:
 
 jobs:
   build:
-    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@v2.7.1
+    # TODO placeholder — replace with the octopus-base tag that carries
+    # github-packages-publications once it is released. Nothing below works before then.
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@vX.Y.Z
+    permissions:
+      contents: write
+      packages: write
     with:
       flow-type: hybrid
       java-version: '21'
       commit-hash: ${{ github.event.client_payload.commit }}
       build-version: ${{ github.event.client_payload.project_version }}
+      resume-deployment-id: ${{ github.event.client_payload.resume_deployment_id }}
       docker-image: release-management-service
       skip-extra-tasks: ft
-      # Exempt from the Maven Central publication guard. Everything else this repository
-      # publishes is a thin library jar, so the guard's defaults apply unchanged.
-      #   automation — the TeamCity metarunner resolves it from a Maven repository as
-      #     ${group}:${name}:${version}:jar:all (automation/metarunners/
-      #     OctopusReleaseManagementAutomation.xml), so the shadow jar must stay published.
-      #   release-management-teamcity-plugin — an 8.5 MB TeamCity plugin bundle, above the
-      #     8 MB default. Exempted to keep this change behaviour-preserving, NOT because a
-      #     consumer is known: nothing in this organisation resolves it from a Maven
-      #     repository (the only in-repo user, ft's deployTeamcity2022Plugin, takes it from
-      #     the project's `distributions` configuration), and the GitHub releases carry no
-      #     assets. Whether Maven Central is still a needed install channel for TeamCity
-      #     admins is an open question in the PR — if it is not, dropping this publication
-      #     saves a further 60 files and 8.5 MB per release.
-      fat-jar-publication-allowlist: automation,release-management-teamcity-plugin
+      github-packages-publications: ":automation:maven, :release-management-teamcity-plugin:maven"
     secrets: inherit
