@@ -28,7 +28,10 @@ abstract class MigrateMockData : DefaultTask() {
 
     @TaskAction
     fun startMockServer() {
-        awaitMockServer()
+        MockServerReadiness.await(host.get(), port.get(), AWAIT_TIMEOUT_MS, AWAIT_PERIOD_MS) {
+            logger.lifecycle("MockServer at ${host.get()}:${port.get()} is not serving yet, retrying")
+        }
+        mockServerClient.reset()
         endpointToResponseFileName.forEach {
             generateMockserverData(it.key.first, it.key.second, testDataDir.get() + File.separator + it.value, HttpStatusCode.OK_200.code())
         }
@@ -54,25 +57,6 @@ abstract class MigrateMockData : DefaultTask() {
             HttpStatusCode.OK_200.code(),
             "POST",
         )
-    }
-
-    /**
-     * On OKD the route is created alongside the pod, so the router can still answer 503 for a few
-     * seconds after the pod reports ready - which is when this task runs. Retry until it serves.
-     */
-    private fun awaitMockServer() {
-        val deadline = System.currentTimeMillis() + AWAIT_TIMEOUT_MS
-        while (true) {
-            try {
-                mockServerClient.reset()
-                return
-            } catch (e: RuntimeException) {
-                if (System.currentTimeMillis() >= deadline) throw e
-                logger.lifecycle("MockServer at ${host.get()}:${port.get()} is not serving yet, retrying")
-                logger.debug("MockServer reset failed", e)
-                Thread.sleep(AWAIT_PERIOD_MS)
-            }
-        }
     }
 
     private fun generateMockserverData(
