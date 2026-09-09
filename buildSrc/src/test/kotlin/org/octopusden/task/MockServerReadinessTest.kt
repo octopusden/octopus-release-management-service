@@ -7,9 +7,12 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.ServerSocket
+import java.net.Socket
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.concurrent.thread
 
 class MockServerReadinessTest {
     @Test
@@ -17,10 +20,10 @@ class MockServerReadinessTest {
         val router = RouterStub(readyAfterProbes = 2)
         router.start()
         try {
-            val retries = AtomicInteger()
-            MockServerReadiness.await(HOST, router.port, TIMEOUT_MS, PERIOD_MS) { retries.incrementAndGet() }
-            assertTrue(retries.get() >= 1, "expected at least one retry, got ${retries.get()}")
-            assertTrue(router.probes.get() >= 3, "expected the 503 probes to be repeated, got ${router.probes.get()}")
+            val outcomes = mutableListOf<String>()
+            MockServerReadiness.await(HOST, router.port, TIMEOUT_MS, PERIOD_MS) { outcomes += it }
+            assertEquals(listOf("HTTP 503", "HTTP 503"), outcomes)
+            assertEquals(3, router.probes.get())
         } finally {
             router.stop()
         }
@@ -36,10 +39,10 @@ class MockServerReadinessTest {
                     MockServerReadiness.await(HOST, router.port, FAIL_TIMEOUT_MS, PERIOD_MS)
                 }
             assertEquals(
-                "MockServer at $HOST:${router.port} did not start serving within $FAIL_TIMEOUT_MS ms",
+                "MockServer at $HOST:${router.port} did not start serving within $FAIL_TIMEOUT_MS ms, " +
+                    "last probe: HTTP 503",
                 exception.message,
             )
-            assertTrue(router.probes.get() >= 1, "expected the readiness probe to be attempted")
         } finally {
             router.stop()
         }
@@ -56,7 +59,31 @@ class MockServerReadinessTest {
         }
     }
 
-    /** Serves the OKD router's 503 page until [readyAfterProbes] status probes have been answered. */
+    @Test
+    fun `gives up within the budget when the route accepts the connection but never answers`() {
+        val route = SilentRoute()
+        route.start()
+        try {
+            val started = System.currentTimeMillis()
+            val exception =
+                assertThrows<GradleException> {
+                    MockServerReadiness.await(HOST, route.port, FAIL_TIMEOUT_MS, PERIOD_MS)
+                }
+            val elapsed = System.currentTimeMillis() - started
+            assertTrue(
+                elapsed < SOCKET_TIMEOUT_MS,
+                "expected the probe to be cut off by the readiness budget, but it waited $elapsed ms",
+            )
+            assertTrue(
+                exception.message!!.contains("HttpTimeoutException"),
+                "expected the timeout to be reported, got: ${exception.message}",
+            )
+        } finally {
+            route.stop()
+        }
+    }
+
+    /** Serves the OKD router's 503 page until [readyAfterProbes] probes have been answered, then 200. */
     private class RouterStub(
         private val readyAfterProbes: Int,
     ) {
@@ -86,11 +113,37 @@ class MockServerReadinessTest {
         }
     }
 
+    /** A route that completes the TCP handshake and then leaves the request unanswered. */
+    private class SilentRoute {
+        private val serverSocket = ServerSocket(0)
+        private val held = mutableListOf<Socket>()
+
+        val port: Int get() = serverSocket.localPort
+
+        fun start() {
+            thread(isDaemon = true, name = "silent-route") {
+                while (!serverSocket.isClosed) {
+                    try {
+                        held += serverSocket.accept()
+                    } catch (e: IOException) {
+                        return@thread
+                    }
+                }
+            }
+        }
+
+        fun stop() {
+            serverSocket.close()
+            held.forEach { runCatching { it.close() } }
+        }
+    }
+
     companion object {
         private const val HOST = "127.0.0.1"
         private const val TIMEOUT_MS = 5_000L
-        private const val FAIL_TIMEOUT_MS = 200L
+        private const val FAIL_TIMEOUT_MS = 300L
         private const val PERIOD_MS = 50L
+        private const val SOCKET_TIMEOUT_MS = 20_000L
         private const val ROUTER_503_PAGE = "<html><body><h1>Application is not available</h1></body></html>"
     }
 }

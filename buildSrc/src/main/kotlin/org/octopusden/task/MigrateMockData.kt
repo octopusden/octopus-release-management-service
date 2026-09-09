@@ -28,8 +28,8 @@ abstract class MigrateMockData : DefaultTask() {
 
     @TaskAction
     fun startMockServer() {
-        MockServerReadiness.await(host.get(), port.get(), AWAIT_TIMEOUT_MS, AWAIT_PERIOD_MS) {
-            logger.lifecycle("MockServer at ${host.get()}:${port.get()} is not serving yet, retrying")
+        MockServerReadiness.await(host.get(), port.get(), AWAIT_TIMEOUT_MS, AWAIT_PERIOD_MS) { outcome ->
+            logger.lifecycle("MockServer at ${host.get()}:${port.get()} is not serving yet ($outcome), retrying")
         }
         mockServerClient.reset()
         endpointToResponseFileName.forEach {
