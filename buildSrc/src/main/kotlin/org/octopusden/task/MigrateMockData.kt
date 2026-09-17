@@ -28,6 +28,9 @@ abstract class MigrateMockData : DefaultTask() {
 
     @TaskAction
     fun startMockServer() {
+        MockServerReadiness.await(host.get(), port.get(), AWAIT_TIMEOUT_MS, AWAIT_PERIOD_MS) { outcome ->
+            logger.lifecycle("MockServer at ${host.get()}:${port.get()} is not serving yet ($outcome), retrying")
+        }
         mockServerClient.reset()
         endpointToResponseFileName.forEach {
             generateMockserverData(it.key.first, it.key.second, testDataDir.get() + File.separator + it.value, HttpStatusCode.OK_200.code())
@@ -93,6 +96,8 @@ abstract class MigrateMockData : DefaultTask() {
     }
 
     companion object {
+        private const val AWAIT_TIMEOUT_MS = 60_000L
+        private const val AWAIT_PERIOD_MS = 2_000L
         private val defaultParams = mapOf("descending" to listOf("false"))
         private val endpointToResponseFileName =
             mapOf(
