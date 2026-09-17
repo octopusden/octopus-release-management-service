@@ -31,5 +31,6 @@ jobs:
       docker-image: release-management-service
       skip-extra-tasks: ft
       github-packages-publications: ":automation:maven, :release-management-teamcity-plugin:maven"
+      github-packages-repository: octopusden/octopus-maven-packages
       dry-run: true
     secrets: inherit
