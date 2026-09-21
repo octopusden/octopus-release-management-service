@@ -93,16 +93,9 @@ kover {
 }
 
 octopusQuality {
-    // Regression guard on what this repository publishes to Maven Central, from octopus-base
-    // v2.7.0. No hand-rolled guard existed here before this change — nothing is being deleted,
-    // this is a straight addition.
-    //
-    // This is deliberately INDEPENDENT of release.yml's fat-jar-publication-allowlist
-    // (`automation,release-management-teamcity-plugin`): that exemption stops the release-time
-    // SIZE guard from inspecting either artifactId at all, so a second oversized artifact added
-    // to either publication would pass that guard unnoticed. The signatures declared below are
-    // the only thing left watching those two — which is why the two mechanisms are
-    // complementary, not redundant.
+    // Regression guard on what this repository publishes, from octopus-base v2.7.0. It compares
+    // the publications the build DECLARES, so the two routed to GitHub Packages are still listed:
+    // the release-time guard no longer sees them, and this is what watches their shape.
     publication {
         enforceCentralPublications.set(true)
         centralPublications.set(
