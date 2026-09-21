@@ -16,6 +16,7 @@ pluginManagement {
         id("org.jetbrains.kotlinx.kover") version (extra["kover.version"] as String)
         id("org.owasp.dependencycheck") version (extra["owasp-dependency-check.version"] as String)
         id("org.octopusden.octopus-quality") version (extra["octopus-quality.version"] as String)
+        id("org.sonarqube") version (extra["sonarqube.version"] as String)
     }
     repositories {
         gradlePluginPortal()
