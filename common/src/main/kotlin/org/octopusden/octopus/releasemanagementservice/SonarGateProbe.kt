@@ -5,7 +5,6 @@ package org.octopusden.octopus.releasemanagementservice
  * to a pull request in this repository. Delete this file; never merge it.
  */
 object SonarGateProbe {
-
     fun alwaysTrue(value: Int): Boolean = value == value
 
     fun weakToken(): Int = java.util.Random().nextInt()
