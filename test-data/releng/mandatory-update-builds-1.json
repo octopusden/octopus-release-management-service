@@ -25,7 +25,8 @@
     "buildParameters": {
       "javaVersion": "17",
       "mavenVersion": "3.9"
-    }
+    },
+    "lineVersion": "1"
   },
   {
     "component": "main-component-first",

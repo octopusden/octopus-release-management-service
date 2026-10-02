@@ -9,7 +9,10 @@ data class ShortBuildDTO(
     val status: BuildStatus,
     val hotfix: Boolean,
     val buildParameters: BuildParameters = BuildParameters(),
-    /** Release line as used by the `lines` filter (a hotfix build belongs to its release version); null if unknown. */
+    /**
+     * Major Version: the value of the component's line version format, as the `lines` filter matches it
+     * (a hotfix build gets its release version); null if unknown.
+     */
     val lineVersion: String? = null,
     /** Same as [BuildDTO.statusHistory]; a missing entry means the date is unknown or the build is no longer in that status. */
     @field:JsonFormat(shape = JsonFormat.Shape.STRING)
