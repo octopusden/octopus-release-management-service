@@ -136,6 +136,8 @@ class UtilityServiceImpl(
             status = status,
             hotfix = hotfix,
             buildParameters = buildParameters,
+            lineVersion = lineVersion,
+            statusHistory = statusHistory,
         )
 
     companion object {
