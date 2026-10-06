@@ -1,6 +1,9 @@
 import kotlinx.kover.gradle.plugin.dsl.AggregationType
 import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.InetAddress
 import java.util.zip.CRC32
@@ -176,12 +179,43 @@ subprojects {
     }
 
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            freeCompilerArgs += "-Xjsr305=strict"
-            suppressWarnings = true
-            jvmTarget = "21"
+        compilerOptions {
+            freeCompilerArgs.add("-Xjsr305=strict")
+            suppressWarnings.set(true)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
+
+    // The Kotlin Gradle plugin (kotlin-plugin.version) is newer than the Kotlin runtime these modules
+    // ship with and run on (kotlin.version). Hold the compiler to the runtime's level so the bytecode
+    // and metadata stay what consumers of the published modules can read, and no call can reach a
+    // stdlib API newer than the stdlib on the classpath.
+    extensions.configure<KotlinJvmProjectExtension> {
+        // The version the plugin gives kotlin-stdlib / kotlin-reflect and its own constraints on them;
+        // it defaults to the plugin's version, which would leak into the published POMs and modules.
+        coreLibrariesVersion = providers.gradleProperty("kotlin.version").get()
+        compilerOptions {
+            languageVersion.set(KotlinVersion.KOTLIN_1_9)
+            apiVersion.set(KotlinVersion.KOTLIN_1_9)
+        }
+    }
+
+    // The imported Spring BOMs pin every org.jetbrains.kotlin artifact to the runtime version, and
+    // dependency-management applies them to every configuration - including the Kotlin plugin's own
+    // compiler, build-tools and compiler-plugin classpaths, where a 1.9 compiler under a 2.x plugin
+    // fails to load. Give the Kotlin artifacts there back the versions the plugin asks for;
+    // registered after dependency-management's rule, this one runs last. kotlinScriptDef* resolve
+    // from the project's classpath and stay managed.
+    configurations
+        .matching { it.name.startsWith("kotlin") && !it.name.startsWith("kotlinScriptDef") }
+        .configureEach {
+            resolutionStrategy.eachDependency {
+                val version = requested.version
+                if (requested.group.startsWith("org.jetbrains.kotlin") && !version.isNullOrEmpty()) {
+                    useVersion(version)
+                }
+            }
+        }
 
     // detekt + ktlint configuration is provided by octopus-quality convention plugin
     // Local overrides: detekt-baseline.xml and ktlint-baseline.xml per module

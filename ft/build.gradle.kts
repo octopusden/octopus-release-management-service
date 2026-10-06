@@ -172,8 +172,6 @@ val ftImplementation: Configuration by configurations.getting {
     extendsFrom(configurations.implementation.get())
 }
 
-ftImplementation.isCanBeResolved = true
-
 configurations["ftRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
 tasks {
@@ -187,13 +185,15 @@ configure<ComposeExtension> {
             .asFile.path,
     )
     waitForTcpPorts.set(true)
+    // The standalone docker-compose binary, as plugin 0.16 used; 0.17 defaults to `docker compose`.
+    useDockerComposeV2.set(false)
     captureContainersOutputToFiles.set(layout.buildDirectory.dir("docker-logs"))
     environment.putAll(
         mapOf(
             "RELEASE_MANAGEMENT_SERVICE_VERSION" to version,
-            "OCTOPUS_COMPONENTS_REGISTRY_SERVICE_VERSION" to properties["octopus-components-registry.version"],
-            "MOCKSERVER_VERSION" to properties["mockserver.version"],
-            "TEAMCITY_2022_IMAGE_TAG" to properties["teamcity-2022.image-tag"],
+            "OCTOPUS_COMPONENTS_REGISTRY_SERVICE_VERSION" to providers.gradleProperty("octopus-components-registry.version").get(),
+            "MOCKSERVER_VERSION" to providers.gradleProperty("mockserver.version").get(),
+            "TEAMCITY_2022_IMAGE_TAG" to providers.gradleProperty("teamcity-2022.image-tag").get(),
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
             "OCTOPUS_GITHUB_DOCKER_REGISTRY" to "octopusGithubDockerRegistry".getExt(),
             "TEST_MOCKSERVER_HOST" to "mockserver:1080",
@@ -505,7 +505,8 @@ tasks.named("ftServerCoverageVerify") {
 }
 
 idea.module {
-    scopes["PROVIDED"]?.get("plus")?.add(configurations["ftImplementation"])
+    // The resolvable view of ftImplementation: a declare-only configuration cannot be resolved.
+    scopes["PROVIDED"]?.get("plus")?.add(configurations["ftCompileClasspath"])
 }
 
 dependencyManagement {
@@ -523,4 +524,6 @@ dependencies {
     ftImplementation("org.junit.jupiter:junit-jupiter-engine")
     ftImplementation("org.junit.jupiter:junit-jupiter-params")
     ftImplementation("org.octopusden.octopus.octopus-external-systems-clients:teamcity-client:2.0.44")
+    // Gradle no longer puts the JUnit Platform launcher on the test runtime classpath itself.
+    "ftRuntimeOnly"("org.junit.platform:junit-platform-launcher")
 }
