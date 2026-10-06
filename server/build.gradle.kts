@@ -21,10 +21,12 @@ fun String.getExt() = project.ext[this] as String
 configure<ComposeExtension> {
     useComposeFiles.add(layout.projectDirectory.file("docker/docker-compose.yml").asFile.path )
     waitForTcpPorts.set(true)
+    // The standalone docker-compose binary, as plugin 0.16 used; 0.17 defaults to `docker compose`.
+    useDockerComposeV2.set(false)
     captureContainersOutputToFiles.set(layout.buildDirectory.dir("docker-logs"))
     environment.putAll(
         mapOf(
-            "MOCKSERVER_VERSION" to properties["mockserver.version"],
+            "MOCKSERVER_VERSION" to providers.gradleProperty("mockserver.version").get(),
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
             "TEST_MOCKSERVER_PORT" to "testMockserverPort".getExt()
         )
@@ -128,6 +130,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:${properties["mockito-kotlin.version"]}")
     testImplementation(project(":test-common"))
+    // Gradle no longer puts the JUnit Platform launcher on the test runtime classpath itself.
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 configurations.all {

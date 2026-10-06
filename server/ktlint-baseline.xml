@@ -5,15 +5,15 @@
         <error line="22" column="48" source="standard:chain-method-continuation" />
         <error line="22" column="82" source="standard:chain-method-continuation" />
         <error line="22" column="94" source="standard:paren-spacing" />
-        <error line="29" column="68" source="standard:trailing-comma-on-call-site" />
-        <error line="30" column="10" source="standard:trailing-comma-on-call-site" />
-        <error line="40" column="64" source="standard:curly-spacing" />
-        <error line="46" column="24" source="standard:wrapping" />
-        <error line="49" column="80" source="standard:trailing-comma-on-call-site" />
-        <error line="50" column="9" source="standard:wrapping" />
-        <error line="110" column="20" source="standard:argument-list-wrapping" />
-        <error line="110" column="141" source="standard:max-line-length" />
-        <error line="110" column="147" source="standard:argument-list-wrapping" />
+        <error line="31" column="68" source="standard:trailing-comma-on-call-site" />
+        <error line="32" column="10" source="standard:trailing-comma-on-call-site" />
+        <error line="42" column="64" source="standard:curly-spacing" />
+        <error line="48" column="24" source="standard:wrapping" />
+        <error line="51" column="80" source="standard:trailing-comma-on-call-site" />
+        <error line="52" column="9" source="standard:wrapping" />
+        <error line="112" column="20" source="standard:argument-list-wrapping" />
+        <error line="112" column="141" source="standard:max-line-length" />
+        <error line="112" column="147" source="standard:argument-list-wrapping" />
     </file>
     <file name="src/main/kotlin/org/octopusden/octopus/releasemanagementservice/actuator/LegacyRelengIndicator.kt">
         <error line="10" column="55" source="standard:trailing-comma-on-declaration-site" />
