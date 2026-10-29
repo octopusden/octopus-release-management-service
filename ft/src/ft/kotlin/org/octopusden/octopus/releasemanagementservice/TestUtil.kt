@@ -16,15 +16,20 @@ class TestUtil private constructor() {
         val client =
             ClassicReleaseManagementServiceClient(object : ReleaseManagementServiceClientParametersProvider {
                 override fun getApiUrl() = "http://$hostReleaseManagement"
+
                 override fun getTimeRetryInMillis() = 180000
+
                 override fun getConnectTimeoutInMillis() = 30000
+
                 override fun getReadTimeoutInMillis() = 30000
             })
 
         @JvmStatic
-        fun executeAutomation(command: String, vararg options: String) =
-            org.octopusden.octopus.automation.releasemanagement.main(
-                arrayOf("--url=http://$hostReleaseManagement", command, *options)
-            )
+        fun executeAutomation(
+            command: String,
+            vararg options: String,
+        ) = org.octopusden.octopus.automation.releasemanagement.main(
+            arrayOf("--url=http://$hostReleaseManagement", command, *options),
+        )
     }
 }

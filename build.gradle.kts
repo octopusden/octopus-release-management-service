@@ -1,11 +1,10 @@
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import kotlinx.kover.gradle.plugin.dsl.AggregationType
 import kotlinx.kover.gradle.plugin.dsl.CoverageUnit
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
-import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import java.net.InetAddress
 import java.util.zip.CRC32
 
@@ -13,12 +12,14 @@ plugins {
     java
     idea
     id("io.spring.dependency-management")
-    id("org.jetbrains.kotlin.jvm")
+    id("org.jetbrains.kotlin.jvm") apply false
     id("io.github.gradle-nexus.publish-plugin")
     id("org.jetbrains.kotlinx.kover")
     id("org.owasp.dependencycheck")
     id("io.gitlab.arturbosch.detekt") apply false
     id("org.jlleitschuh.gradle.ktlint") apply false
+    id("org.octopusden.octopus-quality")
+    id("org.sonarqube")
     signing
 }
 
@@ -95,32 +96,46 @@ kover {
     }
 }
 
+octopusQuality {
+    // Regression guard on what this repository publishes, from octopus-base v2.7.0. It compares
+    // the publications the build DECLARES, so the two routed to GitHub Packages are still listed:
+    // the release-time guard no longer sees them, and this is what watches their shape.
+    publication {
+        enforceCentralPublications.set(true)
+        centralPublications.set(
+            setOf(
+                ":automation|maven|org.octopusden.octopus.automation.release-management:automation|" +
+                    "[jar, jar:all, jar:javadoc, jar:sources, zip:metarunners]",
+                ":client|maven|org.octopusden.octopus.release-management-service:client|" +
+                    "[jar, jar:javadoc, jar:sources]",
+                ":common|maven|org.octopusden.octopus.release-management-service:common|" +
+                    "[jar, jar:javadoc, jar:sources]",
+                ":legacy-releng-client|maven|org.octopusden.octopus.release-management-service:legacy-releng-client|" +
+                    "[jar, jar:javadoc, jar:sources]",
+                ":release-management-teamcity-plugin|maven|" +
+                    "org.octopusden.octopus.release-management-service:release-management-teamcity-plugin|" +
+                    "[jar, jar:javadoc, jar:sources, zip]",
+            ),
+        )
+    }
+    // ORMS: blocking mode (already established)
+    kotlin {
+        failOnViolation.set(true)
+    }
+    coverage {
+        // Enabled so the convention plugin wires qualityCoverage → kover tasks.
+        // Kover itself is configured manually above (custom thresholds + branch coverage);
+        // plugin does not override consumer kover config, only aggregates tasks.
+        enabled.set(true)
+    }
+    excludeProjects("test-common", "ft")
+}
+
 dependencyCheck {
     failBuildOnCVSS = 11.0F
     suppressionFile = "$rootDir/config/owasp/suppressions.xml"
     formats = listOf("HTML", "JSON", "SARIF")
     outputDirectory.set(layout.buildDirectory.dir("reports/dependency-check"))
-}
-
-tasks.register("qualityStatic") {
-    group = "verification"
-    description = "Runs static analysis checks for all modules."
-    dependsOn(subprojects.map { "${it.path}:detekt" })
-    dependsOn(subprojects.map { "${it.path}:ktlintCheck" })
-}
-
-tasks.register("qualityCoverage") {
-    group = "verification"
-    description = "Runs tests, generates merged Kover XML report and verifies coverage thresholds."
-    dependsOn(subprojects.map { "${it.path}:test" })
-    dependsOn(tasks.matching { it.name == "koverMergedXmlReport" || it.name == "koverXmlReport" })
-    dependsOn(tasks.matching { it.name == "koverMergedVerify" || it.name == "koverVerify" })
-}
-
-tasks.register("qualityCheck") {
-    group = "verification"
-    description = "Runs all mandatory quality gates."
-    dependsOn("qualityStatic", "qualityCoverage")
 }
 
 tasks.register("securityReport") {
@@ -143,6 +158,7 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlinx.kover")
     apply(plugin = "io.gitlab.arturbosch.detekt")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    // detekt + ktlint are configured by octopus-quality convention plugin
     apply(plugin = "signing")
 
     repositories {
@@ -163,53 +179,46 @@ subprojects {
     }
 
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            freeCompilerArgs += "-Xjsr305=strict"
-            suppressWarnings = true
-            jvmTarget = "21"
+        compilerOptions {
+            freeCompilerArgs.add("-Xjsr305=strict")
+            suppressWarnings.set(true)
+            jvmTarget.set(JvmTarget.JVM_21)
         }
     }
 
-    extensions.configure<DetektExtension> {
-        buildUponDefaultConfig = true
-        allRules = false
-        config.setFrom(rootProject.file("config/detekt/detekt.yml"))
-        baseline = file("$projectDir/detekt-baseline.xml")
-        ignoreFailures = false
-    }
-
-    tasks.withType<Detekt>().configureEach {
-        reports {
-            xml.required.set(true)
-            html.required.set(true)
-            sarif.required.set(true)
-            txt.required.set(false)
+    // The Kotlin Gradle plugin (kotlin-plugin.version) is newer than the Kotlin runtime these modules
+    // ship with and run on (kotlin.version). Hold the compiler to the runtime's level so the bytecode
+    // and metadata stay what consumers of the published modules can read, and no call can reach a
+    // stdlib API newer than the stdlib on the classpath.
+    extensions.configure<KotlinJvmProjectExtension> {
+        // The version the plugin gives kotlin-stdlib / kotlin-reflect and its own constraints on them;
+        // it defaults to the plugin's version, which would leak into the published POMs and modules.
+        coreLibrariesVersion = providers.gradleProperty("kotlin.version").get()
+        compilerOptions {
+            languageVersion.set(KotlinVersion.KOTLIN_1_9)
+            apiVersion.set(KotlinVersion.KOTLIN_1_9)
         }
     }
 
-    extensions.configure<KtlintExtension> {
-        ignoreFailures.set(false)
-        outputToConsole.set(true)
-        reporters {
-            reporter(ReporterType.PLAIN)
-            reporter(ReporterType.CHECKSTYLE)
+    // The imported Spring BOMs pin every org.jetbrains.kotlin artifact to the runtime version, and
+    // dependency-management applies them to every configuration - including the Kotlin plugin's own
+    // compiler, build-tools and compiler-plugin classpaths, where a 1.9 compiler under a 2.x plugin
+    // fails to load. Give the Kotlin artifacts there back the versions the plugin asks for;
+    // registered after dependency-management's rule, this one runs last. kotlinScriptDef* resolve
+    // from the project's classpath and stay managed.
+    configurations
+        .matching { it.name.startsWith("kotlin") && !it.name.startsWith("kotlinScriptDef") }
+        .configureEach {
+            resolutionStrategy.eachDependency {
+                val version = requested.version
+                if (requested.group.startsWith("org.jetbrains.kotlin") && !version.isNullOrEmpty()) {
+                    useVersion(version)
+                }
+            }
         }
-        baseline.set(file("$projectDir/ktlint-baseline.xml"))
-        filter {
-            exclude("**/generated/**")
-            exclude("**/build/**")
-            include("**/src/**/*.kt")
-        }
-    }
 
-    tasks.matching {
-        it.name == "runKtlintCheckOverKotlinScripts" ||
-                it.name == "ktlintKotlinScriptCheck" ||
-                it.name == "runKtlintFormatOverKotlinScripts" ||
-                it.name == "ktlintKotlinScriptFormat"
-    }.configureEach {
-        enabled = false
-    }
+    // detekt + ktlint configuration is provided by octopus-quality convention plugin
+    // Local overrides: detekt-baseline.xml and ktlint-baseline.xml per module
 
     tasks.withType<Test> {
         useJUnitPlatform()

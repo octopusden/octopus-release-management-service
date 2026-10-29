@@ -2,7 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>MaxLineLength:ClassicReleaseManagementServiceClient.kt$ClassicReleaseManagementServiceClient.Companion$.</ID>
     <ID>SwallowedException:ReleaseManagementServiceErrorDecoder.kt$ReleaseManagementServiceErrorDecoder$e: Exception</ID>
     <ID>TooGenericExceptionCaught:ReleaseManagementServiceErrorDecoder.kt$ReleaseManagementServiceErrorDecoder$e: Exception</ID>
   </CurrentIssues>

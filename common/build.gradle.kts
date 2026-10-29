@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -46,8 +47,8 @@ java {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = "1.8"
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_1_8)
     }
 }
 
@@ -61,6 +62,7 @@ dependencyManagement {
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations")
+    implementation("jakarta.validation:jakarta.validation-api:${properties["jakarta-validation.version"]}")
 
     api("io.github.openfeign:feign-httpclient")
     api("io.github.openfeign:feign-jackson")

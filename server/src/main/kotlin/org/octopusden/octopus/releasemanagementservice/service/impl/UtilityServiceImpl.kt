@@ -76,13 +76,14 @@ class UtilityServiceImpl(
         val extraFields = mapOf(CUSTOMER_FIELD to multiSelectOf(dto.customer), EPIC_NAME_FIELD to dto.epicName)
         logger.debug("Creating Mandatory Update epic issue. component='{}', version='{}', project='{}'", component, version, dto.projectKey)
         return jiraService.createIssue(
-            dto.projectKey,
-            EPIC_ISSUE,
-            summary,
-            description,
-            assignee,
-            dto.dueDate,
-            extraFields
+            projectKey = dto.projectKey,
+            issueTypeName = EPIC_ISSUE,
+            issuePriorityName = dto.issuePriority,
+            summary = summary,
+            description = description,
+            assignee = assignee,
+            dueDate = dto.dueDate,
+            extraFields = extraFields,
         )
     }
 
@@ -108,13 +109,14 @@ class UtilityServiceImpl(
                 epicKey,
             )
             jiraService.createIssue(
-                currentProjectKey,
-                MANDATORY_UPDATE_ISSUE,
-                ISSUE_SUMMARY_TEMPLATE.format(dto.epicName, componentId, component, version),
-                ISSUE_DESCRIPTION_TEMPLATE.format(componentId, versions, component, version),
-                assignee,
-                dto.dueDate,
-                extraFields
+                projectKey = currentProjectKey,
+                issueTypeName = MANDATORY_UPDATE_ISSUE,
+                issuePriorityName = dto.issuePriority,
+                summary = ISSUE_SUMMARY_TEMPLATE.format(dto.epicName, componentId, component, version),
+                description = ISSUE_DESCRIPTION_TEMPLATE.format(componentId, versions, component, version),
+                assignee = assignee,
+                dueDate = dto.dueDate,
+                extraFields = extraFields,
             )
         }
     }
@@ -128,7 +130,15 @@ class UtilityServiceImpl(
     }
 
     private fun BuildDTO.toShortBuildDTO(): ShortBuildDTO =
-        ShortBuildDTO(component = component, version = version, status = status, hotfix = hotfix)
+        ShortBuildDTO(
+            component = component,
+            version = version,
+            status = status,
+            hotfix = hotfix,
+            buildParameters = buildParameters,
+            lineVersion = lineVersion,
+            statusHistory = statusHistory,
+        )
 
     companion object {
         private const val EPIC_SUMMARY_TEMPLATE = "Bump Dependencies on %s %s"
@@ -137,7 +147,7 @@ class UtilityServiceImpl(
         private const val ISSUE_SUMMARY_TEMPLATE = "%s. %s: Bump Dependencies on %s to %s or a later version."
         private const val ISSUE_DESCRIPTION_TEMPLATE =
             "Component %s has the following versions eligible for mandatory update:\n%s\n\n" +
-                    "Those versions are to be updated: please bump dependencies on %s to %s or a later version."
+                "Those versions are to be updated: please bump dependencies on %s to %s or a later version."
 
         private const val CRN_REQUIRED_FIELD_VALUE = "No"
 

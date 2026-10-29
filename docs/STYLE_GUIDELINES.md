@@ -4,8 +4,8 @@ This document describes enabled and review-candidate style-related checks and cu
 
 ## Scope
 
-- `detekt` config: `config/detekt/detekt.yml`
-- `ktlint` config: `.editorconfig`
+- `detekt` + `ktlint` config: bundled in `org.octopusden.octopus-quality` convention plugin
+  (source of truth: [`octopusden/octopus-base`](https://github.com/octopusden/octopus-base))
 - Technical debt tracking: `*/detekt-baseline.xml`, `*/ktlint-baseline.xml`, `docs/TECH_DEBT.md`
 - Detekt default values referenced below are from `detekt-core-1.23.5` (`default-detekt-config.yml`).
 

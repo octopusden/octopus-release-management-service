@@ -10,53 +10,23 @@ plugins {
     `maven-publish`
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("bootJar") {
-            artifact(tasks.getByName("bootJar"))
-            from(components["java"])
-            pom {
-                name.set(project.name)
-                description.set("Octopus module: ${project.name}")
-                url.set("https://github.com/octopusden/octopus-release-management-service.git")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                scm {
-                    url.set("https://github.com/kzaporozhtsev/octopus-release-management-service.git")
-                    connection.set("scm:git://github.com/octopusden/octopus-release-management-service.git")
-                }
-                developers {
-                    developer {
-                        id.set("octopus")
-                        name.set("octopus")
-                    }
-                }
-            }
-        }
-    }
-}
-
-signing {
-    isRequired = project.ext["signingRequired"] as Boolean
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications["bootJar"])
-}
+// Not published to Maven Central: the server is a deployable, its deliverable is the docker
+// image on ghcr, and nothing consumes it as a Maven dependency. Declaring no publication is
+// what actually keeps it out — publishToSonatype then has nothing to upload for this module.
+// The consumed libraries (:client, :common, :legacy-releng-client, :teamcity-plugin) and
+// :automation keep publishing from their own build scripts.
 
 fun String.getExt() = project.ext[this] as String
 
 configure<ComposeExtension> {
     useComposeFiles.add(layout.projectDirectory.file("docker/docker-compose.yml").asFile.path )
     waitForTcpPorts.set(true)
+    // The standalone docker-compose binary, as plugin 0.16 used; 0.17 defaults to `docker compose`.
+    useDockerComposeV2.set(false)
     captureContainersOutputToFiles.set(layout.buildDirectory.dir("docker-logs"))
     environment.putAll(
         mapOf(
-            "MOCKSERVER_VERSION" to properties["mockserver.version"],
+            "MOCKSERVER_VERSION" to providers.gradleProperty("mockserver.version").get(),
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
             "TEST_MOCKSERVER_PORT" to "testMockserverPort".getExt()
         )
@@ -152,6 +122,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter")
     implementation("org.springframework.cloud:spring-cloud-starter-bootstrap")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.retry:spring-retry")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${properties["springdoc-openapi.version"]}")
@@ -159,6 +130,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:${properties["mockito-kotlin.version"]}")
     testImplementation(project(":test-common"))
+    // Gradle no longer puts the JUnit Platform launcher on the test runtime classpath itself.
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 configurations.all {

@@ -10,4 +10,8 @@ data class BuildFilterDTO(
     val descending: Boolean = false,
     val limit: Int? = null,
     val maxAgeBuilds: Int? = null,
+    val javaVersions: Set<String> = emptySet(),
+    val javaVersionPresent: Boolean? = null,
+    val mavenVersions: Set<String> = emptySet(),
+    val mavenVersionPresent: Boolean? = null,
 )

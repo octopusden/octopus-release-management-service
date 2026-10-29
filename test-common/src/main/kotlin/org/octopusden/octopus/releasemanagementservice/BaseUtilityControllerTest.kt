@@ -12,9 +12,11 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 
-abstract class BaseUtilityControllerTest: BaseReleaseManagementServiceTest {
-
-    abstract fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO
+abstract class BaseUtilityControllerTest : BaseReleaseManagementServiceTest {
+    abstract fun createMandatoryUpdate(
+        dryRun: Boolean,
+        dto: MandatoryUpdateDTO,
+    ): MandatoryUpdateResponseDTO
 
     @ParameterizedTest
     @MethodSource("mandatoryUpdateCases")
@@ -26,7 +28,7 @@ abstract class BaseUtilityControllerTest: BaseReleaseManagementServiceTest {
         excludeVersions: Set<String>,
         excludeComponents: Set<String>,
         excludeSystems: Set<String>,
-        expected: MandatoryUpdateResponseDTO
+        expected: MandatoryUpdateResponseDTO,
     ) {
         val result = createMandatoryUpdate(
             dryRun,
@@ -43,29 +45,54 @@ abstract class BaseUtilityControllerTest: BaseReleaseManagementServiceTest {
                     startVersion = startVersion,
                     excludeVersions = excludeVersions,
                     excludeComponents = excludeComponents,
-                    excludeSystems = excludeSystems
-                )
-            )
+                    excludeSystems = excludeSystems,
+                ),
+            ),
         )
         Assertions.assertEquals(expected, result)
     }
 
-    fun mandatoryUpdateCases(): Stream<Arguments> = Stream.of(
-        Arguments.of(
-            true, "dependency-component-first", "1.0.2", "", emptySet<String>(), emptySet<String>(), emptySet<String>(),
-            loadObject("../test-data/releng/create-mandatory-update-1.json", object : TypeReference<MandatoryUpdateResponseDTO>() {})
-        ),
-        Arguments.of(
-            true, "dependency-component-first", "1.0.2", "", emptySet<String>(), setOf("main-component-second"), setOf("CLASSIC"),
-            loadObject("../test-data/releng/create-mandatory-update-2.json", object : TypeReference<MandatoryUpdateResponseDTO>() {})
-        ),
-        Arguments.of(
-            false, "dependency-component-first", "1.0.2", "", emptySet<String>(), emptySet<String>(), emptySet<String>(),
-            loadObject("../test-data/releng/create-mandatory-update-3.json", object : TypeReference<MandatoryUpdateResponseDTO>() {})
-        ),
-        Arguments.of(
-            true, "dependency-component-first", "2.1.0", "", setOf("2.2"), emptySet<String>(), emptySet<String>(),
-            loadObject("../test-data/releng/create-mandatory-update-4.json", object : TypeReference<MandatoryUpdateResponseDTO>() {})
+    fun mandatoryUpdateCases(): Stream<Arguments> =
+        Stream.of(
+            Arguments.of(
+                true,
+                "dependency-component-first",
+                "1.0.2",
+                "",
+                emptySet<String>(),
+                emptySet<String>(),
+                emptySet<String>(),
+                loadObject("../test-data/releng/create-mandatory-update-1.json", object : TypeReference<MandatoryUpdateResponseDTO>() {}),
+            ),
+            Arguments.of(
+                true,
+                "dependency-component-first",
+                "1.0.2",
+                "",
+                emptySet<String>(),
+                setOf("main-component-second"),
+                setOf("CLASSIC"),
+                loadObject("../test-data/releng/create-mandatory-update-2.json", object : TypeReference<MandatoryUpdateResponseDTO>() {}),
+            ),
+            Arguments.of(
+                false,
+                "dependency-component-first",
+                "1.0.2",
+                "",
+                emptySet<String>(),
+                emptySet<String>(),
+                emptySet<String>(),
+                loadObject("../test-data/releng/create-mandatory-update-3.json", object : TypeReference<MandatoryUpdateResponseDTO>() {}),
+            ),
+            Arguments.of(
+                true,
+                "dependency-component-first",
+                "2.1.0",
+                "",
+                setOf("2.2"),
+                emptySet<String>(),
+                emptySet<String>(),
+                loadObject("../test-data/releng/create-mandatory-update-4.json", object : TypeReference<MandatoryUpdateResponseDTO>() {}),
+            ),
         )
-    )
 }

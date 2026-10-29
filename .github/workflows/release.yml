@@ -6,12 +6,18 @@ on:
 
 jobs:
   build:
-    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@v2.1.12
+    uses: octopusden/octopus-base/.github/workflows/common-java-gradle-release.yml@v3.2.0
+    permissions:
+      contents: write
+      packages: write
     with:
       flow-type: hybrid
       java-version: '21'
       commit-hash: ${{ github.event.client_payload.commit }}
       build-version: ${{ github.event.client_payload.project_version }}
+      resume-deployment-id: ${{ github.event.client_payload.resume_deployment_id }}
       docker-image: release-management-service
       skip-extra-tasks: ft
+      github-packages-publications: ":automation:maven, :release-management-teamcity-plugin:maven"
+      github-packages-repository: octopusden/octopus-maven-packages
     secrets: inherit

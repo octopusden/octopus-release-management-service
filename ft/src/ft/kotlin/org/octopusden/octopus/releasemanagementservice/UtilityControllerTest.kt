@@ -3,10 +3,13 @@ package org.octopusden.octopus.releasemanagementservice
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateDTO
 import org.octopusden.octopus.releasemanagementservice.client.common.dto.MandatoryUpdateResponseDTO
 
-class UtilityControllerTest : BaseUtilityControllerTest(), BaseReleaseManagementServiceFuncTest {
-
+class UtilityControllerTest :
+    BaseUtilityControllerTest(),
+    BaseReleaseManagementServiceFuncTest {
     override fun getObjectMapper() = TestUtil.mapper
 
-    override fun createMandatoryUpdate(dryRun: Boolean, dto: MandatoryUpdateDTO): MandatoryUpdateResponseDTO =
-        TestUtil.client.createMandatoryUpdate(dryRun, dto)
+    override fun createMandatoryUpdate(
+        dryRun: Boolean,
+        dto: MandatoryUpdateDTO,
+    ): MandatoryUpdateResponseDTO = TestUtil.client.createMandatoryUpdate(dryRun, dto)
 }

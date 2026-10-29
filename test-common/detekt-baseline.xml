@@ -2,7 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
-    <ID>NewLineAtEndOfFile:BaseSupportControllerTest.kt$org.octopusden.octopus.releasemanagementservice.BaseSupportControllerTest.kt</ID>
-    <ID>NewLineAtEndOfFile:BaseUtilityControllerTest.kt$org.octopusden.octopus.releasemanagementservice.BaseUtilityControllerTest.kt</ID>
+    <ID>TooManyFunctions:BaseBuildControllerTest.kt$BaseBuildControllerTest : BaseReleaseManagementServiceTest</ID>
   </CurrentIssues>
 </SmellBaseline>

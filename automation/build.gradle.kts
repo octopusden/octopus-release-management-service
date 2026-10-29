@@ -1,9 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("org.jetbrains.kotlin.jvm")
     application
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
     `maven-publish`
 }
 
@@ -11,9 +12,9 @@ group = "org.octopusden.octopus.automation.release-management"
 description = "Octopus Release Management Automation"
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        suppressWarnings = true
-        jvmTarget = "1.8"
+    compilerOptions {
+        suppressWarnings.set(true)
+        jvmTarget.set(JvmTarget.JVM_1_8)
     }
 }
 
@@ -97,6 +98,17 @@ publishing {
                         name.set("octopus")
                     }
                 }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/octopusden/${rootProject.name}")
+            credentials {
+                username = System.getenv("GITHUB_PACKAGES_USERNAME")
+                password = System.getenv("GITHUB_PACKAGES_TOKEN")
             }
         }
     }

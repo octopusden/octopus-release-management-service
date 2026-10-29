@@ -31,6 +31,13 @@ objects:
           ports:
             - containerPort: 4567
               protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1536Mi
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -41,7 +48,7 @@ objects:
             - name: SPRING_CONFIG_ADDITIONAL_LOCATION
               value: "/"
             - name: SPRING_PROFILES_ACTIVE
-              value: "dev"
+              value: "dev,ft-db"
             - name: SPRING_CLOUD_CONFIG_ENABLED
               value: "false"
           volumeMounts:

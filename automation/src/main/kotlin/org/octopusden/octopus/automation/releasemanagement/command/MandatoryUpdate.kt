@@ -43,6 +43,10 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         .required()
         .check("$EPIC_NAME must not be empty") { it.isNotEmpty() }
 
+    private val issuePriority by option(ISSUE_PRIORITY, help = "Issue priority for epic and sub-issues")
+        .convert { it.trim() }
+        .default("")
+
     private val dueDate by option(DUE_DATE, help = "Due date (yyyy-MM-dd)")
         .convert { it.trim() }
         .default("")
@@ -132,6 +136,7 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
                 version = version,
                 projectKey = projectKey,
                 epicName = epicName,
+                issuePriority = issuePriority.takeIf { it.isNotBlank() },
                 dueDate = dueDate,
                 notice = notice,
                 customer = customer,
@@ -156,6 +161,7 @@ class MandatoryUpdate : CliktCommand(name = COMMAND) {
         const val VERSION = "--version"
         const val PROJECT_KEY = "--project-key"
         const val EPIC_NAME = "--epic-name"
+        const val ISSUE_PRIORITY = "--issue-priority"
         const val DUE_DATE = "--due-date"
         const val CUSTOMER = "--customer"
         const val NOTICE = "--notice"
