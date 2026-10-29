@@ -523,7 +523,7 @@ dependencies {
     ftImplementation(project(":test-common"))
     ftImplementation("org.junit.jupiter:junit-jupiter-engine")
     ftImplementation("org.junit.jupiter:junit-jupiter-params")
-    ftImplementation("org.octopusden.octopus.octopus-external-systems-clients:teamcity-client:2.0.44")
+    ftImplementation("org.octopusden.octopus.octopus-external-systems-clients:teamcity-client:${properties["octopusExternalSystemsVersion"]}")
     // Gradle no longer puts the JUnit Platform launcher on the test runtime classpath itself.
     "ftRuntimeOnly"("org.junit.platform:junit-platform-launcher")
 }
