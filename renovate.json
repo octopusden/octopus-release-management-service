@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "enabledManagers": ["gradle"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "description": "Only org.octopusden dependencies, Gradle plugins included; everything else stays out of scope",
+      "matchPackageNames": ["!org.octopusden.**"],
+      "enabled": false
+    },
+    {
+      "description": "External-systems clients (jira-client, teamcity-client) move together",
+      "matchPackageNames": ["org.octopusden.octopus.octopus-external-systems-clients:**"],
+      "groupName": "octopus-external-systems-clients"
+    },
+    {
+      "description": "Infrastructure libraries",
+      "matchPackageNames": ["org.octopusden.octopus.infrastructure:**"],
+      "groupName": "octopus-infrastructure"
+    },
+    {
+      "description": "Org-owned Gradle plugins",
+      "matchPackageNames": ["org.octopusden.octopus.oc-template", "org.octopusden.octopus-quality"],
+      "groupName": "octopus-plugins"
+    }
+  ]
+}

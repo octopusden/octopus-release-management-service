@@ -191,7 +191,7 @@ configure<ComposeExtension> {
     environment.putAll(
         mapOf(
             "RELEASE_MANAGEMENT_SERVICE_VERSION" to version,
-            "OCTOPUS_COMPONENTS_REGISTRY_SERVICE_VERSION" to providers.gradleProperty("octopus-components-registry.version").get(),
+            "OCTOPUS_COMPONENTS_REGISTRY_SERVICE_VERSION" to providers.gradleProperty("octopusComponentsRegistryVersion").get(),
             "MOCKSERVER_VERSION" to providers.gradleProperty("mockserver.version").get(),
             "TEAMCITY_2022_IMAGE_TAG" to providers.gradleProperty("teamcity-2022.image-tag").get(),
             "DOCKER_REGISTRY" to "dockerRegistry".getExt(),
@@ -318,7 +318,7 @@ ocTemplate {
                 .asFile.absolutePath
             parameters.set(
                 commonOkdParameters + mapOf(
-                    "COMPONENTS_REGISTRY_SERVICE_VERSION" to properties["octopus-components-registry.version"] as String,
+                    "COMPONENTS_REGISTRY_SERVICE_VERSION" to properties["octopusComponentsRegistryVersion"] as String,
                     "AGGREGATOR_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/Aggregator.groovy").readText(),
                     "DEFAULTS_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/Defaults.groovy").readText(),
                     "TEST_COMPONENTS_GROOVY_CONTENT" to file("$componentsRegistryWorkDir/TestComponents.groovy").readText(),
@@ -523,7 +523,9 @@ dependencies {
     ftImplementation(project(":test-common"))
     ftImplementation("org.junit.jupiter:junit-jupiter-engine")
     ftImplementation("org.junit.jupiter:junit-jupiter-params")
-    ftImplementation("org.octopusden.octopus.octopus-external-systems-clients:teamcity-client:2.0.44")
+    ftImplementation(
+        "org.octopusden.octopus.octopus-external-systems-clients:teamcity-client:${properties["octopusExternalSystemsVersion"]}",
+    )
     // Gradle no longer puts the JUnit Platform launcher on the test runtime classpath itself.
     "ftRuntimeOnly"("org.junit.platform:junit-platform-launcher")
 }
