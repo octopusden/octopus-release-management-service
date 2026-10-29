@@ -10,12 +10,12 @@ pluginManagement {
         id("io.github.gradle-nexus.publish-plugin") version "2.0.0" apply false
         id("io.github.rodm.teamcity-server") version (extra["rodm-teamcity-plugin.version"] as String)
         id("com.gradleup.shadow") version ("8.3.11")
-        id("org.octopusden.octopus.oc-template") version (extra["octopus-oc-template.version"] as String)
+        id("org.octopusden.octopus.oc-template") version (extra["octopusOcTemplateVersion"] as String)
         id("io.gitlab.arturbosch.detekt") version (extra["detekt.version"] as String)
         id("org.jlleitschuh.gradle.ktlint") version (extra["ktlint-gradle.version"] as String)
         id("org.jetbrains.kotlinx.kover") version (extra["kover.version"] as String)
         id("org.owasp.dependencycheck") version (extra["owasp-dependency-check.version"] as String)
-        id("org.octopusden.octopus-quality") version (extra["octopus-quality.version"] as String)
+        id("org.octopusden.octopus-quality") version (extra["octopusQualityVersion"] as String)
         id("org.sonarqube") version (extra["sonarqube.version"] as String)
     }
     repositories {
