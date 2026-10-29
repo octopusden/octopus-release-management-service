@@ -109,8 +109,12 @@ dependencyManagement {
 dependencies {
     implementation(project(":common"))
     implementation(project(":legacy-releng-client"))
-    implementation("org.octopusden.octopus.infrastructure:components-registry-service-client:${properties["octopusComponentsRegistryVersion"]}")
-    implementation("org.octopusden.octopus.octopus-external-systems-clients:jira-client:${properties["octopusExternalSystemsVersion"]}")
+    implementation(
+        "org.octopusden.octopus.infrastructure:components-registry-service-client:${properties["octopusComponentsRegistryVersion"]}",
+    )
+    implementation(
+        "org.octopusden.octopus.octopus-external-systems-clients:jira-client:${properties["octopusExternalSystemsVersion"]}",
+    )
     implementation("com.atlassian.jira:jira-rest-java-client-core:${properties["jira-rest-client.version"]}")
     implementation("com.atlassian.jira:jira-rest-java-client-api:${properties["jira-rest-client.version"]}")
     implementation("io.atlassian.fugue:fugue:${properties["fugue.version"]}")
